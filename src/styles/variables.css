@@ -10,25 +10,34 @@
   --color-bg-card-hover: #1F3148;
   --color-bg-surface: #FFFFFF;
   --color-bg-input: #0D1826;
+  --color-bg-hero: #030d1a;
+  --color-bg-mission: #f5f0e8;
+  --color-bg-services: #0f3460;
+  --color-bg-footer: #0c1c2e;
 
   /* ── Accent Colors ── */
-  --color-accent-green: #15803D;
-  --color-accent-green-hover: #166534;
+  --color-accent-green: #006a4e;
+  --color-accent-green-hover: #005a42;
   --color-accent-teal: #0D9488;
   --color-accent-teal-light: rgba(13, 148, 136, 0.15);
+  --color-amber: #f59e0b;
 
   /* ── Text Colors ── */
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #94A3B8;
   --color-text-muted: #64748B;
-  --color-text-dark: #1E293B;
+  --color-text-dark: #1a1a2e;
+  --color-text-dark-muted: rgba(26, 26, 46, 0.44);
   --color-text-link: #38BDF8;
   --color-text-link-hover: #7DD3FC;
+  --color-text-hero-sub: #cad5e2;
+  --color-text-overlay: #62748e;
 
   /* ── Alert Severity Colors ── */
   --color-critical: #DC2626;
   --color-critical-bg: rgba(220, 38, 38, 0.12);
   --color-critical-border: rgba(220, 38, 38, 0.3);
+  --color-critical-solid: #b91c1c;
   --color-high: #EA580C;
   --color-high-bg: rgba(234, 88, 12, 0.12);
   --color-high-border: rgba(234, 88, 12, 0.3);
@@ -52,13 +61,19 @@
   --color-info: #3B82F6;
   --color-info-bg: rgba(59, 130, 246, 0.15);
 
+  /* ── Service Card Colors ── */
+  --color-service-blue: #0069a8;
+  --color-service-orange: #bb4d00;
+  --color-service-teal: #006a4e;
+  --color-service-red: #c10007;
+
   /* ── Border Colors ── */
   --color-border: #2A3544;
   --color-border-light: #334155;
   --color-border-input: #3B4D63;
 
   /* ── Typography ── */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 
   --font-size-xs: 0.75rem;     /* 12px */
@@ -77,8 +92,9 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
+  --font-weight-black: 900;
 
-  --line-height-tight: 1.2;
+  --line-height-tight: 1.08;
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.75;
 
@@ -112,7 +128,7 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -4px rgba(0, 0, 0, 0.1);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
 
   /* ── Transitions ── */
