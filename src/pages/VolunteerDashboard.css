@@ -1,0 +1,64 @@
+.vol-dashboard-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: var(--space-12);
+}
+
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-primary);
+  border: 2px solid var(--color-accent-teal);
+  color: var(--color-accent-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-extrabold);
+}
+
+.vol-name {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+}
+
+.vol-code-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.vol-stats-counters .counter-box {
+  text-align: center;
+}
+
+.c-num {
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.c-lbl {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+.current-assignment-card {
+  background-color: #0c2035 !important;
+  border-color: var(--color-accent-teal) !important;
+}
+
+.section-tag-light {
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-teal);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.assign-title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+}
+
+.open-title {
+  font-size: var(--font-size-md);
+}

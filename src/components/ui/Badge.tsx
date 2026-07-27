@@ -7,6 +7,7 @@ export type BadgeVariant =
   | ShelterStatus
   | RouteStatus
   | VerificationStatus
+  | 'Govt Verified'
   | 'default'
   | 'success'
   | 'warning'

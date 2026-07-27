@@ -1,0 +1,57 @@
+.volunteer-landing-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: var(--space-12);
+}
+
+.vol-hero-card {
+  background-color: var(--color-bg-card) !important;
+  border-color: var(--color-accent-teal) !important;
+}
+
+.vol-hero-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent-teal-light);
+  color: var(--color-accent-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.v-stat-box {
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.v-num {
+  font-size: 1.75rem;
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-text-primary);
+}
+
+.v-lbl {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+.help-type-item {
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+}
+
+.help-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

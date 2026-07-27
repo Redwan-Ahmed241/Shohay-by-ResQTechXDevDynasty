@@ -1,0 +1,93 @@
+.command-center-page {
+  padding-bottom: var(--space-12);
+}
+
+.cc-stat-box {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+}
+
+.stat-red { border-color: rgba(220, 38, 38, 0.3); background-color: rgba(220, 38, 38, 0.08); }
+.stat-blue { border-color: rgba(37, 99, 235, 0.3); background-color: rgba(37, 99, 235, 0.08); }
+.stat-green { border-color: rgba(22, 163, 74, 0.3); background-color: rgba(22, 163, 74, 0.08); }
+.stat-purple { border-color: rgba(147, 51, 234, 0.3); background-color: rgba(147, 51, 234, 0.08); }
+
+.cc-lbl {
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+.cc-val {
+  font-size: 2rem;
+  font-weight: var(--font-weight-extrabold);
+  line-height: 1.1;
+  color: var(--color-text-primary);
+  margin: 0.2rem 0;
+}
+
+.cc-sub {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+.cc-substat-box {
+  text-align: center;
+  padding: var(--space-3);
+}
+
+.sub-val {
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.sub-lbl {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+}
+
+.cc-tabs {
+  padding-bottom: 0.5rem;
+}
+
+.cc-tab-btn {
+  padding: 0.4rem 1rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.cc-tab-btn.active {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-card-hover);
+  border: 1px solid var(--color-border);
+}
+
+.chart-card h3 {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+.info-list-card h4 {
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}

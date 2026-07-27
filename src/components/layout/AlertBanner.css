@@ -1,0 +1,88 @@
+.alert-banner {
+  background-color: #b91c1c;
+  color: #ffffff;
+  padding: 0.45rem 0;
+  font-size: var(--font-size-xs);
+}
+
+.banner-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.banner-badge {
+  background-color: #7f1d1d;
+  color: #fca5a5;
+  font-weight: var(--font-weight-extrabold);
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.banner-icon {
+  color: #fef08a;
+  flex-shrink: 0;
+}
+
+.banner-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.banner-btn-secondary {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+.banner-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.banner-btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+  background-color: #ffffff;
+  color: #b91c1c;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+.banner-btn-primary:hover {
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+@media (max-width: 768px) {
+  .banner-actions {
+    display: none;
+  }
+}

@@ -1,0 +1,41 @@
+.campaigns-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: var(--space-12);
+}
+
+.campaign-stats-bar .box-purple {
+  border-color: rgba(147, 51, 234, 0.3);
+  background-color: rgba(147, 51, 234, 0.08);
+}
+.campaign-stats-bar .box-purple .summary-num {
+  color: #c084fc;
+}
+
+.campaign-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.campaign-title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.campaign-org {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: 0.2rem;
+}
+
+.households-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.donate-link {
+  color: var(--color-accent-teal) !important;
+  font-weight: var(--font-weight-bold) !important;
+}

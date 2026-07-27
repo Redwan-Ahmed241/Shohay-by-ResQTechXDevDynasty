@@ -11,7 +11,7 @@ export const MOCK_CAMPAIGNS: ReliefCampaign[] = [
     raisedAmount: 3240000,
     householdsTarget: 5000,
     householdsReached: 2840,
-    verificationStatus: 'Govt Verified'
+    verificationStatus: 'Government Verified'
   },
   {
     id: 'camp-2',
@@ -35,6 +35,6 @@ export const MOCK_CAMPAIGNS: ReliefCampaign[] = [
     raisedAmount: 890000,
     householdsTarget: 4000,
     householdsReached: 120,
-    verificationStatus: 'Govt Verified'
+    verificationStatus: 'Government Verified'
   }
 ];
