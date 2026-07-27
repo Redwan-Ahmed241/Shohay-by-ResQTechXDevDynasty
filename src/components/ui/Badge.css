@@ -1,0 +1,49 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── Severity & Status Badges ── */
+.badge-critical {
+  background-color: var(--color-critical-bg);
+  color: #f87171;
+  border: 1px solid var(--color-critical-border);
+}
+
+.badge-high {
+  background-color: var(--color-high-bg);
+  color: #fb923c;
+  border: 1px solid var(--color-high-border);
+}
+
+.badge-medium {
+  background-color: var(--color-medium-bg);
+  color: #facc15;
+  border: 1px solid var(--color-medium-border);
+}
+
+.badge-low {
+  background-color: var(--color-allclear-bg);
+  color: #4ade80;
+  border: 1px solid var(--color-allclear-border);
+}
+
+.badge-allclear {
+  background-color: rgba(148, 163, 184, 0.12);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.badge-default {
+  background-color: var(--color-bg-card-hover);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}

@@ -1,0 +1,75 @@
+.stat-card {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-accent-teal);
+}
+
+.stat-value {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-extrabold);
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+.stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin-top: 0.25rem;
+}
+
+.stat-sublabel {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Variants ── */
+.stat-critical {
+  border-color: var(--color-critical-border);
+  background-color: var(--color-critical-bg);
+}
+.stat-critical .stat-value {
+  color: #f87171;
+}
+
+.stat-warning {
+  border-color: var(--color-medium-border);
+  background-color: var(--color-medium-bg);
+}
+.stat-warning .stat-value {
+  color: #facc15;
+}
+
+.stat-success {
+  border-color: var(--color-allclear-border);
+  background-color: var(--color-allclear-bg);
+}
+.stat-success .stat-value {
+  color: #4ade80;
+}
+
+.stat-info {
+  border-color: var(--color-low-border);
+  background-color: var(--color-low-bg);
+}
+.stat-info .stat-value {
+  color: #60a5fa;
+}

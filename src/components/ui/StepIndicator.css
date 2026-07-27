@@ -1,0 +1,80 @@
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-6);
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: default;
+}
+
+.step-item.step-completed {
+  cursor: pointer;
+}
+
+.step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-input);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.step-active .step-circle {
+  border-color: var(--color-accent-teal);
+  background-color: var(--color-bg-primary);
+  color: var(--color-accent-teal);
+  box-shadow: 0 0 8px var(--color-accent-teal-light);
+}
+
+.step-completed .step-circle {
+  border-color: var(--color-accent-green);
+  background-color: var(--color-accent-green);
+  color: #ffffff;
+}
+
+.step-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+.step-active .step-label {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.step-completed .step-label {
+  color: var(--color-text-secondary);
+}
+
+.step-connector {
+  flex: 1;
+  height: 2px;
+  background-color: var(--color-border);
+  margin: 0 0.5rem;
+  transition: background-color var(--transition-fast);
+}
+
+.connector-active {
+  background-color: var(--color-accent-green);
+}
+
+@media (max-width: 600px) {
+  .step-label {
+    display: none;
+  }
+}

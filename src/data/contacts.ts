@@ -1,0 +1,152 @@
+import { EmergencyContact } from '../types';
+
+export const MOCK_CONTACTS: EmergencyContact[] = [
+  {
+    id: 'contact-1',
+    title: 'National Emergency Service',
+    category: 'National Emergency',
+    phone: '999 (DEMO)',
+    description: 'National emergency hotline for police, fire, ambulance',
+    availability: '24/7',
+    isTollFree: true,
+    isVerified: true,
+    notes: 'Demo — not a real emergency line',
+    lastVerified: '2024-07-01'
+  },
+  {
+    id: 'contact-2',
+    title: 'Fire Service & Civil Defence',
+    category: 'Fire Service',
+    phone: '102 (DEMO)',
+    description: 'Fire rescue, water rescue and civil defence',
+    availability: '24/7',
+    isTollFree: true,
+    isVerified: true,
+    notes: 'Demo number',
+    lastVerified: '2024-07-01'
+  },
+  {
+    id: 'contact-3',
+    title: 'Ambulance Service',
+    category: 'Medical',
+    phone: '199 (DEMO)',
+    description: 'Emergency medical response and transport',
+    availability: '24/7',
+    isTollFree: true,
+    isVerified: true,
+    notes: 'Demo number',
+    lastVerified: '2024-07-01'
+  },
+  {
+    id: 'contact-4',
+    title: 'DDM National Helpline',
+    category: 'Disaster Management',
+    phone: '01XX-DDMHOT (DEMO)',
+    description: 'Department of Disaster Management central line',
+    availability: '24/7',
+    isTollFree: false,
+    isVerified: true,
+    lastVerified: '2024-07-10'
+  },
+  {
+    id: 'contact-5',
+    title: 'Sunamganj District Control Room',
+    category: 'District Control Room',
+    district: 'Sunamganj',
+    phone: '01XX-DEMO280',
+    description: 'Sunamganj District Commissioner control room',
+    availability: '24/7',
+    isTollFree: false,
+    isVerified: true,
+    notes: 'DCMR only',
+    lastVerified: '2024-07-14'
+  },
+  {
+    id: 'contact-6',
+    title: 'Sirajganj District Control Room',
+    category: 'District Control Room',
+    district: 'Sirajganj',
+    phone: '01XX-DEMO281',
+    description: 'Sirajganj District Commissioner control room',
+    availability: '24/7',
+    isTollFree: false,
+    isVerified: true,
+    notes: 'DCMR only',
+    lastVerified: '2024-07-14'
+  },
+  {
+    id: 'contact-7',
+    title: 'Kurigram District Control Room',
+    category: 'District Control Room',
+    district: 'Kurigram',
+    phone: '01XX-DEMO282',
+    description: 'Kurigram District Commissioner control room',
+    availability: '24/7',
+    isTollFree: false,
+    isVerified: true,
+    notes: 'DCMR only',
+    lastVerified: '2024-07-14'
+  },
+  {
+    id: 'contact-8',
+    title: 'Feni District Control Room',
+    category: 'District Control Room',
+    district: 'Feni',
+    phone: '01XX-DEMO283',
+    description: 'Feni District Commissioner control room',
+    availability: '24/7',
+    isTollFree: false,
+    isVerified: true,
+    notes: 'DCMR only',
+    lastVerified: '2024-07-14'
+  },
+  {
+    id: 'contact-9',
+    title: 'Women & Child Protection Helpline',
+    category: 'Protection',
+    phone: '109 (DEMO)',
+    description: 'Support for vulnerable women and children',
+    availability: '24/7',
+    isTollFree: true,
+    isVerified: true,
+    notes: 'Demo — confidential',
+    lastVerified: '2024-07-01'
+  },
+  {
+    id: 'contact-10',
+    title: 'SHOHOY Emergency Helpline',
+    category: 'Platform Hotline',
+    phone: '01XX-SHOHOY (DEMO)',
+    description: 'Platform assistance and request tracking support',
+    availability: '24/7',
+    isTollFree: false,
+    isVerified: true,
+    notes: 'Demo platform helpline',
+    lastVerified: '2024-07-15'
+  },
+  {
+    id: 'contact-11',
+    title: 'Rescue Boat — Sunamganj',
+    category: 'Rescue',
+    district: 'Sunamganj',
+    phone: '01XX-DEMO401',
+    description: 'Local emergency boat dispatch for Sunamganj',
+    availability: 'Emergency only',
+    isTollFree: false,
+    isVerified: true,
+    notes: 'Emergency use only',
+    lastVerified: '2024-07-15'
+  },
+  {
+    id: 'contact-12',
+    title: 'Sunamganj Sadar Hospital',
+    category: 'Hospital',
+    district: 'Sunamganj',
+    phone: '01XX-DEMO300',
+    description: '24/7 emergency unit and doctors on call',
+    availability: '24/7',
+    isTollFree: false,
+    isVerified: true,
+    lastVerified: '2024-07-02'
+  }
+];

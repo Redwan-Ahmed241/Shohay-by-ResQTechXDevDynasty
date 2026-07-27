@@ -1,0 +1,211 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  background-color: #0c1524;
+  border-bottom: 1px solid var(--color-border);
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Brand ── */
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-accent-teal-light);
+  color: var(--color-accent-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.brand-sub {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  line-height: 1;
+  margin-top: 2px;
+}
+
+/* ── Nav Links ── */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.nav-link {
+  padding: 0.4rem 0.75rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.nav-link:hover {
+  color: var(--color-text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+  color: #ffffff;
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+}
+
+.nav-special {
+  color: var(--color-accent-teal);
+  border: 1px dashed var(--color-accent-teal);
+}
+
+/* ── Right Actions ── */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.lang-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  font-size: var(--font-size-xs);
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+}
+
+.lang-toggle-btn:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.btn-signin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  font-size: var(--font-size-xs);
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+
+}
+
+.btn-signin:hover {
+  background-color: var(--color-bg-card-hover);
+  color: #ffffff;
+}
+
+/* ── Role Switcher ── */
+.role-switcher-wrapper {
+  position: relative;
+}
+
+.role-switcher-btn {
+  padding: 0.35rem 0.5rem;
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent-teal);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.role-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  width: 240px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-dropdown);
+}
+
+.dropdown-header {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  padding: 0.25rem 0.5rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.dropdown-item {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.dropdown-item:hover, .dropdown-item.active {
+  background-color: var(--color-bg-card-hover);
+  color: var(--color-text-primary);
+}
+
+/* ── Mobile ── */
+.mobile-menu-btn {
+  display: none;
+  color: var(--color-text-primary);
+}
+
+.mobile-nav-drawer {
+  position: absolute;
+  top: 56px;
+  left: 0;
+  right: 0;
+  background-color: #0c1524;
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mobile-nav-drawer a {
+  padding: 0.5rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 900px) {
+  .mobile-menu-btn {
+    display: flex;
+  }
+}
