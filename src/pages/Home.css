@@ -6,6 +6,7 @@
 .home-page {
   display: flex;
   flex-direction: column;
+  margin-top: calc(-1 * var(--space-6)); /* cancel the page-content top padding */
 }
 
 /* ────────────────────────────

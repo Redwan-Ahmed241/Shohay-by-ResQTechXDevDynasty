@@ -116,6 +116,7 @@ p {
 .page-content {
   flex: 1;
   padding: var(--space-6) 0;
+  background-color: #0d2137;
 }
 
 /* ── Flex ── */

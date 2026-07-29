@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Globe, Menu, Radio, Shield, Layers3, ChevronDown, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
@@ -17,11 +17,20 @@ export const Header: React.FC = () => {
   const location = useLocation();
   const { toggleLanguage } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <header className="header">
+    <header className={`header${scrolled ? ' header-scrolled' : ''}`}>
       <div className="container header-container">
         <Link to="/" className="header-brand" onClick={() => setMobileMenuOpen(false)}>
           <div className="brand-icon">
@@ -33,7 +42,7 @@ export const Header: React.FC = () => {
           </div>
         </Link>
 
-        <nav className="header-nav hide-mobile">
+        <nav className={`header-nav${scrolled ? ' nav-centered' : ''}`}>
           {navigationItems.map((item) => (
             <Link key={item.path} to={item.path} className={`nav-link ${isActive(item.path) ? 'active' : ''}`}>
               {item.label}
