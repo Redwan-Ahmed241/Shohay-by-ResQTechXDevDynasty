@@ -25,6 +25,7 @@ import {
   HelpCircle,
   Hand,
 } from 'lucide-react';
+import { PageLayout } from '../components/layout/PageLayout';
 import { requestService } from '../services/requestService';
 import { MOCK_ALERTS } from '../data/alerts';
 import './Home.css';
@@ -62,10 +63,12 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="home-page">
-      {/* ═══════════════════════════════════════
-         1. ALERT BANNER (Red)
-         ═══════════════════════════════════════ */}
+    <PageLayout showAlertBanner={false}>
+      <div className="home-page">
+        {/* ═══════════════════════════════════════
+           1. ALERT BANNER (Red)
+           ═══════════════════════════════════════ */}
+
       <div className="alert-banner-home">
         <div className="alert-banner-icon">
           <AlertTriangle />
@@ -605,5 +608,7 @@ export const Home: React.FC = () => {
         </div>
       </section>
     </div>
+    </PageLayout>
   );
 };
+
