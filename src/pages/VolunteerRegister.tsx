@@ -21,7 +21,7 @@ export const VolunteerRegister: React.FC = () => {
     firstName: 'Demo',
     lastName: 'Volunteer',
     mobile: '01712345678',
-    email: 'volunteer@shohoy.gov.bd',
+    email: 'volunteer@shohay.gov.bd',
     district: 'Sunamganj',
     skills: {
       boatRescue: true,
@@ -58,7 +58,7 @@ export const VolunteerRegister: React.FC = () => {
               <div className="submission-success text-center flex flex-col items-center gap-4 py-8 animate-fade-in">
                 <CheckCircle size={56} className="text-success" />
                 <h2>Registration Complete!</h2>
-                <p>Welcome to the SHOHOY volunteer network. Your ID is <strong>VOL-2024-DEMO</strong>.</p>
+                <p>Welcome to the SHOHAY volunteer network. Your ID is <strong>VOL-2024-DEMO</strong>.</p>
                 <Button variant="primary" className="mt-4" onClick={() => navigate('/volunteer/dashboard')}>
                   Go to Volunteer Dashboard
                 </Button>

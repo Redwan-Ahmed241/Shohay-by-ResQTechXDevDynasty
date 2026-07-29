@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   SHOHOY — TypeScript Domain Types & Data Models
+  SHOHAY — TypeScript Domain Types & Data Models
    ═══════════════════════════════════════════════════════════ */
 
 export type SeverityLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'ALL CLEAR';

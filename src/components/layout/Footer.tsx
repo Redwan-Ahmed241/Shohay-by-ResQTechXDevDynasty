@@ -15,7 +15,7 @@ export const Footer: React.FC = () => {
                 <Radio size={16} />
               </div>
               <div className="logo-text-wrapper">
-                <div className="logo-title">SHOHOY / সহায়</div>
+                <div className="logo-title">SHOHAY / সহায়</div>
                 <div className="logo-sub">Bangladesh Flood Relief Platform</div>
               </div>
             </div>
@@ -51,7 +51,7 @@ export const Footer: React.FC = () => {
 
         {/* Footer Bottom Disclaimer */}
         <div className="footer-bottom">
-          <span>SHOHOY / সহায় — Prototype Platform for Bangladesh Flood Relief Coordination</span>
+          <span>SHOHAY / সহায় — Prototype Platform for Bangladesh Flood Relief Coordination</span>
           <span>All data shown is placeholder content for demonstration purposes</span>
         </div>
       </div>

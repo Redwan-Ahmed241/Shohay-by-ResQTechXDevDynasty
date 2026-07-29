@@ -52,7 +52,7 @@ export const SignIn: React.FC = () => {
             <div className="visual-content">
               <div className="brand-logo-white flex items-center gap-2 mb-4">
                 <Shield size={24} />
-                <span>SHOHOY / সহায়</span>
+                <span>SHOHAY / সহায়</span>
               </div>
               <h2>Coordinating relief where it matters most.</h2>
               <p>Sign in to manage shelters, track inventory, coordinate volunteers, and oversee district relief operations.</p>
@@ -145,7 +145,7 @@ export const SignIn: React.FC = () => {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@shohoy.gov.bd"
+                      placeholder="admin@shohay.gov.bd"
                     />
                   )}
 

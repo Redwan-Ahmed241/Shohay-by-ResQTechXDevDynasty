@@ -114,9 +114,9 @@ export const MOCK_CONTACTS: EmergencyContact[] = [
   },
   {
     id: 'contact-10',
-    title: 'SHOHOY Emergency Helpline',
+    title: 'SHOHAY Emergency Helpline',
     category: 'Platform Hotline',
-    phone: '01XX-SHOHOY (DEMO)',
+    phone: '01XX-SHOHAY (DEMO)',
     description: 'Platform assistance and request tracking support',
     availability: '24/7',
     isTollFree: false,

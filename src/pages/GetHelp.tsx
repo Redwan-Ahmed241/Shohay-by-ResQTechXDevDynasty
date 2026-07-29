@@ -116,7 +116,7 @@ export const GetHelp: React.FC = () => {
               <div className="submission-success text-center flex flex-col items-center gap-4 py-8 animate-fade-in">
                 <CheckCircle size={56} className="text-success" />
                 <h2>Assistance Request Submitted!</h2>
-                <p>Your request has been registered in the SHOHOY response network.</p>
+                <p>Your request has been registered in the SHOHAY response network.</p>
 
                 <div className="tracking-id-display mt-4">
                   <span className="id-label">YOUR TRACKING ID:</span>

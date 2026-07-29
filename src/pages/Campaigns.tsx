@@ -30,7 +30,7 @@ export const Campaigns: React.FC = () => {
         {/* Header Title */}
         <div className="page-header text-center mb-6">
           <h1>Relief Campaigns</h1>
-          <p>All campaigns are verified by SHOHOY before listing. Track fund usage transparently.</p>
+          <p>All campaigns are verified by SHOHAY before listing. Track fund usage transparently.</p>
         </div>
 
         {/* Top Summary Stats Bar */}

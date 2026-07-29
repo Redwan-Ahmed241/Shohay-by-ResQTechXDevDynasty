@@ -10,7 +10,7 @@ interface LanguageContextType {
 }
 
 const DICTIONARY: Record<string, Record<Language, string>> = {
-  appName: { en: 'SHOHOY', bn: 'সহায়' },
+  appName: { en: 'SHOHAY', bn: 'সহায়' },
   subTitle: { en: 'Bangladesh Flood Relief Platform', bn: 'বাংলাদেশ বন্যা সহায়তা প্ল্যাটফর্ম' },
   home: { en: 'Home', bn: 'হোম' },
   alerts: { en: 'Alerts', bn: 'সতর্কতা' },

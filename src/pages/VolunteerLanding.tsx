@@ -17,7 +17,7 @@ export const VolunteerLanding: React.FC = () => {
           <div className="vol-hero-icon">
             <Users size={32} />
           </div>
-          <h1>Volunteer with SHOHOY</h1>
+          <h1>Volunteer with SHOHAY</h1>
           <p className="max-w-md">Join thousands of volunteers coordinating flood relief across Bangladesh.</p>
 
           <div className="vol-stats-row grid-3 gap-6 my-4 w-full max-w-xl">

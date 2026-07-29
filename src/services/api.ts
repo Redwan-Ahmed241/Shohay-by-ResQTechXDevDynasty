@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   SHOHOY API Service Client — Mock / Real Layer
+  SHOHAY API Service Client — Mock / Real Layer
    ═══════════════════════════════════════════════════════════ */
 
 const MOCK_DELAY = 150; // Simulate network latency in ms

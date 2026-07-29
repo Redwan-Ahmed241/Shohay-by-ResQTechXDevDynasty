@@ -30,13 +30,15 @@ import { requestService } from '../services/requestService';
 import { MOCK_ALERTS } from '../data/alerts';
 import './Home.css';
 
-// Hero background image
-const HERO_BG = 'https://images.unsplash.com/photo-1578357078586-491adf1aa5ab?auto=format&fit=crop&w=1920&q=80';
-const MISSION_IMG = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1000&q=80';
-const NEWS_FEATURED_IMG = 'https://images.unsplash.com/photo-1578357078586-491adf1aa5ab?auto=format&fit=crop&w=1200&q=80';
-const NEWS_THUMB_1 = 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=300&q=80';
-const NEWS_THUMB_2 = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=300&q=80';
-const NEWS_THUMB_3 = 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=300&q=80';
+// Local image assets from public/
+const HERO_BG = '/photo-1741081038901-f258dd2f5a1c.jpg';
+const MISSION_IMG = '/photo-1528726164383-33c4a223b78c.jpg';
+const NEWS_FEATURED_IMG = '/photo-1728320771441-17a19df0fe4c.jpg';
+const NEWS_THUMB_1 = '/photo-1727475807090-f1c30f6c294f.jpg';
+const NEWS_THUMB_2 = '/photo-1617494532674-67d22df2addb.jpg';
+const NEWS_THUMB_3 = '/photo-1617494532490-297fc0eb515e.jpg';
+const HELP_IMAGE_1 = '/photo-1679027325489-deb056503de4.jpg';
+const HELP_IMAGE_2 = '/photo-1649134799042-ccca78a3f9bf.jpg';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -456,8 +458,37 @@ export const Home: React.FC = () => {
          ═══════════════════════════════════════ */}
       <section className="how-help-section">
         <div className="how-help-inner">
-          <div className="how-help-tag">There are many ways to help flood-affected families</div>
-          <h2 className="how-help-title">How You Can Help</h2>
+          <div className="how-help-copy">
+            <div className="how-help-tag">There are many ways to help flood-affected families</div>
+            <h2 className="how-help-title">How You Can Help</h2>
+            <p className="how-help-description">
+              Support rescue logistics, deliver relief supplies, and help families reach safe shelter through the most urgent response channels.
+            </p>
+            <div className="how-help-actions">
+              <Link to="/get-help" className="how-help-primary">Request Help</Link>
+              <Link to="/volunteer" className="how-help-secondary">Volunteer</Link>
+            </div>
+          </div>
+
+          <div className="help-gallery">
+            <div className="help-photo-card help-photo-card-large">
+              <img src={HELP_IMAGE_1} alt="Relief transport by boat" className="help-photo-img" />
+              <div className="help-photo-overlay" />
+              <div className="help-photo-caption">
+                <span className="help-photo-kicker">Relief Transport</span>
+                <span className="help-photo-title">Supplies moving into flooded communities</span>
+              </div>
+            </div>
+
+            <div className="help-photo-card help-photo-card-small">
+              <img src={HELP_IMAGE_2} alt="Flood response by local residents" className="help-photo-img" />
+              <div className="help-photo-overlay" />
+              <div className="help-photo-caption">
+                <span className="help-photo-kicker">Community Support</span>
+                <span className="help-photo-title">Local responders guiding families to safety</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
