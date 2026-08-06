@@ -15,12 +15,10 @@ import {
   Truck,
   HelpCircle,
   CheckCircle,
-  ArrowRight,
-  ArrowLeft
+  ChevronRight,
+  ChevronLeft
 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Checkbox } from '../components/ui/Checkbox';
 import { StepIndicator } from '../components/ui/StepIndicator';
@@ -64,20 +62,26 @@ export const GetHelp: React.FC = () => {
     { number: 5, label: 'Review' }
   ];
 
-  const assistanceOptionList: Array<{ id: AssistanceType; label: string; icon: React.ReactNode; priority?: boolean }> = [
-    { id: 'rescue', label: 'Rescue / Evacuation', icon: <Anchor size={24} />, priority: true },
-    { id: 'shelter', label: 'Shelter', icon: <HomeIcon size={24} /> },
-    { id: 'food', label: 'Food', icon: <Utensils size={24} /> },
-    { id: 'water', label: 'Safe Water', icon: <Droplets size={24} /> },
-    { id: 'medicine', label: 'Medicine / Medical Supply', icon: <Pill size={24} /> },
-    { id: 'medical_emergency', label: 'Medical Emergency', icon: <Activity size={24} />, priority: true },
-    { id: 'maternal', label: 'Maternal / Newborn Care', icon: <Heart size={24} />, priority: true },
-    { id: 'child_welfare', label: 'Child Welfare', icon: <Baby size={24} /> },
-    { id: 'disability', label: 'Disability Assistance', icon: <Accessibility size={24} /> },
-    { id: 'hygiene', label: 'Hygiene Supplies', icon: <Sparkles size={24} /> },
-    { id: 'missing_person', label: 'Missing Person', icon: <Search size={24} />, priority: true },
-    { id: 'evacuation', label: 'Evacuation Transport', icon: <Truck size={24} /> },
-    { id: 'other', label: 'Other / Multiple', icon: <HelpCircle size={24} /> }
+  const assistanceOptionList: Array<{
+    id: AssistanceType;
+    label: string;
+    icon: React.ReactNode;
+    iconColor: string;
+    priority?: boolean;
+  }> = [
+    { id: 'rescue', label: 'Rescue / Evacuation', icon: <Anchor size={22} />, iconColor: '#006a4e', priority: true },
+    { id: 'shelter', label: 'Shelter', icon: <HomeIcon size={22} />, iconColor: '#2563eb' },
+    { id: 'food', label: 'Food', icon: <Utensils size={22} />, iconColor: '#d97706' },
+    { id: 'water', label: 'Safe Water', icon: <Droplets size={22} />, iconColor: '#0284c7' },
+    { id: 'medicine', label: 'Medicine / Medical Supply', icon: <Pill size={22} />, iconColor: '#9333ea' },
+    { id: 'medical_emergency', label: 'Medical Emergency', icon: <Activity size={22} />, iconColor: '#dc2626', priority: true },
+    { id: 'maternal', label: 'Maternal / Newborn Care', icon: <Heart size={22} />, iconColor: '#e11d48', priority: true },
+    { id: 'child_welfare', label: 'Child Welfare', icon: <Baby size={22} />, iconColor: '#db2777' },
+    { id: 'disability', label: 'Disability Assistance', icon: <Accessibility size={22} />, iconColor: '#4f46e5' },
+    { id: 'hygiene', label: 'Hygiene Supplies', icon: <Sparkles size={22} />, iconColor: '#0d9488' },
+    { id: 'missing_person', label: 'Missing Person', icon: <Search size={22} />, iconColor: '#ea580c', priority: true },
+    { id: 'evacuation', label: 'Evacuation Transport', icon: <Truck size={22} />, iconColor: '#475569' },
+    { id: 'other', label: 'Other / Multiple', icon: <HelpCircle size={22} />, iconColor: '#64748b' }
   ];
 
   const toggleType = (typeId: AssistanceType) => {
@@ -101,22 +105,22 @@ export const GetHelp: React.FC = () => {
 
   return (
     <PageLayout showAlertBanner={false}>
-      <div className="container get-help-page">
-        <div className="page-header text-center mb-6">
-          <h1>Request Assistance</h1>
-          <p>No account needed. Anonymous if preferred.</p>
-        </div>
+      <div className="get-help-page-bg">
+        <div className="get-help-container">
+          <div className="page-header text-center">
+            <h1 className="get-help-title">Request Assistance</h1>
+            <p className="get-help-subtitle">No account needed. Anonymous if preferred.</p>
+          </div>
 
-        <div className="form-card-container">
-          <Card className="wizard-card">
+          <div className="get-help-card">
             <StepIndicator steps={steps} currentStep={currentStep} onStepClick={(s) => setCurrentStep(s)} />
 
             {submittedId ? (
               /* Success Screen */
               <div className="submission-success text-center flex flex-col items-center gap-4 py-8 animate-fade-in">
-                <CheckCircle size={56} className="text-success" />
-                <h2>Assistance Request Submitted!</h2>
-                <p>Your request has been registered in the SHOHAY response network.</p>
+                <CheckCircle size={56} style={{ color: '#006a4e' }} />
+                <h2 className="success-heading">Assistance Request Submitted!</h2>
+                <p className="success-sub">Your request has been registered in the SHOHAY response network.</p>
 
                 <div className="tracking-id-display mt-4">
                   <span className="id-label">YOUR TRACKING ID:</span>
@@ -124,9 +128,9 @@ export const GetHelp: React.FC = () => {
                   <span className="id-hint">Save this ID to check rescue or relief status on the homepage.</span>
                 </div>
 
-                <Button variant="primary" className="mt-6" onClick={() => navigate('/')}>
+                <button className="get-help-btn-primary mt-6" onClick={() => navigate('/')}>
                   Return to Home
-                </Button>
+                </button>
               </div>
             ) : (
               <>
@@ -135,7 +139,7 @@ export const GetHelp: React.FC = () => {
                   <div className="step-content animate-fade-in">
                     <h3 className="step-heading">What do you need?</h3>
 
-                    <div className="types-grid grid-3 gap-4 mt-4">
+                    <div className="types-grid">
                       {assistanceOptionList.map((opt) => {
                         const selected = selectedTypes.includes(opt.id);
                         return (
@@ -144,9 +148,13 @@ export const GetHelp: React.FC = () => {
                             className={`type-card ${selected ? 'selected' : ''}`}
                             onClick={() => toggleType(opt.id)}
                           >
-                            <div className="type-icon">{opt.icon}</div>
-                            <div className="type-label">{opt.label}</div>
-                            {opt.priority && <span className="priority-pill">Priority</span>}
+                            <div className="type-icon-wrapper" style={{ color: opt.iconColor }}>
+                              {opt.icon}
+                            </div>
+                            <div className="type-card-text">
+                              <span className="type-label">{opt.label}</span>
+                              {opt.priority && <span className="priority-text">Priority</span>}
+                            </div>
                           </div>
                         );
                       })}
@@ -288,28 +296,30 @@ export const GetHelp: React.FC = () => {
                 )}
 
                 {/* Navigation Buttons Footer */}
-                <div className="wizard-actions flex justify-between items-center mt-8">
+                <div className="wizard-actions">
                   {currentStep > 1 ? (
-                    <Button variant="outline" onClick={() => setCurrentStep(currentStep - 1)}>
-                      <ArrowLeft size={14} /> Back
-                    </Button>
+                    <button className="get-help-btn-outline" onClick={() => setCurrentStep(currentStep - 1)}>
+                      <ChevronLeft size={16} /> Back
+                    </button>
                   ) : (
-                    <div />
+                    <button className="get-help-btn-outline disabled" disabled>
+                      <ChevronLeft size={16} /> Back
+                    </button>
                   )}
 
                   {currentStep < 5 ? (
-                    <Button variant="primary" onClick={() => setCurrentStep(currentStep + 1)}>
-                      Next <ArrowRight size={14} />
-                    </Button>
+                    <button className="get-help-btn-primary" onClick={() => setCurrentStep(currentStep + 1)}>
+                      Next <ChevronRight size={16} />
+                    </button>
                   ) : (
-                    <Button variant="success" onClick={handleSubmit}>
+                    <button className="get-help-btn-success" onClick={handleSubmit}>
                       Submit Assistance Request
-                    </Button>
+                    </button>
                   )}
                 </div>
               </>
             )}
-          </Card>
+          </div>
         </div>
       </div>
     </PageLayout>

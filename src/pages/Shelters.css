@@ -1,120 +1,370 @@
-.shelters-page {
-  padding-bottom: var(--space-12);
+.shelters-page-bg {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 120px);
+  padding: 32px 16px 80px 16px;
+  width: 100%;
 }
 
-.shelter-stats-bar {
-  margin-bottom: var(--space-6);
+.shelters-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Top Summary Stats Bar matching Figma */
+.shelter-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .summary-stat-box {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 24px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.box-green { border-color: rgba(22, 163, 74, 0.3); background-color: rgba(22, 163, 74, 0.08); }
-.box-green .summary-num { color: #4ade80; }
+.box-green {
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+.box-green .summary-num {
+  color: #10b981;
+}
+.box-green .summary-lbl {
+  color: #047857;
+}
 
-.box-yellow { border-color: rgba(234, 88, 12, 0.3); background-color: rgba(234, 88, 12, 0.08); }
-.box-yellow .summary-num { color: #fb923c; }
+.box-amber {
+  background-color: #fffbeb;
+  border-color: #fef3c7;
+}
+.box-amber .summary-num {
+  color: #d97706;
+}
+.box-amber .summary-lbl {
+  color: #b45309;
+}
 
-.box-blue { border-color: rgba(37, 99, 235, 0.3); background-color: rgba(37, 99, 235, 0.08); }
-.box-blue .summary-num { color: #60a5fa; }
+.box-blue {
+  background-color: #eff6ff;
+  border-color: #dbeafe;
+}
+.box-blue .summary-num {
+  color: #2563eb;
+}
+.box-blue .summary-lbl {
+  color: #1d4ed8;
+}
 
 .summary-num {
-  font-size: 2.25rem;
-  font-weight: var(--font-weight-extrabold);
-  line-height: 1;
+  font-family: var(--font-family);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 4px;
 }
 
 .summary-lbl {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-top: 0.25rem;
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 500;
 }
 
-.shelters-layout {
+/* Main Layout */
+.shelters-content-layout {
   display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: var(--space-6);
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+}
+
+/* Left Filter Sidebar */
+.shelters-sidebar {
+  display: flex;
+  flex-direction: column;
 }
 
 .filter-card {
-  position: sticky;
-  top: 76px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.filter-title {
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .filter-label {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .f-chip {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.72rem;
-  background-color: var(--color-bg-input);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
+  padding: 4px 10px;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  color: #475569;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.f-chip:hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
 }
 
 .f-chip.active {
-  background-color: var(--color-accent-teal-light);
-  color: var(--color-accent-teal);
-  border-color: var(--color-accent-teal);
+  background-color: #0f3460;
+  color: #ffffff;
+  border-color: #0f3460;
+}
+
+.amenities-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Right Main List */
+.shelters-main-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .results-count-text {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 4px;
 }
 
-.shelter-card {
+.shelter-cards-stack {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 12px;
 }
 
-.shelter-name {
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
+.shelter-item-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
-.shelter-address {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
-.icon-pill {
+.shelter-title {
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.shelter-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.map-icon {
+  color: #94a3b8;
+}
+
+.shelter-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Status Badges */
+.badge-status {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-open {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.badge-nearly-full {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.badge-full {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.badge-unverified {
+  background-color: #ffedd5;
+  color: #c2410c;
+}
+
+/* Route Badges */
+.badge-route {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.route-caution {
+  border-color: #fef08a;
+  color: #a16207;
+  background-color: #fefce8;
+}
+
+.route-blocked {
+  border-color: #fca5a5;
+  color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.route-ok {
+  border-color: #a7f3d0;
+  color: #059669;
+  background-color: #ecfdf5;
+}
+
+.card-category-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+  margin-bottom: 8px;
+}
+
+.category-text {
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* Occupancy Section */
+.occupancy-container {
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.occupancy-text-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-family);
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.capacity-num {
+  color: #475569;
+}
+
+.capacity-pct {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background-color: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Amenity Icons Row */
+.amenities-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.amenity-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-box {
   width: 28px;
   height: 28px;
-  border-radius: var(--radius-sm);
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-secondary);
+  color: #64748b;
 }
 
-.icon-more {
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
-  display: flex;
-  align-items: center;
-}
-
-.category-tag-text {
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
+.more-count {
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 @media (max-width: 900px) {
-  .shelters-layout {
+  .shelters-content-layout {
+    grid-template-columns: 1fr;
+  }
+  .shelter-stats-grid {
     grid-template-columns: 1fr;
   }
 }
