@@ -10,11 +10,8 @@ import {
   BarChart,
   Bar
 } from 'recharts';
-import { AlertTriangle, Users, Home, Box, Clock, CheckCircle } from 'lucide-react';
+import { AlertTriangle, Users, Home, Box } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { Card } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
 import './CommandCenter.css';
 
 export const CommandCenter: React.FC = () => {
@@ -41,192 +38,185 @@ export const CommandCenter: React.FC = () => {
 
   return (
     <PageLayout showAlertBanner={false}>
-      <div className="container command-center-page">
-        {/* Header Title + Status */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1>Command Center</h1>
-            <p className="text-xs text-muted">Administrator Dashboard — Shelter, Warehouse &amp; Operations</p>
+      <div className="cc-page-bg">
+        <div className="cc-container">
+          {/* Top Header Row */}
+          <div className="cc-header-row">
+            <div>
+              <h1 className="cc-title">Command Center</h1>
+              <p className="cc-subtitle">Administrator Dashboard — Shelter, Warehouse &amp; Operations</p>
+            </div>
+            <span className="cc-ops-active-pill">■ Operations Active</span>
           </div>
-          <Badge variant="LOW" pulse>
-            ● Operations Active
-          </Badge>
-        </div>
 
-        {/* 4 Primary Stat Cards */}
-        <div className="grid-4 gap-4 mb-4">
-          <Card className="cc-stat-box stat-red">
-            <div className="flex justify-between items-start">
-              <div>
-                <span className="cc-lbl">OPEN REQUESTS</span>
-                <div className="cc-val">142</div>
-                <div className="cc-sub">18 critical</div>
+          {/* 4 Primary Stat Cards Grid */}
+          <div className="cc-top-stats-grid">
+            <div className="cc-stat-card card-red">
+              <div className="cc-stat-info">
+                <span className="cc-stat-label label-red">OPEN REQUESTS</span>
+                <div className="cc-stat-value text-red">142</div>
+                <div className="cc-stat-sub text-red">18 critical</div>
               </div>
-              <AlertTriangle size={20} className="text-danger" />
+              <AlertTriangle size={24} className="icon-red" />
             </div>
-          </Card>
 
-          <Card className="cc-stat-box stat-blue">
-            <div className="flex justify-between items-start">
-              <div>
-                <span className="cc-lbl">ACTIVE VOLUNTEERS</span>
-                <div className="cc-val">89</div>
-                <div className="cc-sub">12 rescue teams</div>
+            <div className="cc-stat-card card-blue">
+              <div className="cc-stat-info">
+                <span className="cc-stat-label label-blue">ACTIVE VOLUNTEERS</span>
+                <div className="cc-stat-value text-blue">89</div>
+                <div className="cc-stat-sub text-blue">12 rescue teams</div>
               </div>
-              <Users size={20} className="text-info" />
+              <Users size={24} className="icon-blue" />
             </div>
-          </Card>
 
-          <Card className="cc-stat-box stat-green">
-            <div className="flex justify-between items-start">
-              <div>
-                <span className="cc-lbl">SHELTER OCCUPANCY</span>
-                <div className="cc-val">3,599/5,800</div>
-                <div className="cc-sub">1 nearly full</div>
+            <div className="cc-stat-card card-green">
+              <div className="cc-stat-info">
+                <span className="cc-stat-label label-green">SHELTER OCCUPANCY</span>
+                <div className="cc-stat-value text-green">3,599/5,800</div>
+                <div className="cc-stat-sub text-green">1 nearly full</div>
               </div>
-              <Home size={20} className="text-success" />
+              <Home size={24} className="icon-green" />
             </div>
-          </Card>
 
-          <Card className="cc-stat-box stat-purple">
-            <div className="flex justify-between items-start">
-              <div>
-                <span className="cc-lbl">HOUSEHOLDS REACHED</span>
-                <div className="cc-val">4,310</div>
-                <div className="cc-sub">8 today</div>
+            <div className="cc-stat-card card-purple">
+              <div className="cc-stat-info">
+                <span className="cc-stat-label label-purple">HOUSEHOLDS REACHED</span>
+                <div className="cc-stat-value text-purple">4,310</div>
+                <div className="cc-stat-sub text-purple">8 today</div>
               </div>
-              <Box size={20} className="text-purple-400" />
+              <Box size={24} className="icon-purple" />
             </div>
-          </Card>
-        </div>
+          </div>
 
-        {/* 4 Secondary Stat Cards */}
-        <div className="grid-4 gap-4 mb-6">
-          <Card className="cc-substat-box">
-            <div className="sub-val">34</div>
-            <div className="sub-lbl">Awaiting Verification</div>
-          </Card>
-          <Card className="cc-substat-box">
-            <div className="sub-val">47m</div>
-            <div className="sub-lbl">Avg Verify Time</div>
-          </Card>
-          <Card className="cc-substat-box">
-            <div className="sub-val text-warning">3</div>
-            <div className="sub-lbl">Low Stock Items</div>
-          </Card>
-          <Card className="cc-substat-box">
-            <div className="sub-val">7</div>
-            <div className="sub-lbl">Open Complaints</div>
-          </Card>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="cc-tabs flex gap-2 border-b mb-6">
-          <button
-            className={`cc-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overview')}
-          >
-            Overview
-          </button>
-          <button
-            className={`cc-tab-btn ${activeTab === 'requests' ? 'active' : ''}`}
-            onClick={() => setActiveTab('requests')}
-          >
-            Requests
-          </button>
-          <button
-            className={`cc-tab-btn ${activeTab === 'shelters' ? 'active' : ''}`}
-            onClick={() => setActiveTab('shelters')}
-          >
-            Shelters
-          </button>
-          <button
-            className={`cc-tab-btn ${activeTab === 'warehouse' ? 'active' : ''}`}
-            onClick={() => navigate('/admin/warehouse')}
-          >
-            Warehouse
-          </button>
-          <button
-            className={`cc-tab-btn ${activeTab === 'verify' ? 'active' : ''}`}
-            onClick={() => setActiveTab('verify')}
-          >
-            Verify Queue
-          </button>
-        </div>
-
-        {/* Charts Grid */}
-        <div className="grid-2 gap-6 mb-6">
-          {/* Chart 1: Request Trend */}
-          <Card className="chart-card">
-            <h3>REQUEST TREND (7 DAYS)</h3>
-            <div className="h-64 mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={requestTrendData}>
-                  <XAxis dataKey="date" stroke="#64748B" fontSize={12} />
-                  <YAxis stroke="#64748B" fontSize={12} />
-                  <Tooltip contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155' }} />
-                  <Line type="monotone" dataKey="submitted" stroke="#0D9488" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="resolved" stroke="#16A34A" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
+          {/* 4 Secondary Stat Cards Row */}
+          <div className="cc-secondary-stats-grid">
+            <div className="cc-sec-stat-card">
+              <div className="sec-stat-val text-amber">34</div>
+              <div className="sec-stat-lbl">Awaiting Verification</div>
             </div>
-            <div className="flex gap-4 justify-center text-xs text-muted mt-2">
-              <span className="flex items-center gap-1"><span className="legend-dot bg-teal-500" /> Submitted</span>
-              <span className="flex items-center gap-1"><span className="legend-dot bg-green-500" /> Resolved</span>
+
+            <div className="cc-sec-stat-card">
+              <div className="sec-stat-val text-blue">47m</div>
+              <div className="sec-stat-lbl">Avg Verify Time</div>
             </div>
-          </Card>
 
-          {/* Chart 2: Shelter Occupancy by District */}
-          <Card className="chart-card">
-            <h3>SHELTER OCCUPANCY BY DISTRICT</h3>
-            <div className="h-64 mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={occupancyByDistrictData}>
-                  <XAxis dataKey="district" stroke="#64748B" fontSize={12} />
-                  <YAxis stroke="#64748B" fontSize={12} />
-                  <Tooltip contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155' }} />
-                  <Bar dataKey="occupancy" fill="#60A5FA" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="cc-sec-stat-card">
+              <div className="sec-stat-val text-red">3</div>
+              <div className="sec-stat-lbl">Low Stock Items</div>
             </div>
-          </Card>
-        </div>
 
-        {/* Bottom 3 Info Cards */}
-        <div className="grid-3 gap-6">
-          <Card className="info-list-card">
-            <h4>Districts Active</h4>
-            <ul className="info-list mt-3">
-              <li>Sunamganj</li>
-              <li>Sirajganj</li>
-              <li>Kurigram</li>
-              <li>Feni</li>
-              <li>Netrokona</li>
-            </ul>
-          </Card>
+            <div className="cc-sec-stat-card">
+              <div className="sec-stat-val text-orange">7</div>
+              <div className="sec-stat-lbl">Open Complaints</div>
+            </div>
+          </div>
 
-          <Card className="info-list-card">
-            <h4>Partner Organizations</h4>
-            <ul className="info-list mt-3">
-              <li>BRAC</li>
-              <li>ActionAid</li>
-              <li>CARE</li>
-              <li>UNICEF</li>
-              <li>WFP</li>
-              <li>WHO</li>
-            </ul>
-          </Card>
+          {/* Navigation Tabs */}
+          <div className="cc-nav-tabs">
+            <button
+              className={`cc-tab-item ${activeTab === 'overview' ? 'active' : ''}`}
+              onClick={() => setActiveTab('overview')}
+            >
+              Overview
+            </button>
+            <button
+              className={`cc-tab-item ${activeTab === 'requests' ? 'active' : ''}`}
+              onClick={() => setActiveTab('requests')}
+            >
+              Requests
+            </button>
+            <button
+              className={`cc-tab-item ${activeTab === 'shelters' ? 'active' : ''}`}
+              onClick={() => setActiveTab('shelters')}
+            >
+              Shelters
+            </button>
+            <button
+              className={`cc-tab-item ${activeTab === 'warehouse' ? 'active' : ''}`}
+              onClick={() => navigate('/admin/warehouse')}
+            >
+              Warehouse
+            </button>
+            <button
+              className={`cc-tab-item ${activeTab === 'verify' ? 'active' : ''}`}
+              onClick={() => setActiveTab('verify')}
+            >
+              Verify Queue
+            </button>
+          </div>
 
-          <Card className="info-list-card">
-            <h4>Active Alerts</h4>
-            <ul className="info-list mt-3">
-              <li><span className="text-danger font-bold">Critical:</span> Sunamganj</li>
-              <li><span className="text-warning font-bold">High:</span> Sirajganj</li>
-              <li><span className="text-yellow-400 font-bold">Med:</span> Netrokona</li>
-              <li><span className="text-info font-bold">Low:</span> Kurigram</li>
-              <li><span className="text-success font-bold">All Clear:</span> Habiganj</li>
-            </ul>
-          </Card>
+          {/* 2 Charts Grid */}
+          <div className="cc-charts-grid">
+            <div className="cc-chart-card">
+              <h3 className="chart-title">REQUEST TREND (7 DAYS)</h3>
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={220}>
+                  <LineChart data={requestTrendData}>
+                    <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
+                    <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a', borderRadius: '4px' }} />
+                    <Line type="monotone" dataKey="submitted" stroke="#006a4e" strokeWidth={2.5} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="chart-legend">
+                <span className="legend-item"><span className="legend-dot green" /> Submitted</span>
+                <span className="legend-item"><span className="legend-dot dark" /> Resolved</span>
+              </div>
+            </div>
+
+            <div className="cc-chart-card">
+              <h3 className="chart-title">SHELTER OCCUPANCY BY DISTRICT</h3>
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={occupancyByDistrictData}>
+                    <XAxis dataKey="district" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
+                    <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a', borderRadius: '4px' }} />
+                    <Bar dataKey="occupancy" fill="#93c5fd" radius={[2, 2, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom 3 Summary Lists */}
+          <div className="cc-bottom-lists-grid">
+            <div className="cc-list-card">
+              <h4 className="list-card-title">Districts Active</h4>
+              <ul className="cc-bullet-list">
+                <li>Sunamganj</li>
+                <li>Sirajganj</li>
+                <li>Kurigram</li>
+                <li>Feni</li>
+                <li>Netrokona</li>
+              </ul>
+            </div>
+
+            <div className="cc-list-card">
+              <h4 className="list-card-title">Partner Organizations</h4>
+              <ul className="cc-bullet-list">
+                <li>BRAC</li>
+                <li>ActionAid</li>
+                <li>CARE</li>
+                <li>UNICEF</li>
+                <li>WFP</li>
+                <li>WHO</li>
+                <li className="text-muted">+ 8 more</li>
+              </ul>
+            </div>
+
+            <div className="cc-list-card">
+              <h4 className="list-card-title">Active Alerts</h4>
+              <ul className="cc-bullet-list">
+                <li><strong className="text-red">Critical:</strong> Sunamganj</li>
+                <li><strong className="text-orange">High:</strong> Sirajganj</li>
+                <li><strong className="text-amber">Med:</strong> Netrokona</li>
+                <li><strong className="text-blue">Low:</strong> Kurigram</li>
+                <li><strong className="text-green">All Clear:</strong> Habiganj</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </PageLayout>

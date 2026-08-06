@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { Card } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { ProgressBar } from '../components/ui/ProgressBar';
-import { Button } from '../components/ui/Button';
 import { campaignService } from '../services/campaignService';
 import { ReliefCampaign } from '../types';
 import './Campaigns.css';
@@ -26,67 +22,71 @@ export const Campaigns: React.FC = () => {
 
   return (
     <PageLayout showAlertBanner={false}>
-      <div className="container campaigns-page">
-        {/* Header Title */}
-        <div className="page-header text-center mb-6">
-          <h1>Relief Campaigns</h1>
-          <p>All campaigns are verified by SHOHAY before listing. Track fund usage transparently.</p>
-        </div>
-
-        {/* Top Summary Stats Bar */}
-        {summaryStats && (
-          <div className="campaign-stats-bar grid-3 gap-4 mb-8">
-            <div className="summary-stat-box box-green">
-              <div className="summary-num">{summaryStats.activeCampaigns}</div>
-              <div className="summary-lbl">Active Campaigns</div>
-            </div>
-            <div className="summary-stat-box box-blue">
-              <div className="summary-num">{summaryStats.householdsReached}</div>
-              <div className="summary-lbl">Households Reached</div>
-            </div>
-            <div className="summary-stat-box box-purple">
-              <div className="summary-num">{summaryStats.totalRaisedBDT}</div>
-              <div className="summary-lbl">Total Raised (BDT)</div>
-            </div>
+      <div className="campaigns-page-bg">
+        <div className="campaigns-container">
+          {/* Header Title */}
+          <div className="campaigns-header-text text-center">
+            <h1 className="campaigns-title">Relief Campaigns &amp; Donations</h1>
+            <p className="campaigns-subtitle">All campaigns are verified by SHOHAY before listing. Track fund usage transparently.</p>
           </div>
-        )}
 
-        {/* Campaign Cards List */}
-        <div className="campaigns-list flex flex-col gap-6">
-          {campaigns.map((camp) => {
-            const fundingPct = Math.round((camp.raisedAmount / camp.targetAmount) * 100);
+          {/* Top 3 Summary Cards */}
+          {summaryStats && (
+            <div className="campaign-summary-grid">
+              <div className="c-stat-box box-green">
+                <div className="c-stat-num">{summaryStats.activeCampaigns}</div>
+                <div className="c-stat-lbl">Active Campaigns</div>
+              </div>
+              <div className="c-stat-box box-blue">
+                <div className="c-stat-num">{summaryStats.householdsReached}</div>
+                <div className="c-stat-lbl">Households Reached</div>
+              </div>
+              <div className="c-stat-box box-purple">
+                <div className="c-stat-num">৳{summaryStats.totalRaisedBDT}</div>
+                <div className="c-stat-lbl">Total Raised (BDT)</div>
+              </div>
+            </div>
+          )}
 
-            return (
-              <Card key={camp.id} className="campaign-card">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="campaign-title">{camp.title}</h3>
-                    <div className="campaign-org">{camp.organization} — {camp.district}</div>
+          {/* Campaign Cards List */}
+          <div className="campaigns-cards-stack">
+            {campaigns.map((camp) => {
+              const fundingPct = Math.round((camp.raisedAmount / camp.targetAmount) * 100);
+
+              return (
+                <div key={camp.id} className="campaign-item-card">
+                  <div className="c-card-top-row">
+                    <div>
+                      <h3 className="c-card-title">{camp.title}</h3>
+                      <div className="c-card-org">{camp.organization} • {camp.district}</div>
+                    </div>
+                    <span className="badge-verified-gov">{camp.verificationStatus}</span>
                   </div>
-                  <Badge variant={camp.verificationStatus}>{camp.verificationStatus}</Badge>
-                </div>
 
-                {/* Progress Bar 1: Raised Amount BDT */}
-                <div className="mt-4">
-                  <ProgressBar
-                    value={fundingPct}
-                    label={`৳${camp.raisedAmount.toLocaleString()} / ৳${camp.targetAmount.toLocaleString()}`}
-                    colorVariant="teal"
-                  />
-                </div>
+                  {/* Funding Progress */}
+                  <div className="c-progress-section">
+                    <div className="c-progress-text-row">
+                      <span className="c-raised-amount">৳{camp.raisedAmount.toLocaleString()}</span>
+                      <span className="c-target-amount">of ৳{camp.targetAmount.toLocaleString()} ({fundingPct}%)</span>
+                    </div>
+                    <div className="c-progress-track">
+                      <div className="c-progress-fill" style={{ width: `${fundingPct}%` }} />
+                    </div>
+                  </div>
 
-                {/* Footer Details: Households reached & View/Donate CTA */}
-                <div className="flex justify-between items-center mt-4">
-                  <span className="households-text">
-                    {camp.householdsReached.toLocaleString()} / {camp.householdsTarget.toLocaleString()} households reached
-                  </span>
-                  <Button variant="ghost" size="sm" className="donate-link">
-                    View &amp; Donate &rarr;
-                  </Button>
+                  {/* Card Bottom Row */}
+                  <div className="c-card-bottom-row">
+                    <span className="c-households-text">
+                      {camp.householdsReached.toLocaleString()} / {camp.householdsTarget.toLocaleString()} households reached
+                    </span>
+                    <button className="c-btn-donate">
+                      View &amp; Donate →
+                    </button>
+                  </div>
                 </div>
-              </Card>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </PageLayout>

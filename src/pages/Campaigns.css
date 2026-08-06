@@ -1,41 +1,187 @@
-.campaigns-page {
+.campaigns-page-bg {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 120px);
+  padding: 40px 16px 80px 16px;
+  width: 100%;
+}
+
+.campaigns-container {
   max-width: 800px;
   margin: 0 auto;
-  padding-bottom: var(--space-12);
 }
 
-.campaign-stats-bar .box-purple {
-  border-color: rgba(147, 51, 234, 0.3);
-  background-color: rgba(147, 51, 234, 0.08);
-}
-.campaign-stats-bar .box-purple .summary-num {
-  color: #c084fc;
+.campaigns-header-text {
+  margin-bottom: 28px;
+  text-align: center;
 }
 
-.campaign-card {
+.campaigns-title {
+  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.campaigns-subtitle {
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Top 3 Summary Cards */
+.campaign-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.c-stat-box {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 20px;
+  text-align: center;
+}
+
+.box-green .c-stat-num { color: #10b981; }
+.box-blue .c-stat-num { color: #2563eb; }
+.box-purple .c-stat-num { color: #9333ea; }
+
+.c-stat-num {
+  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.c-stat-lbl {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Campaign Cards Stack */
+.campaigns-cards-stack {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 16px;
 }
 
-.campaign-title {
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
+.campaign-item-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
 }
 
-.campaign-org {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-top: 0.2rem;
+.c-card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
-.households-text {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+.c-card-title {
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
 }
 
-.donate-link {
-  color: var(--color-accent-teal) !important;
-  font-weight: var(--font-weight-bold) !important;
+.c-card-org {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.badge-verified-gov {
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+
+/* Funding Progress */
+.c-progress-section {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.c-progress-text-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.c-raised-amount {
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.c-target-amount {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #64748b;
+}
+
+.c-progress-track {
+  width: 100%;
+  height: 6px;
+  background-color: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.c-progress-fill {
+  height: 100%;
+  background-color: #006a4e;
+  border-radius: 3px;
+}
+
+/* Card Bottom Row */
+.c-card-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 14px;
+}
+
+.c-households-text {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #64748b;
+}
+
+.c-btn-donate {
+  background: transparent;
+  border: none;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 700;
+  color: #006a4e;
+  cursor: pointer;
+  padding: 0;
+}
+
+.c-btn-donate:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .campaign-summary-grid {
+    grid-template-columns: 1fr;
+  }
 }

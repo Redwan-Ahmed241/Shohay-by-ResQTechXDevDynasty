@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, Clock, Plus, Search } from 'lucide-react';
+import { AlertTriangle, Clock, Plus } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { Card } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
-import { Tag } from '../components/ui/Tag';
 import { warehouseService } from '../services/warehouseService';
 import { WarehouseItem, InventoryCategory } from '../types';
 import './Warehouse.css';
@@ -12,7 +8,7 @@ import './Warehouse.css';
 export const Warehouse: React.FC = () => {
   const [items, setItems] = useState<WarehouseItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<InventoryCategory | 'All'>('All');
-  const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<'inventory' | 'movements'>('inventory');
 
   useEffect(() => {
     fetchInventory();
@@ -33,53 +29,75 @@ export const Warehouse: React.FC = () => {
     'Shelter'
   ];
 
-  const filteredItems = items.filter(
-    (item) =>
-      item.name.toLowerCase().includes(search.toLowerCase()) ||
-      item.sku.toLowerCase().includes(search.toLowerCase()) ||
-      item.warehouseName.toLowerCase().includes(search.toLowerCase())
-  );
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'OK':
+        return 'w-badge-ok';
+      case 'LOW':
+        return 'w-badge-low';
+      case 'CAUTION':
+        return 'w-badge-caution';
+      default:
+        return '';
+    }
+  };
 
   return (
     <PageLayout showAlertBanner={false}>
-      <div className="container warehouse-page">
-        {/* Page Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1>Warehouse &amp; Inventory</h1>
-            <p className="text-xs text-muted">Live inventory across all registered warehouses</p>
-          </div>
-          <Button variant="primary" size="md">
-            <Plus size={14} /> Receive Stock
-          </Button>
-        </div>
-
-        {/* Alert Banners */}
-        <div className="grid-2 gap-4 mb-6">
-          <div className="w-banner banner-red">
-            <AlertTriangle size={16} className="text-danger flex-shrink-0" />
+      <div className="warehouse-page-bg">
+        <div className="warehouse-container">
+          {/* Header Row matching Figma */}
+          <div className="warehouse-header-row">
             <div>
-              <strong className="text-xs">3 Items Below Minimum Stock</strong>
-              <div className="text-xs text-muted mt-0.5">Insulin (Rapid-acting), Menstrual Hygiene Kit, Baby Food (Formula)</div>
+              <h1 className="warehouse-title">Warehouse &amp; Inventory</h1>
+              <p className="warehouse-subtitle">Live inventory across all registered warehouses</p>
+            </div>
+            <button className="btn-receive-stock">
+              <Plus size={14} /> Receive Stock
+            </button>
+          </div>
+
+          {/* Alert Banners (Red & Yellow) matching Figma */}
+          <div className="warehouse-alerts-grid">
+            <div className="w-banner banner-red">
+              <AlertTriangle size={16} className="icon-red" />
+              <div>
+                <div className="w-banner-title title-red">3 Items Below Minimum Stock</div>
+                <div className="w-banner-desc desc-red">Insulin (Rapid-acting), Menstrual Hygiene Kit, Baby Food (Formula)</div>
+              </div>
+            </div>
+
+            <div className="w-banner banner-yellow">
+              <Clock size={16} className="icon-yellow" />
+              <div>
+                <div className="w-banner-title title-yellow">3 Items Expiring Within 60 Days</div>
+                <div className="w-banner-desc desc-yellow">Oral Saline (ORS), Insulin (Rapid-acting), Baby Food (Formula)</div>
+              </div>
             </div>
           </div>
 
-          <div className="w-banner banner-yellow">
-            <Clock size={16} className="text-warning flex-shrink-0" />
-            <div>
-              <strong className="text-xs">3 Items Expiring Within 60 Days</strong>
-              <div className="text-xs text-muted mt-0.5">Oral Saline (ORS), Insulin (Rapid-acting), Baby Food (Formula)</div>
-            </div>
+          {/* Sub Navigation Tabs */}
+          <div className="warehouse-sub-tabs">
+            <button
+              className={`w-sub-tab ${activeTab === 'inventory' ? 'active' : ''}`}
+              onClick={() => setActiveTab('inventory')}
+            >
+              Inventory
+            </button>
+            <button
+              className={`w-sub-tab ${activeTab === 'movements' ? 'active' : ''}`}
+              onClick={() => setActiveTab('movements')}
+            >
+              Movements
+            </button>
           </div>
-        </div>
 
-        {/* Category Filters + Search */}
-        <div className="flex justify-between items-center flex-wrap gap-4 mb-4">
-          <div className="flex gap-2 flex-wrap">
+          {/* Category Filter Chips */}
+          <div className="warehouse-category-chips">
             {categories.map((cat) => (
               <button
                 key={cat}
-                className={`w-cat-btn ${selectedCategory === cat ? 'active' : ''}`}
+                className={`w-cat-chip ${selectedCategory === cat ? 'active' : ''}`}
                 onClick={() => setSelectedCategory(cat)}
               >
                 {cat}
@@ -87,22 +105,9 @@ export const Warehouse: React.FC = () => {
             ))}
           </div>
 
-          <div className="w-search-box">
-            <Search size={14} className="text-muted" />
-            <input
-              type="text"
-              placeholder="Filter by item or SKU…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-search-input"
-            />
-          </div>
-        </div>
-
-        {/* Inventory Data Table */}
-        <Card className="table-card p-0">
-          <div className="table-responsive">
-            <table className="inventory-table">
+          {/* Inventory Table Container */}
+          <div className="inventory-table-card">
+            <table className="inventory-data-table">
               <thead>
                 <tr>
                   <th>Item</th>
@@ -117,34 +122,49 @@ export const Warehouse: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredItems.map((item) => (
+                {items.map((item) => (
                   <tr key={item.id}>
                     <td>
-                      <div className="font-bold text-primary">{item.name}</div>
-                      <div className="text-xs text-muted font-mono">{item.sku}</div>
+                      <div className="item-name-text">{item.name}</div>
+                      <div className="item-sku-text">#{item.sku}</div>
                     </td>
-                    <td><span className="cat-chip">{item.category}</span></td>
-                    <td className="font-mono font-bold">
-                      {item.availableCount.toLocaleString()} <span className="text-xs text-muted font-normal">{item.unit}</span>
-                    </td>
-                    <td className="font-mono text-muted">{item.reservedCount.toLocaleString()}</td>
-                    <td className="font-mono text-muted">{item.minStockThreshold.toLocaleString()}</td>
                     <td>
-                      <Badge variant={item.status === 'LOW' ? 'HIGH' : item.status === 'CAUTION' ? 'MEDIUM' : 'LOW'}>
+                      <span className="cat-plain-text">{item.category}</span>
+                    </td>
+                    <td>
+                      <span className="count-num-bold">{item.availableCount.toLocaleString()}</span>{' '}
+                      <span className="count-unit-sub">{item.unit}</span>
+                    </td>
+                    <td>
+                      <span className="count-num-plain">{item.reservedCount.toLocaleString()}</span>
+                    </td>
+                    <td>
+                      <span className="count-num-plain">{item.minStockThreshold.toLocaleString()}</span>
+                    </td>
+                    <td>
+                      <span className={`w-status-badge ${getStatusBadgeClass(item.status)}`}>
                         {item.status}
-                      </Badge>
+                      </span>
                     </td>
-                    <td className="font-mono text-xs text-muted">
-                      {item.expiryDate ? <span className="text-danger font-bold">{item.expiryDate}</span> : '—'}
+                    <td>
+                      {item.expiryDate ? (
+                        <span className="expiry-red-text">{item.expiryDate}</span>
+                      ) : (
+                        <span className="expiry-dash">—</span>
+                      )}
                     </td>
-                    <td className="text-xs">{item.warehouseName}</td>
-                    <td className="text-xs text-muted">{item.lastCountDate}</td>
+                    <td>
+                      <span className="warehouse-location-text">{item.warehouseName}</span>
+                    </td>
+                    <td>
+                      <span className="count-date-text">{item.lastCountDate}</span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
       </div>
     </PageLayout>
   );

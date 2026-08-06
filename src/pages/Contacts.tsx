@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, Copy, Bookmark, AlertCircle, Check } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { Card } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
-import { Tag } from '../components/ui/Tag';
 import { contactService } from '../services/contactService';
 import { EmergencyContact, ContactCategory } from '../types';
 import './Contacts.css';
@@ -47,110 +43,111 @@ export const Contacts: React.FC = () => {
 
   return (
     <PageLayout showAlertBanner={false}>
-      <div className="container contacts-page">
-        {/* Header Title */}
-        <div className="page-header text-center mb-4">
-          <h1>Emergency Contacts</h1>
-        </div>
+      <div className="contacts-page-bg">
+        <div className="contacts-container">
+          {/* Header Title */}
+          <h1 className="contacts-title">Emergency Contacts</h1>
 
-        {/* Warning Banner */}
-        <div className="warning-banner mb-6">
-          <AlertCircle size={14} />
-          <span>Please verify all contact numbers with official sources before use in an emergency.</span>
-        </div>
-
-        {/* National Emergency Numbers Banner Box */}
-        <Card className="national-banner-card mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <Phone size={18} className="text-accent-teal" />
-            <h3 className="banner-card-title">National Emergency Numbers</h3>
+          {/* Yellow Warning Banner matching Figma */}
+          <div className="contacts-warning-banner">
+            Please verify all contact numbers with official sources before use in an emergency.
           </div>
-          <p className="text-xs text-muted mb-4">Available 24/7. Verify numbers from primary sources.</p>
 
-          <div className="national-numbers-grid grid-3 gap-4">
-            <div className="nat-num-box">
-              <div className="nat-num">999 (DEMO)</div>
-              <div className="nat-lbl">National Emergency</div>
+          {/* Dark Navy Hero Box - National Emergency Numbers */}
+          <div className="national-hero-box">
+            <div className="hero-box-header">
+              <Phone size={18} className="hero-phone-icon" />
+              <div>
+                <h3 className="hero-box-title">National Emergency Numbers</h3>
+                <p className="hero-box-sub">Available 24/7. Verify numbers from primary sources.</p>
+              </div>
             </div>
-            <div className="nat-num-box">
-              <div className="nat-num">102 (DEMO)</div>
-              <div className="nat-lbl">Fire Service &amp; Civil Defence</div>
-            </div>
-            <div className="nat-num-box">
-              <div className="nat-num">199 (DEMO)</div>
-              <div className="nat-lbl">Ambulance Service</div>
+
+            <div className="national-numbers-grid">
+              <div className="nat-card">
+                <div className="nat-card-number">999 (DEMO)</div>
+                <div className="nat-card-label">National Emergency</div>
+              </div>
+              <div className="nat-card">
+                <div className="nat-card-number">102 (DEMO)</div>
+                <div className="nat-card-label">Fire Service &amp; Civil Defence</div>
+              </div>
+              <div className="nat-card">
+                <div className="nat-card-number">199 (DEMO)</div>
+                <div className="nat-card-label">Ambulance Service</div>
+              </div>
             </div>
           </div>
-        </Card>
 
-        {/* Category Filters */}
-        <div className="category-filters flex gap-2 flex-wrap mb-4">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              className={`cat-btn ${selectedCategory === cat ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+          {/* Category Filter Buttons */}
+          <div className="contact-category-filters">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                className={`cat-filter-btn ${selectedCategory === cat ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
 
-        {/* District Filter Tags */}
-        <div className="district-tags flex gap-2 flex-wrap mb-6">
-          {districts.map((d) => (
-            <Tag
-              key={d}
-              active={selectedDistrict === d}
-              onClick={() => setSelectedDistrict(d)}
-            >
-              {d}
-            </Tag>
-          ))}
-        </div>
+          {/* District Filter Chips */}
+          <div className="contact-district-chips">
+            {districts.map((d) => (
+              <button
+                key={d}
+                className={`district-chip-btn ${selectedDistrict === d ? 'active' : ''}`}
+                onClick={() => setSelectedDistrict(d)}
+              >
+                {d}
+              </button>
+            ))}
+          </div>
 
-        {/* Contacts List */}
-        <div className="contacts-list flex flex-col gap-4">
-          {contacts.map((contact) => (
-            <Card key={contact.id} className="contact-item-card">
-              <div className="flex justify-between items-start">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="contact-title">{contact.title}</h3>
-                    {contact.isVerified && <Badge variant="LOW">Verified</Badge>}
-                    {contact.isTollFree && <Badge variant="ALL CLEAR">Toll Free</Badge>}
+          {/* Contacts List Stack */}
+          <div className="contacts-list-stack">
+            {contacts.map((contact) => (
+              <div key={contact.id} className="contact-figma-card">
+                <div className="contact-card-top">
+                  <div className="contact-left-info">
+                    <div className="contact-name-row">
+                      <h3 className="contact-name">{contact.title}</h3>
+                      {contact.isTollFree && <span className="tag-pill tag-tollfree">Toll Free</span>}
+                      {contact.isVerified && <span className="tag-pill tag-verified">Verified</span>}
+                    </div>
+
+                    <div className="contact-phone-code">{contact.phone}</div>
+
+                    {contact.notes && <div className="contact-demo-note">{contact.notes}</div>}
+
+                    <div className="contact-verified-date">Last verified: {contact.lastVerified}</div>
                   </div>
-                  <div className="contact-meta mt-1">
-                    {contact.availability} {contact.district ? `• ${contact.district}` : ''}
-                  </div>
-                </div>
 
-                {/* Right Action Buttons: Call, Copy, Bookmark */}
-                <div className="contact-actions flex items-center gap-2">
-                  <Button variant="primary" size="sm" onClick={() => window.open(`tel:${contact.phone}`)}>
-                    <Phone size={12} /> Call
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleCopy(contact.id, contact.phone)}
-                    title="Copy Phone Number"
-                  >
-                    {copiedId === contact.id ? <Check size={12} className="text-success" /> : <Copy size={12} />}
-                  </Button>
-                  <Button variant="ghost" size="sm" title="Bookmark">
-                    <Bookmark size={12} />
-                  </Button>
+                  <div className="contact-right-actions">
+                    <div className="availability-label">24/7</div>
+                    {contact.district && <div className="district-label">{contact.district}</div>}
+
+                    <div className="action-buttons-row">
+                      <button className="btn-call" onClick={() => window.open(`tel:${contact.phone}`)}>
+                        <Phone size={14} /> Call
+                      </button>
+                      <button
+                        className="btn-icon-action"
+                        onClick={() => handleCopy(contact.id, contact.phone)}
+                        title="Copy Phone Number"
+                      >
+                        {copiedId === contact.id ? <Check size={14} style={{ color: '#006a4e' }} /> : <Copy size={14} />}
+                      </button>
+                      <button className="btn-icon-action" title="Bookmark">
+                        <Bookmark size={14} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {/* Large Monospace Phone Display */}
-              <div className="phone-number-display mt-3">{contact.phone}</div>
-
-              {contact.notes && <div className="contact-notes mt-2">{contact.notes}</div>}
-              <div className="last-verified-text mt-2">Last verified: {contact.lastVerified}</div>
-            </Card>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </PageLayout>

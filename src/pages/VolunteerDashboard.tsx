@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { UserCheck, Clock, CheckCircle, AlertTriangle, Shield, Check, X } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { Card } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
-import { Tag } from '../components/ui/Tag';
 import { volunteerService } from '../services/volunteerService';
 import { VolunteerProfile, VolunteerAssignment } from '../types';
 import './VolunteerDashboard.css';
@@ -40,101 +36,114 @@ export const VolunteerDashboard: React.FC = () => {
 
   return (
     <PageLayout showAlertBanner={false}>
-      <div className="container vol-dashboard-page">
-        {/* Profile Card */}
-        <Card className="vol-profile-card flex flex-col gap-4 mb-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="avatar-circle">DV</div>
-              <div>
-                <h3 className="vol-name">{profile.name}</h3>
-                <div className="vol-code-text">ID: {profile.code} • {profile.district}</div>
-                <div className="text-xs text-muted">Joined: {profile.joinDate}</div>
+      <div className="vol-dashboard-bg">
+        <div className="vol-dashboard-container">
+          {/* Profile Card */}
+          <div className="vol-profile-card">
+            <div className="profile-top-row">
+              <div className="profile-user-left">
+                <div className="avatar-square-navy">DV</div>
+                <div className="user-details">
+                  <h3 className="vol-user-name">{profile.name}</h3>
+                  <div className="vol-user-id">ID: {profile.code} • {profile.district}</div>
+                  <div className="vol-joined-date">Joined: {profile.joinDate}</div>
+                </div>
+              </div>
+
+              <div className="profile-status-right">
+                <span className="badge-available">Available</span>
+                <span className="toggle-hint">Tap to toggle</span>
               </div>
             </div>
-            <Badge variant="LOW">Available</Badge>
+
+            <div className="profile-counters-row">
+              <div className="counter-col">
+                <div className="counter-num">{profile.hoursLogged}</div>
+                <div className="counter-lbl">Hours</div>
+              </div>
+              <div className="counter-col">
+                <div className="counter-num">{profile.tasksCompleted}</div>
+                <div className="counter-lbl">Tasks</div>
+              </div>
+              <div className="counter-col">
+                <div className="counter-num">{profile.rating}</div>
+                <div className="counter-lbl">Rating</div>
+              </div>
+            </div>
           </div>
 
-          <div className="vol-stats-counters grid-3 gap-4 pt-3 border-t">
-            <div className="counter-box">
-              <div className="c-num">{profile.hoursLogged}</div>
-              <div className="c-lbl">Hours</div>
+          {/* Current Active Assignment Box (Dark Navy) */}
+          {profile.currentAssignment && (
+            <div className="current-assignment-navy-card">
+              <div className="assign-header-row">
+                <span className="assign-header-tag">Current Assignment</span>
+                <span className="badge-in-progress">In Progress</span>
+              </div>
+
+              <h3 className="assign-main-title">{profile.currentAssignment.title}</h3>
+              <div className="assign-meta-row">
+                <span>⏱ {profile.currentAssignment.durationHours} hours remaining</span>
+                <span>👥 Team of {profile.currentAssignment.teamSize}</span>
+              </div>
+
+              <div className="assign-button-group">
+                <button
+                  className={`btn-checkin ${checkInStatus === 'Checked In' ? 'active' : ''}`}
+                  onClick={() => setCheckInStatus(checkInStatus === 'Checked In' ? 'Not Checked In' : 'Checked In')}
+                >
+                  {checkInStatus === 'Checked In' ? 'Checked In ✓' : 'Check In'}
+                </button>
+                <button className="btn-secondary-dark">Pause</button>
+                <button className="btn-secondary-dark">Report</button>
+              </div>
             </div>
-            <div className="counter-box">
-              <div className="c-num">{profile.tasksCompleted}</div>
-              <div className="c-lbl">Tasks</div>
-            </div>
-            <div className="counter-box">
-              <div className="c-num">{profile.rating}</div>
-              <div className="c-lbl">Rating</div>
+          )}
+
+          {/* My Skills */}
+          <div className="skills-card">
+            <h4 className="skills-title">My Skills</h4>
+            <div className="skills-chips-row">
+              {profile.skills.map((skill) => (
+                <span key={skill} className="skill-chip">{skill}</span>
+              ))}
             </div>
           </div>
-        </Card>
 
-        {/* Current Active Assignment */}
-        {profile.currentAssignment && (
-          <Card className="current-assignment-card mb-6">
-            <div className="flex justify-between items-center">
-              <span className="section-tag-light">Current Assignment</span>
-              <Badge variant="HIGH">In Progress</Badge>
-            </div>
-            <h3 className="assign-title mt-2">{profile.currentAssignment.title}</h3>
-            <div className="assign-meta flex gap-4 text-xs text-secondary mt-1">
-              <span>⏱ {profile.currentAssignment.durationHours} hours remaining</span>
-              <span>👥 Team of {profile.currentAssignment.teamSize}</span>
-            </div>
+          {/* Open Assignments Near You */}
+          <div className="open-assignments-section">
+            <h2 className="open-section-title">Open Assignments Near You</h2>
 
-            <div className="assign-actions flex gap-3 mt-4">
-              <Button
-                variant={checkInStatus === 'Checked In' ? 'success' : 'primary'}
-                onClick={() => setCheckInStatus(checkInStatus === 'Checked In' ? 'Not Checked In' : 'Checked In')}
-              >
-                {checkInStatus === 'Checked In' ? 'Checked In ✓' : 'Check In'}
-              </Button>
-              <Button variant="secondary">Pause</Button>
-              <Button variant="outline">Report</Button>
-            </div>
-          </Card>
-        )}
+            <div className="open-cards-stack">
+              {assignments.map((item) => (
+                <div key={item.id} className="open-item-card">
+                  <div className="open-item-top">
+                    <div className="open-item-left">
+                      <h3 className="open-item-title">{item.title}</h3>
+                      <div className="open-item-meta">
+                        ⏱ {item.durationHours} hours &nbsp; {item.location}
+                      </div>
+                    </div>
 
-        {/* My Skills Tags */}
-        <div className="skills-section mb-6">
-          <label className="text-xs font-semibold text-muted block mb-2">My Skills</label>
-          <div className="flex gap-2 flex-wrap">
-            {profile.skills.map((skill) => (
-              <Tag key={skill} variant="teal">{skill}</Tag>
-            ))}
-          </div>
-        </div>
+                    <span className={`priority-tag priority-${item.priority}`}>
+                      {item.priority}
+                    </span>
+                  </div>
 
-        {/* Open Assignments Near You */}
-        <div className="open-assignments-section flex flex-col gap-4">
-          <h2>Open Assignments Near You</h2>
-
-          {assignments.map((item) => (
-            <Card key={item.id} className="open-assign-card">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="open-title">{item.title}</h3>
-                  <div className="open-meta text-xs text-muted mt-1">
-                    ⏱ {item.durationHours} hours • {item.location}
+                  <div className="open-item-bottom-actions">
+                    <button className="btn-accept-green" onClick={() => handleAccept(item.id)}>
+                      Accept
+                    </button>
+                    <button className="btn-decline-outline" onClick={() => handleDecline(item.id)}>
+                      Decline
+                    </button>
+                    <button className="btn-arrow-icon">
+                      <ChevronRight size={16} />
+                    </button>
                   </div>
                 </div>
-                <Badge variant={item.priority === 'critical' ? 'CRITICAL' : item.priority === 'high' ? 'HIGH' : 'MEDIUM'}>
-                  {item.priority}
-                </Badge>
-              </div>
-
-              <div className="flex gap-3 mt-4">
-                <Button variant="primary" size="sm" onClick={() => handleAccept(item.id)}>
-                  <Check size={12} /> Accept
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => handleDecline(item.id)}>
-                  Decline
-                </Button>
-              </div>
-            </Card>
-          ))}
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </PageLayout>

@@ -1,9 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Anchor, Utensils, HeartPulse, FileText } from 'lucide-react';
+import { Users, Anchor, Utensils, Activity, FileText } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import './VolunteerLanding.css';
 
 export const VolunteerLanding: React.FC = () => {
@@ -11,86 +9,89 @@ export const VolunteerLanding: React.FC = () => {
 
   return (
     <PageLayout showAlertBanner={false}>
-      <div className="container volunteer-landing-page">
-        {/* Top Hero Banner */}
-        <Card className="vol-hero-card text-center flex flex-col items-center gap-4 py-10">
-          <div className="vol-hero-icon">
-            <Users size={32} />
-          </div>
-          <h1>Volunteer with SHOHAY</h1>
-          <p className="max-w-md">Join thousands of volunteers coordinating flood relief across Bangladesh.</p>
-
-          <div className="vol-stats-row grid-3 gap-6 my-4 w-full max-w-xl">
-            <div className="v-stat-box">
-              <div className="v-num">89</div>
-              <div className="v-lbl">Active Now</div>
+      <div className="volunteer-landing-bg">
+        <div className="volunteer-landing-container">
+          {/* Top Hero Navy Card matching Figma */}
+          <div className="vol-hero-card">
+            <div className="vol-hero-icon-box">
+              <Users size={28} />
             </div>
-            <div className="v-stat-box">
-              <div className="v-num">48h</div>
-              <div className="v-lbl">Avg Response</div>
-            </div>
-            <div className="v-stat-box">
-              <div className="v-num">4.3k</div>
-              <div className="v-lbl">People Helped</div>
-            </div>
-          </div>
-        </Card>
+            <h1 className="vol-hero-title">Volunteer with SHOHOY</h1>
+            <p className="vol-hero-sub">Join thousands of volunteers coordinating flood relief across Bangladesh.</p>
 
-        {/* How You Can Help Section */}
-        <Card className="mt-8 p-6">
-          <h2 className="mb-4">How You Can Help</h2>
-
-          <div className="grid-2 gap-4">
-            <div className="help-type-item flex gap-3 items-center">
-              <div className="help-icon-box icon-teal">
-                <Anchor size={20} />
+            <div className="vol-stats-grid">
+              <div className="v-stat-card-navy">
+                <div className="v-stat-num-big">89</div>
+                <div className="v-stat-label-sub">Active Now</div>
               </div>
-              <div>
-                <h4 className="help-title">Field Rescue</h4>
-                <p className="text-xs text-secondary">Boat rescue, evacuation assistance in flooded upazilas.</p>
+              <div className="v-stat-card-navy">
+                <div className="v-stat-num-big">48h</div>
+                <div className="v-stat-label-sub">Avg Response</div>
               </div>
-            </div>
-
-            <div className="help-type-item flex gap-3 items-center">
-              <div className="help-icon-box icon-orange">
-                <Utensils size={20} />
-              </div>
-              <div>
-                <h4 className="help-title">Distribution</h4>
-                <p className="text-xs text-secondary">Food, water, and emergency supply packing &amp; delivery.</p>
-              </div>
-            </div>
-
-            <div className="help-type-item flex gap-3 items-center">
-              <div className="help-icon-box icon-purple">
-                <HeartPulse size={20} />
-              </div>
-              <div>
-                <h4 className="help-title">Medical Support</h4>
-                <p className="text-xs text-secondary">First aid, mobile health camps, and doctor assistance.</p>
-              </div>
-            </div>
-
-            <div className="help-type-item flex gap-3 items-center">
-              <div className="help-icon-box icon-blue">
-                <FileText size={20} />
-              </div>
-              <div>
-                <h4 className="help-title">Coordination</h4>
-                <p className="text-xs text-secondary">Shelter registration, admin, data entry &amp; phone lines.</p>
+              <div className="v-stat-card-navy">
+                <div className="v-stat-num-big">4.3k</div>
+                <div className="v-stat-label-sub">People Helped</div>
               </div>
             </div>
           </div>
 
-          <div className="flex gap-4 justify-center mt-8">
-            <Button variant="primary" size="lg" onClick={() => navigate('/volunteer/register')}>
+          {/* How You Can Help Section */}
+          <div className="vol-help-card">
+            <h2 className="vol-help-title">How You Can Help</h2>
+
+            <div className="help-types-grid">
+              <div className="help-item-box">
+                <div className="help-icon-wrapper text-teal">
+                  <Anchor size={20} />
+                </div>
+                <div className="help-item-text">
+                  <h4 className="help-item-title">Field Rescue</h4>
+                  <p className="help-item-sub">Boat rescue, evacuation</p>
+                </div>
+              </div>
+
+              <div className="help-item-box">
+                <div className="help-icon-wrapper text-amber">
+                  <Utensils size={20} />
+                </div>
+                <div className="help-item-text">
+                  <h4 className="help-item-title">Distribution</h4>
+                  <p className="help-item-sub">Food, water, supplies</p>
+                </div>
+              </div>
+
+              <div className="help-item-box">
+                <div className="help-icon-wrapper text-red">
+                  <Activity size={20} />
+                </div>
+                <div className="help-item-text">
+                  <h4 className="help-item-title">Medical Support</h4>
+                  <p className="help-item-sub">First aid, health camps</p>
+                </div>
+              </div>
+
+              <div className="help-item-box">
+                <div className="help-icon-wrapper text-blue">
+                  <FileText size={20} />
+                </div>
+                <div className="help-item-text">
+                  <h4 className="help-item-title">Coordination</h4>
+                  <p className="help-item-sub">Logistics, admin, data</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Action Buttons */}
+          <div className="vol-actions-row">
+            <button className="btn-register-green" onClick={() => navigate('/volunteer/register')}>
               Register as Volunteer
-            </Button>
-            <Button variant="outline" size="lg" onClick={() => navigate('/volunteer/dashboard')}>
+            </button>
+            <button className="btn-dashboard-outline" onClick={() => navigate('/volunteer/dashboard')}>
               View Dashboard
-            </Button>
+            </button>
           </div>
-        </Card>
+        </div>
       </div>
     </PageLayout>
   );

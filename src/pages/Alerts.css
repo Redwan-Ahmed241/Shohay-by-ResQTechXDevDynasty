@@ -1,96 +1,242 @@
-.alerts-page {
+.alerts-page-bg {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 120px);
+  padding: 40px 16px 80px 16px;
+  width: 100%;
+}
+
+.alerts-container {
   max-width: 800px;
   margin: 0 auto;
 }
 
+.alerts-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.alerts-title {
+  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
 .active-count-badge {
-  background-color: var(--color-bg-card-hover);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  padding: 0.2rem 0.6rem;
-  border-radius: var(--radius-full);
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+/* Search Bar */
+.alerts-search-container {
+  margin-bottom: 16px;
+}
+
+.alerts-search-input {
+  width: 100%;
+  height: 40px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 0 16px;
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: #1e293b;
+  box-sizing: border-box;
+}
+
+.alerts-search-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Severity Filter Pills */
+.severity-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
 }
 
 .filter-btn {
-  padding: 0.35rem 0.85rem;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
+  padding: 6px 14px;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 600;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  color: #475569;
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .filter-btn:hover {
-  border-color: var(--color-border-light);
-  color: var(--color-text-primary);
+  background-color: #f1f5f9;
+  color: #0f172a;
 }
 
 .filter-btn.active {
-  background-color: var(--color-bg-card-hover);
-  border-color: var(--color-accent-teal);
+  background-color: #0f3460;
+  border-color: #0f3460;
   color: #ffffff;
 }
 
-.alert-item-card {
-  padding: 0 !important;
+/* Alert Cards Stack */
+.alerts-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.alert-figma-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
   overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
 }
 
-.alert-top-bar {
-  background-color: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid var(--color-border);
-  padding: 0.6rem 1rem;
+/* Header strip banners matching Figma */
+.alert-card-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  color: #ffffff;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 700;
 }
 
-.alert-type-label {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+.banner-severity {
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
-.alert-content {
-  padding: 1rem 1.25rem 1.25rem 1.25rem;
+.banner-type {
+  font-weight: 500;
+  font-size: 11px;
+  opacity: 0.9;
 }
 
-.alert-title {
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
+.header-critical {
+  background-color: #dc2626;
+}
+
+.header-high {
+  background-color: #ea580c;
+}
+
+.header-medium {
+  background-color: #d97706;
+}
+
+.header-low {
+  background-color: #2563eb;
+}
+
+.header-allclear {
+  background-color: #059669;
+}
+
+/* Card Body */
+.alert-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.alert-card-top-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.alert-card-title {
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
   line-height: 1.3;
 }
 
 .verification-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.68rem;
-  background-color: rgba(16, 185, 129, 0.12);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  padding: 0.2rem 0.5rem;
-  border-radius: var(--radius-sm);
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 4px;
   white-space: nowrap;
 }
 
-.alert-desc {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-top: 0.5rem;
-  line-height: var(--line-height-relaxed);
+.verification-badge.gov {
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.verification-badge.partner {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.alert-card-desc {
+  font-family: var(--font-family);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #64748b;
+  margin: 8px 0 14px 0;
+}
+
+/* Affected Area Tags */
+.affected-areas-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
 }
 
 .area-tag {
-  font-size: 0.7rem;
-  background-color: var(--color-bg-input);
-  border: 1px solid var(--color-border);
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: #475569;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 3px 8px;
+  border-radius: 4px;
 }
 
-.alert-timestamp {
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
+.alert-card-timestamp {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.clock-icon {
+  color: #94a3b8;
+}
+
+.no-alerts-box {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 32px;
+  text-align: center;
+  border-radius: 6px;
+  color: #64748b;
+  font-family: var(--font-family);
 }

@@ -1,95 +1,324 @@
-.contacts-page {
+.contacts-page-bg {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 120px);
+  padding: 40px 16px 80px 16px;
+  width: 100%;
+}
+
+.contacts-container {
   max-width: 800px;
   margin: 0 auto;
-  padding-bottom: var(--space-12);
 }
 
-.warning-banner {
-  background-color: rgba(234, 88, 12, 0.12);
-  border: 1px solid rgba(234, 88, 12, 0.3);
-  color: #fb923c;
-  padding: 0.6rem 1rem;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-xs);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.national-banner-card {
-  background-color: var(--color-bg-secondary) !important;
-  border-color: var(--color-accent-teal) !important;
-}
-
-.banner-card-title {
-  font-size: var(--font-size-md);
-}
-
-.nat-num-box {
-  background-color: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  padding: var(--space-4);
-  border-radius: var(--radius-md);
+.contacts-title {
+  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 16px 0;
   text-align: center;
 }
 
-.nat-num {
-  font-size: 1.5rem;
-  font-weight: var(--font-weight-extrabold);
+/* Yellow Warning Banner */
+.contacts-warning-banner {
+  background-color: #fefce8;
+  border: 1px solid #fef08a;
+  border-radius: 4px;
+  padding: 10px 16px;
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #854d0e;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* Dark Navy Hero Box */
+.national-hero-box {
+  background-color: #0f2338;
+  border-radius: 6px;
+  padding: 24px;
+  color: #ffffff;
+  margin-bottom: 24px;
+}
+
+.hero-box-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.hero-phone-icon {
+  color: #10b981;
+  margin-top: 2px;
+}
+
+.hero-box-title {
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.hero-box-sub {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 4px 0 0 0;
+}
+
+.national-numbers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.nat-card {
+  background-color: #091523;
+  border: 1px solid #1e3a5f;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+}
+
+.nat-card-number {
   font-family: var(--font-mono);
-  color: var(--color-accent-teal);
+  font-size: 22px;
+  font-weight: 700;
+  color: #34d399;
+  margin-bottom: 4px;
 }
 
-.nat-lbl {
-  font-size: 0.7rem;
-  color: var(--color-text-secondary);
-  margin-top: 0.25rem;
+.nat-card-label {
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: #94a3b8;
 }
 
-.cat-btn {
-  padding: 0.3rem 0.75rem;
-  font-size: var(--font-size-xs);
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
+/* Category Filters */
+.contact-category-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
 }
 
-.cat-btn.active {
-  background-color: var(--color-accent-teal-light);
-  color: var(--color-accent-teal);
-  border-color: var(--color-accent-teal);
+.cat-filter-btn {
+  padding: 5px 12px;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 500;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  color: #475569;
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
-.contact-item-card {
+.cat-filter-btn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.cat-filter-btn.active {
+  background-color: #0f3460;
+  border-color: #0f3460;
+  color: #ffffff;
+}
+
+/* District Chips */
+.contact-district-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.district-chip-btn {
+  padding: 4px 12px;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 500;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #475569;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.district-chip-btn.active {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+/* Contacts Cards Stack */
+.contacts-list-stack {
   display: flex;
   flex-direction: column;
+  gap: 16px;
 }
 
-.contact-title {
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
+.contact-figma-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
 }
 
-.contact-meta {
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
+.contact-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
 }
 
-.phone-number-display {
-  font-size: 1.5rem;
-  font-weight: var(--font-weight-extrabold);
+.contact-left-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.contact-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-name {
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.tag-pill {
+  font-family: var(--font-family);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.tag-tollfree {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.tag-verified {
+  background-color: #f0fdf4;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.contact-phone-code {
   font-family: var(--font-mono);
-  color: var(--color-text-primary);
-  letter-spacing: 0.02em;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 10px 0 6px 0;
 }
 
-.contact-notes {
-  font-size: 0.7rem;
-  color: #fb923c;
+.contact-demo-note {
+  background-color: #fefce8;
+  border: 1px solid #fef08a;
+  color: #854d0e;
+  font-family: var(--font-family);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  align-self: flex-start;
+  margin-bottom: 8px;
 }
 
-.last-verified-text {
-  font-size: 0.65rem;
-  color: var(--color-text-muted);
+.contact-verified-date {
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.contact-right-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.availability-label {
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.district-label {
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: #64748b;
+}
+
+.action-buttons-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn-call {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #006a4e;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.btn-call:hover {
+  background-color: #005a42;
+}
+
+.btn-icon-action {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-icon-action:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+@media (max-width: 640px) {
+  .national-numbers-grid {
+    grid-template-columns: 1fr;
+  }
+  .contact-card-top {
+    flex-direction: column;
+  }
+  .contact-right-actions {
+    align-items: flex-start;
+    width: 100%;
+    margin-top: 12px;
+  }
 }

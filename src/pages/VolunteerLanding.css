@@ -1,57 +1,188 @@
-.volunteer-landing-page {
-  max-width: 800px;
+.volunteer-landing-bg {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 120px);
+  padding: 40px 16px 80px 16px;
+  width: 100%;
+}
+
+.volunteer-landing-container {
+  max-width: 680px;
   margin: 0 auto;
-  padding-bottom: var(--space-12);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
+/* Dark Navy Hero Card matching Figma */
 .vol-hero-card {
-  background-color: var(--color-bg-card) !important;
-  border-color: var(--color-accent-teal) !important;
+  background-color: #0f3460;
+  border-radius: 8px;
+  padding: 36px 32px 32px 32px;
+  text-align: center;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.vol-hero-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-accent-teal-light);
-  color: var(--color-accent-teal);
+.vol-hero-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #ffffff;
+  margin-bottom: 16px;
 }
 
-.v-stat-box {
-  background-color: var(--color-bg-input);
-  border: 1px solid var(--color-border);
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
+.vol-hero-title {
+  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+}
+
+.vol-hero-sub {
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: #cbd5e1;
+  margin: 0 0 24px 0;
+  max-width: 440px;
+}
+
+.vol-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.v-stat-card-navy {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 16px;
   text-align: center;
 }
 
-.v-num {
-  font-size: 1.75rem;
-  font-weight: var(--font-weight-extrabold);
-  color: var(--color-text-primary);
+.v-stat-num-big {
+  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
 }
 
-.v-lbl {
-  font-size: 0.7rem;
-  color: var(--color-text-secondary);
+.v-stat-label-sub {
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: #cbd5e1;
+  margin-top: 4px;
 }
 
-.help-type-item {
-  background-color: var(--color-bg-input);
-  border: 1px solid var(--color-border);
-  padding: var(--space-4);
-  border-radius: var(--radius-md);
+/* White Help Card */
+.vol-help-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 24px 32px 32px 32px;
 }
 
-.help-icon-box {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
+.vol-help-title {
+  font-family: var(--font-family);
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 20px 0;
+}
+
+.help-types-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.help-item-box {
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.help-icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+}
+
+.text-teal { color: #006a4e; }
+.text-amber { color: #d97706; }
+.text-red { color: #dc2626; }
+.text-blue { color: #2563eb; }
+
+.help-item-title {
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+}
+
+.help-item-sub {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Bottom Action Buttons */
+.vol-actions-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.btn-register-green {
+  height: 48px;
+  background-color: #006a4e;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.btn-register-green:hover {
+  background-color: #005a42;
+}
+
+.btn-dashboard-outline {
+  height: 48px;
+  background-color: #ffffff;
+  color: #0f3460;
+  border: 1.5px solid #0f3460;
+  border-radius: 6px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-dashboard-outline:hover {
+  background-color: #f1f5f9;
+}
+
+@media (max-width: 640px) {
+  .help-types-grid, .vol-actions-row {
+    grid-template-columns: 1fr;
+  }
 }
