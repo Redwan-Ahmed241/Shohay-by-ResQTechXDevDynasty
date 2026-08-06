@@ -8,7 +8,7 @@
   ],
   "headers": [
     {
-      "source": "/(.*)\\.(?:css|js|png|jpg|jpeg|gif|svg|ico|webp|avif|woff2?)$",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
