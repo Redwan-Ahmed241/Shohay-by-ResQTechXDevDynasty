@@ -342,3 +342,36 @@
   justify-content: center;
   cursor: pointer;
 }
+
+@media (max-width: 640px) {
+  .vol-dashboard-bg {
+    padding: 20px 12px 60px 12px;
+  }
+  .vol-profile-card {
+    padding: 16px;
+  }
+  .profile-top-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .profile-status-right {
+    align-items: flex-start;
+  }
+  .assign-button-group {
+    grid-template-columns: 1fr;
+  }
+  .assign-meta-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .open-item-bottom-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+  .btn-arrow-icon {
+    display: none;
+  }
+  .open-item-top {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

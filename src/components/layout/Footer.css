@@ -8,12 +8,13 @@
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 624px 296px 296px;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 32px;
   margin-bottom: 40px;
   max-width: 1280px;
   margin-left: auto;
   margin-right: auto;
+  padding: 0 16px;
 }
 
 .footer-brand-col {
@@ -115,7 +116,7 @@
   margin-left: auto;
   margin-right: auto;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 24px;
+  padding: 24px 16px 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -322,3 +322,9 @@
     margin-top: 12px;
   }
 }
+
+@media (max-width: 480px) {
+  .contacts-page-bg {
+    padding: 20px 12px 60px 12px;
+  }
+}

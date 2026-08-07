@@ -1764,3 +1764,35 @@
     min-height: 240px;
   }
 }
+
+@media (max-width: 480px) {
+  .hero-section {
+    height: 400px;
+  }
+  .hero-title {
+    font-size: 24px;
+    line-height: 30px;
+  }
+  .hero-description {
+    font-size: 13px;
+    line-height: 20px;
+  }
+  .hero-content {
+    padding: 0 16px 36px 16px;
+  }
+  .quick-services-grid {
+    grid-template-columns: 1fr;
+  }
+  .live-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .location-row {
+    padding: 8px 12px;
+  }
+  .location-row-inner {
+    flex-wrap: wrap;
+  }
+  .alert-banner-home {
+    padding: 10px 12px;
+  }
+}

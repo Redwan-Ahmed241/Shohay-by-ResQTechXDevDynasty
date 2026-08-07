@@ -188,4 +188,16 @@
   .name-inputs-grid {
     grid-template-columns: 1fr;
   }
+  .step-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .vol-register-bg {
+    padding: 20px 12px 60px 12px;
+  }
+  .register-card {
+    padding: 20px 16px;
+  }
 }
