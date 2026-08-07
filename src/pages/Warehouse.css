@@ -262,3 +262,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .warehouse-page-bg {
+    padding: 20px 12px 60px 12px;
+  }
+  .warehouse-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}

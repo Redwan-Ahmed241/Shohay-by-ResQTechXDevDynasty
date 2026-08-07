@@ -186,3 +186,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .vol-landing-bg {
+    padding: 20px 12px 60px 12px;
+  }
+}

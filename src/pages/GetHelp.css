@@ -256,3 +256,12 @@
     padding: 20px;
   }
 }
+
+@media (max-width: 480px) {
+  .types-grid {
+    grid-template-columns: 1fr;
+  }
+  .get-help-bg {
+    padding: 20px 12px 60px 12px;
+  }
+}
