@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Globe, Menu, Radio, Shield, Layers3, ChevronDown, X } from 'lucide-react';
+import { Globe, Menu, Radio, Shield, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import './Header.css';
 
@@ -60,11 +60,6 @@ export const Header: React.FC = () => {
             <Shield size={14} />
             <span>Sign In</span>
           </Link>
-
-          <button className="utility-btn utility-icon hide-mobile" type="button" aria-label="More options">
-            <Layers3 size={14} />
-            <ChevronDown size={12} />
-          </button>
 
           <button
             className="mobile-menu-btn"
