@@ -203,20 +203,7 @@
   text-decoration: underline;
 }
 
-.location-device-only {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-family);
-  font-size: 10px;
-  color: #9ca3af;
-}
 
-.location-device-only svg {
-  width: 10px;
-  height: 10px;
-}
 
 /* ────────────────────────────
    QUICK STATS BAR (below location)

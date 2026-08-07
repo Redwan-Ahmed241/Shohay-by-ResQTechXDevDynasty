@@ -117,10 +117,6 @@ export const Home: React.FC = () => {
           </select>
           <span className="location-separator">|</span>
           <button className="location-skip">Skip</button>
-          <div className="location-device-only">
-            <Lock />
-            <span>Device only</span>
-          </div>
         </div>
       </div>
 
