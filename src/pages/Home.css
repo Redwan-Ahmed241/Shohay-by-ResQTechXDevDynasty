@@ -1227,7 +1227,7 @@
   max-width: 1280px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 840px 1fr;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
   gap: 0;
 }
 
@@ -1321,6 +1321,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  min-width: 0;
 }
 
 .alert-card-title {
@@ -1411,6 +1412,7 @@
   flex-direction: column;
   gap: 24px;
   padding-left: 40px;
+  min-width: 0;
 }
 
 .widget-card {
@@ -1697,6 +1699,29 @@
   .bottom-cards-grid {
     grid-template-columns: 1fr;
   }
+  .alert-card {
+    flex-direction: column;
+  }
+  .alert-card-severity {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  .alert-card-header-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .updates-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .track-form {
+    flex-direction: column;
+  }
+  .track-btn {
+    width: 100%;
+  }
   .quick-stats-bar,
   .stat-chips,
   .water-risk-section {
@@ -1705,6 +1730,9 @@
 }
 
 @media (max-width: 768px) {
+  .alert-banner-home {
+    padding: 12px 16px;
+  }
   .hero-section {
     height: 500px;
   }
@@ -1723,9 +1751,17 @@
     flex-direction: column;
     align-items: flex-start;
   }
+  .hero-btn-primary,
+  .hero-btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
   .mission-heading {
     font-size: 24px;
     line-height: 32px;
+  }
+  .mission-left {
+    padding: 40px 24px;
   }
   .mission-stats {
     grid-template-columns: 1fr;
@@ -1741,7 +1777,37 @@
   }
   .alert-banner-actions {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .alert-btn-outline,
+  .alert-btn-solid {
+    flex: 1 1 140px;
+  }
+  .quick-stats-bar {
+    padding: 8px 0;
+  }
+  .quick-stats-inner {
+    height: auto;
+    padding: 0 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .stat-chips {
+    width: 100%;
+    padding-bottom: 2px;
+  }
+  .stat-chip {
+    flex-shrink: 0;
+  }
+  .stats-divider {
+    display: none;
+  }
+  .water-risk-section {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px 12px;
   }
   .news-header {
     flex-direction: column;
@@ -1749,7 +1815,19 @@
     gap: 12px;
   }
   .location-row-inner {
-    overflow-x: auto;
+    flex-wrap: wrap;
+    align-items: stretch;
+    overflow-x: visible;
+  }
+  .location-label,
+  .location-gps-btn,
+  .location-dropdown,
+  .location-skip {
+    width: 100%;
+    justify-content: center;
+  }
+  .location-separator {
+    display: none;
   }
 
   .how-help-inner {
@@ -1762,6 +1840,160 @@
 
   .help-photo-card {
     min-height: 240px;
+  }
+  .updates-section {
+    padding-bottom: 40px;
+  }
+  .news-featured-image-wrapper {
+    height: 280px;
+  }
+  .news-sidebar-item {
+    height: auto;
+    padding: 12px 0;
+  }
+  .news-sidebar-thumb {
+    width: 96px;
+    height: 80px;
+  }
+  .bottom-cards-section {
+    padding: 48px 16px;
+  }
+  .bottom-card {
+    padding: 32px 24px;
+  }
+  .live-ticker {
+    height: auto;
+    padding: 0 16px;
+  }
+  .live-ticker-text {
+    white-space: normal;
+    animation: none;
+    padding: 8px 0;
+  }
+  .hero-scroll-indicator {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .alert-banner-title {
+    white-space: normal;
+  }
+  .alert-banner-actions {
+    gap: 6px;
+  }
+  .alert-btn-outline,
+  .alert-btn-solid {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+  .location-row {
+    padding: 8px 12px;
+  }
+  .location-row-inner {
+    gap: 8px;
+  }
+  .location-gps-btn,
+  .location-dropdown,
+  .location-skip {
+    min-height: 36px;
+  }
+  .hero-content {
+    padding: 0 16px 40px 16px;
+  }
+  .hero-title {
+    font-size: 28px;
+    line-height: 32px;
+  }
+  .hero-description {
+    font-size: 14px;
+    line-height: 22px;
+  }
+  .mission-left {
+    padding: 32px 20px;
+  }
+  .mission-heading {
+    font-size: 22px;
+    line-height: 30px;
+  }
+  .mission-image-badge {
+    left: 12px;
+    bottom: 12px;
+    padding: 10px 12px;
+  }
+  .news-section {
+    padding: 48px 12px;
+  }
+  .how-help-section,
+  .updates-section,
+  .bottom-cards-section,
+  .live-situation-section,
+  .quick-services-section {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .alert-banner-actions {
+    flex-direction: column;
+  }
+  .alert-btn-outline,
+  .alert-btn-solid {
+    width: 100%;
+  }
+  .location-gps-btn,
+  .location-dropdown,
+  .location-skip {
+    font-size: 11px;
+  }
+  .stat-chip {
+    padding-inline: 10px;
+  }
+  .water-risk-item {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .water-risk-bar {
+    flex: 1;
+    min-width: 36px;
+  }
+  .how-help-primary,
+  .how-help-secondary,
+  .bottom-card-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    height: 400px;
+  }
+  .hero-title {
+    font-size: 24px;
+    line-height: 30px;
+  }
+  .hero-description {
+    font-size: 13px;
+    line-height: 20px;
+  }
+  .hero-content {
+    padding: 0 16px 36px 16px;
+  }
+  .quick-services-grid {
+    grid-template-columns: 1fr;
+  }
+  .live-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .location-row {
+    padding: 8px 12px;
+  }
+  .location-row-inner {
+    flex-wrap: wrap;
+  }
+  .alert-banner-home {
+    padding: 10px 12px;
   }
 }
 
