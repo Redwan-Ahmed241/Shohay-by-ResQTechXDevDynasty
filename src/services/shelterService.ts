@@ -1,6 +1,6 @@
 import { MOCK_SHELTERS } from '../data/shelters';
 import { Shelter, ShelterStatus } from '../types';
-import { mockFetch } from './api';
+import { apiFetch, mockFetch } from './api';
 
 export interface ShelterFilterParams {
   status?: ShelterStatus | 'All';
@@ -10,40 +10,75 @@ export interface ShelterFilterParams {
 
 export const shelterService = {
   async getShelters(filters?: ShelterFilterParams): Promise<Shelter[]> {
-    let results = [...MOCK_SHELTERS];
-
-    if (filters?.status && filters.status !== 'All') {
-      results = results.filter((s) => s.status === filters.status);
-    }
-
-    if (filters?.district && filters.district !== 'All') {
-      results = results.filter((s) => s.district.toLowerCase() === filters.district?.toLowerCase());
-    }
-
-    if (filters?.amenities) {
-      const activeKeys = Object.entries(filters.amenities)
-        .filter(([_, active]) => active)
-        .map(([key]) => key as keyof Shelter['amenities']);
-
-      if (activeKeys.length > 0) {
-        results = results.filter((s) => activeKeys.every((key) => s.amenities[key]));
+    try {
+      const hasAmenities = filters?.amenities && Object.values(filters.amenities).some(Boolean);
+      if (hasAmenities) {
+        return await apiFetch<Shelter[]>('/api/shelters/filter', {
+          method: 'POST',
+          body: JSON.stringify({
+            status: filters?.status || 'All',
+            district: filters?.district || 'All',
+            amenities: filters?.amenities
+          })
+        });
       }
-    }
 
-    return mockFetch(results);
+      const params = new URLSearchParams();
+      if (filters?.status && filters.status !== 'All') {
+        params.append('status', filters.status);
+      }
+      if (filters?.district && filters.district !== 'All') {
+        params.append('district', filters.district);
+      }
+      const queryStr = params.toString() ? `?${params.toString()}` : '';
+      return await apiFetch<Shelter[]>(`/api/shelters${queryStr}`);
+    } catch (err) {
+      console.warn('Backend unavailable, falling back to local shelters:', err);
+      let results = [...MOCK_SHELTERS];
+
+      if (filters?.status && filters.status !== 'All') {
+        results = results.filter((s) => s.status === filters.status);
+      }
+
+      if (filters?.district && filters.district !== 'All') {
+        results = results.filter((s) => s.district.toLowerCase() === filters.district?.toLowerCase());
+      }
+
+      if (filters?.amenities) {
+        const activeKeys = Object.entries(filters.amenities)
+          .filter(([_, active]) => active)
+          .map(([key]) => key as keyof Shelter['amenities']);
+
+        if (activeKeys.length > 0) {
+          results = results.filter((s) => activeKeys.every((key) => s.amenities[key]));
+        }
+      }
+
+      return mockFetch(results);
+    }
   },
 
   async getShelterSummaryStats() {
-    const totalShelters = MOCK_SHELTERS.length;
-    const openShelters = MOCK_SHELTERS.filter((s) => s.status === 'Open').length;
-    const nearlyFull = MOCK_SHELTERS.filter((s) => s.status === 'Nearly Full').length;
-    const freeSpaces = MOCK_SHELTERS.reduce((acc, s) => acc + Math.max(0, s.capacity - s.occupancy), 0);
+    try {
+      return await apiFetch<{
+        totalShelters: number;
+        openShelters: number;
+        nearlyFull: number;
+        freeSpaces: string;
+      }>('/api/shelters/summary');
+    } catch (err) {
+      console.warn('Backend unavailable, falling back to local shelter stats:', err);
+      const totalShelters = MOCK_SHELTERS.length;
+      const openShelters = MOCK_SHELTERS.filter((s) => s.status === 'Open').length;
+      const nearlyFull = MOCK_SHELTERS.filter((s) => s.status === 'Nearly Full').length;
+      const freeSpaces = MOCK_SHELTERS.reduce((acc, s) => acc + Math.max(0, s.capacity - s.occupancy), 0);
 
-    return mockFetch({
-      totalShelters,
-      openShelters,
-      nearlyFull,
-      freeSpaces: freeSpaces.toLocaleString('en-US')
-    });
+      return mockFetch({
+        totalShelters,
+        openShelters,
+        nearlyFull,
+        freeSpaces: freeSpaces.toLocaleString('en-US')
+      });
+    }
   }
 };
