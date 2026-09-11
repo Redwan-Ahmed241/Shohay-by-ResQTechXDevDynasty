@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Radio, Phone, Mail, ArrowRight } from 'lucide-react';
+import { Phone, Mail, ArrowRight, ArrowLeft } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
 import './SignIn.css';
 
-const SIGNIN_BG_IMAGE = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1200&q=80';
-
 export const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [selectedRole, setSelectedRole] = useState<UserRole>('volunteer');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('public');
   const [authMethod, setAuthMethod] = useState<'otp' | 'email'>('otp');
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
@@ -26,7 +24,8 @@ export const SignIn: React.FC = () => {
 
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    login(selectedRole, mobileNumber);
+    const identifier = authMethod === 'otp' ? mobileNumber : email;
+    login(selectedRole, identifier);
 
     if (selectedRole === 'admin') {
       navigate('/admin/command-center');
@@ -38,69 +37,62 @@ export const SignIn: React.FC = () => {
   };
 
   return (
-    <PageLayout showAlertBanner={false}>
-      <div className="signin-page-bg">
-        <div className="signin-container-card">
-          {/* Left Visual Image Panel */}
-          <div className="signin-visual-panel">
-            <img src={SIGNIN_BG_IMAGE} alt="Coordinating relief" className="visual-bg-img" />
-            <div className="visual-gradient-overlay" />
+    <PageLayout showAlertBanner={false} showFooter={false}>
+      <div className="signin-page-viewport">
+        <div className="signin-modal-container">
+          {/* Left Visual Panel: Frosted Glass with Hadith Quote & Stats */}
+          <div className="signin-glass-panel">
+            <div className="quote-container">
+              <blockquote className="hadith-quote">
+                “And whoever helps his brother (in need), Allah will be helping him; and whoever helps a believer to be free of a grievance, Allah will remove one of his grievances on the Day of Resurrection.”
+              </blockquote>
+              <cite className="hadith-citation">(Sahih Muslim 2699)</cite>
+            </div>
 
-            <div className="visual-panel-content">
-              <div className="brand-header">
-                <div className="brand-icon-box">
-                  <Radio size={16} />
-                </div>
-                <div className="brand-title">SHOHOY</div>
+            <div className="signin-stats-grid">
+              <div className="signin-stat-card">
+                <div className="signin-stat-number">1.2M+</div>
+                <div className="signin-stat-label">People helped</div>
               </div>
-
-              <h2 className="visual-heading">Coordinating relief where it matters most.</h2>
-              <p className="visual-subtext">
-                Sign in to manage shelters, track inventory, coordinate volunteers, and oversee district relief operations.
-              </p>
-
-              <div className="visual-stats-grid">
-                <div className="v-stat-box">
-                  <div className="v-stat-num">1.2M+</div>
-                  <div className="v-stat-lbl">People served</div>
-                </div>
-                <div className="v-stat-box">
-                  <div className="v-stat-num">847</div>
-                  <div className="v-stat-lbl">Open shelters</div>
-                </div>
-                <div className="v-stat-box">
-                  <div className="v-stat-num">38</div>
-                  <div className="v-stat-lbl">Partner orgs</div>
-                </div>
-                <div className="v-stat-box">
-                  <div className="v-stat-num">98%</div>
-                  <div className="v-stat-lbl">Special ops</div>
-                </div>
+              <div className="signin-stat-card">
+                <div className="signin-stat-number">847</div>
+                <div className="signin-stat-label">Special shelters</div>
+              </div>
+              <div className="signin-stat-card">
+                <div className="signin-stat-number">38</div>
+                <div className="signin-stat-label">Partner orgs</div>
+              </div>
+              <div className="signin-stat-card">
+                <div className="signin-stat-number">98%</div>
+                <div className="signin-stat-label">Special ops</div>
               </div>
             </div>
           </div>
 
-          {/* Right Form Panel */}
+          {/* Right Form Panel: Pure White Auth Card */}
           <div className="signin-form-panel">
             <div className="signin-form-box">
               <h1 className="signin-title">Sign In</h1>
               <p className="signin-subtitle">Bangladesh Flood Relief Coordination Platform</p>
 
               {/* Role Selection Tabs */}
-              <div className="role-selector-tabs">
+              <div className="role-selector-tabs" role="tablist">
                 <button
+                  type="button"
                   className={`role-tab ${selectedRole === 'public' ? 'active' : ''}`}
                   onClick={() => setSelectedRole('public')}
                 >
                   PUBLIC ACCESS
                 </button>
                 <button
+                  type="button"
                   className={`role-tab ${selectedRole === 'volunteer' ? 'active' : ''}`}
                   onClick={() => setSelectedRole('volunteer')}
                 >
                   FIELD WORKER
                 </button>
                 <button
+                  type="button"
                   className={`role-tab ${selectedRole === 'admin' ? 'active' : ''}`}
                   onClick={() => setSelectedRole('admin')}
                 >
@@ -108,21 +100,31 @@ export const SignIn: React.FC = () => {
                 </button>
               </div>
 
-              {/* White Form Card Box matching Figma */}
+              {/* Inner Auth Box */}
               <div className="auth-card-box">
-                {/* Auth Method Toggle */}
+                {/* Auth Method Switcher: Mobile OTP vs Email */}
                 <div className="auth-method-toggle">
                   <button
+                    type="button"
                     className={`method-btn ${authMethod === 'otp' ? 'active' : ''}`}
-                    onClick={() => setAuthMethod('otp')}
+                    onClick={() => {
+                      setAuthMethod('otp');
+                      setOtpSent(false);
+                    }}
                   >
-                    <Phone size={14} /> Mobile OTP
+                    <Phone size={14} />
+                    <span>Mobile OTP</span>
                   </button>
                   <button
+                    type="button"
                     className={`method-btn ${authMethod === 'email' ? 'active' : ''}`}
-                    onClick={() => setAuthMethod('email')}
+                    onClick={() => {
+                      setAuthMethod('email');
+                      setOtpSent(false);
+                    }}
                   >
-                    <Mail size={14} /> Email
+                    <Mail size={14} />
+                    <span>Email</span>
                   </button>
                 </div>
 
@@ -130,27 +132,31 @@ export const SignIn: React.FC = () => {
                   <form onSubmit={handleSendOtp} className="auth-form-stack">
                     {authMethod === 'otp' ? (
                       <div className="field-group">
-                        <label className="field-label">MOBILE NUMBER</label>
+                        <label className="field-label" htmlFor="phone-input">MOBILE NUMBER</label>
                         <div className="phone-prefix-group">
                           <span className="phone-prefix">+880</span>
                           <input
-                            type="text"
+                            id="phone-input"
+                            type="tel"
                             value={mobileNumber}
                             onChange={(e) => setMobileNumber(e.target.value)}
                             className="phone-input"
                             placeholder="01XXXXXXXXX"
+                            pattern="01[0-9]{9}"
+                            title="Please enter an 11-digit Bangladeshi mobile number starting with 01"
                             required
                           />
                         </div>
                       </div>
                     ) : (
                       <div className="field-group">
-                        <label className="field-label">EMAIL ADDRESS</label>
+                        <label className="field-label" htmlFor="email-input">EMAIL ADDRESS</label>
                         <input
+                          id="email-input"
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="email-input"
+                          className="auth-text-input"
                           placeholder="admin@shohay.gov.bd"
                           required
                         />
@@ -158,26 +164,46 @@ export const SignIn: React.FC = () => {
                     )}
 
                     <button type="submit" className="submit-btn-navy">
-                      Send OTP <ArrowRight size={14} />
+                      <span>Send OTP</span>
+                      <ArrowRight size={15} />
                     </button>
-                    <span className="otp-disclaimer">A one-time code will be sent to your number.</span>
+                    <p className="otp-disclaimer">
+                      A one-time code will be sent to your {authMethod === 'otp' ? 'number' : 'email'}
+                    </p>
                   </form>
                 ) : (
                   <form onSubmit={handleVerifyOtp} className="auth-form-stack">
                     <div className="field-group">
-                      <label className="field-label">ENTER 6-DIGIT OTP CODE</label>
+                      <div className="otp-header-row">
+                        <label className="field-label" htmlFor="otp-input">ENTER 6-DIGIT OTP CODE</label>
+                        <button
+                          type="button"
+                          className="change-auth-btn"
+                          onClick={() => setOtpSent(false)}
+                        >
+                          <ArrowLeft size={11} />
+                          <span>Change</span>
+                        </button>
+                      </div>
                       <input
+                        id="otp-input"
                         type="text"
+                        maxLength={6}
                         value={otpCode}
-                        onChange={(e) => setOtpCode(e.target.value)}
-                        className="email-input"
+                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                        className="auth-text-input otp-code-input"
                         placeholder="123456"
                         required
+                        autoFocus
                       />
                     </div>
-                    <button type="submit" className="submit-btn-success">
-                      Verify &amp; Enter System
+                    <button type="submit" className="submit-btn-navy">
+                      <span>Verify &amp; Enter System</span>
+                      <ArrowRight size={15} />
                     </button>
+                    <p className="otp-disclaimer">
+                      Demo mode: Enter any 6-digit number to proceed
+                    </p>
                   </form>
                 )}
               </div>

@@ -6,18 +6,20 @@ import { AlertBanner } from './AlertBanner';
 export interface PageLayoutProps {
   children: React.ReactNode;
   showAlertBanner?: boolean;
+  showFooter?: boolean;
 }
 
 export const PageLayout: React.FC<PageLayoutProps> = ({
   children,
-  showAlertBanner = true
+  showAlertBanner = true,
+  showFooter = true,
 }) => {
   return (
     <>
       {showAlertBanner && <AlertBanner />}
       <Header />
       <main className="page-content">{children}</main>
-      <Footer />
+      {showFooter && <Footer />}
     </>
   );
 };
