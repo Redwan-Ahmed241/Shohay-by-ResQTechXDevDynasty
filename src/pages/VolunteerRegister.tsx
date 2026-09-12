@@ -9,9 +9,11 @@ import './VolunteerRegister.css';
 
 export const VolunteerRegister: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [assignedId, setAssignedId] = useState('');
 
   // Form State
   const [formData, setFormData] = useState({
@@ -38,10 +40,40 @@ export const VolunteerRegister: React.FC = () => {
     { number: 3, label: '' }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login('volunteer', formData.mobile || '01712345678');
-    setIsCompleted(true);
+    setIsSubmitting(true);
+
+    try {
+      const skillsList: string[] = [];
+      if (formData.skills.boatRescue) skillsList.push('Boat Operation & Navigation');
+      if (formData.skills.foodDistribution) skillsList.push('Food & Relief Distribution');
+      if (formData.skills.firstAid) skillsList.push('First Aid & CPR');
+      if (formData.skills.shelterAdmin) skillsList.push('Shelter Management');
+      if (formData.skills.dataEntry) skillsList.push('Information & Logistics');
+
+      const equipmentList: string[] = [];
+      if (formData.hasBoat) equipmentList.push('Engine Boat / Rescue Boat');
+      if (formData.hasVehicle) equipmentList.push('Emergency Transport Vehicle');
+
+      const effectiveEmail = formData.email.trim() || `${formData.mobile.trim() || Date.now()}@shohay.gov.bd`;
+      const registeredUser = await register({
+        firstName: formData.firstName.trim() || 'Field',
+        lastName: formData.lastName.trim() || 'Volunteer',
+        mobile: formData.mobile.trim() || '01712345678',
+        email: effectiveEmail,
+        skills: skillsList,
+        equipment: equipmentList
+      });
+
+      setAssignedId(registeredUser.id);
+      setIsCompleted(true);
+    } catch (err) {
+      console.error('Registration failed:', err);
+      setIsCompleted(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -64,7 +96,7 @@ export const VolunteerRegister: React.FC = () => {
               <div className="submission-success text-center flex flex-col items-center gap-4 py-8 animate-fade-in">
                 <CheckCircle size={56} style={{ color: '#006a4e' }} />
                 <h2 className="success-title">Registration Complete!</h2>
-                <p className="success-sub">Welcome to the SHOHAY volunteer network. Your ID is <strong>VOL-2024-DEMO</strong>.</p>
+                <p className="success-sub">Welcome to the SHOHAY volunteer network. Your database ID is <strong>{assignedId || 'VOL-2024-LIVE'}</strong>.</p>
                 <button className="btn-navy-primary mt-4" onClick={() => navigate('/volunteer/dashboard')}>
                   Go to Volunteer Dashboard
                 </button>

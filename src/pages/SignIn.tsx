@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Phone, Mail, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Phone, Mail, ArrowRight, Loader2 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
@@ -11,11 +11,11 @@ export const SignIn: React.FC = () => {
   const { login } = useAuth();
 
   const [selectedRole, setSelectedRole] = useState<UserRole>('volunteer');
-  const [authMethod, setAuthMethod] = useState<'otp' | 'email'>('email');
+  const [authMethod, setAuthMethod] = useState<'email' | 'mobile'>('email');
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const executeRedirect = (role: UserRole) => {
     if (role === 'admin') {
@@ -27,25 +27,38 @@ export const SignIn: React.FC = () => {
     }
   };
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const effectiveEmail = email.trim() || (selectedRole === 'admin' ? 'admin@shohay.gov.bd' : 'volunteer@shohay.gov.bd');
-    const name = selectedRole === 'admin' ? 'District Coordinator' : selectedRole === 'volunteer' ? 'Field Volunteer' : 'Public Citizen';
-    login(selectedRole, effectiveEmail, name);
-    executeRedirect(selectedRole);
+    setErrorMessage(null);
+    setIsLoading(true);
+
+    try {
+      const effectiveEmail = email.trim() || (selectedRole === 'admin' ? 'admin@shohay.gov.bd' : 'volunteer@shohay.gov.bd');
+      const name = selectedRole === 'admin' ? 'District Coordinator' : selectedRole === 'volunteer' ? 'Field Volunteer' : 'Public Citizen';
+      const user = await login(selectedRole, effectiveEmail, name);
+      executeRedirect(user.role);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to sign in. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleMobileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setOtpSent(true);
-  };
+    setErrorMessage(null);
+    setIsLoading(true);
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
-    e.preventDefault();
-    const identifier = mobileNumber.trim() || '01712345678';
-    const name = selectedRole === 'admin' ? 'District Coordinator' : selectedRole === 'volunteer' ? 'Field Volunteer' : 'Public Citizen';
-    login(selectedRole, identifier, name);
-    executeRedirect(selectedRole);
+    try {
+      const identifier = mobileNumber.trim() || '01712345678';
+      const name = selectedRole === 'admin' ? 'District Coordinator' : selectedRole === 'volunteer' ? 'Field Volunteer' : 'Public Citizen';
+      const user = await login(selectedRole, identifier, name);
+      executeRedirect(user.role);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to sign in. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -93,7 +106,7 @@ export const SignIn: React.FC = () => {
               <div className="signin-header-block">
                 <h1 className="signin-title">Sign In</h1>
                 <p className="signin-subtitle">
-                  Choose your role and sign in with any email or phone number.
+                  Choose your role and sign in with your registered email or phone number.
                 </p>
               </div>
 
@@ -135,28 +148,28 @@ export const SignIn: React.FC = () => {
                   <button
                     type="button"
                     className={`method-btn ${authMethod === 'email' ? 'active' : ''}`}
-                    onClick={() => {
-                      setAuthMethod('email');
-                      setOtpSent(false);
-                    }}
+                    onClick={() => setAuthMethod('email')}
                   >
                     <Mail size={14} />
                     <span>Email Address</span>
                   </button>
                   <button
                     type="button"
-                    className={`method-btn ${authMethod === 'otp' ? 'active' : ''}`}
-                    onClick={() => {
-                      setAuthMethod('otp');
-                      setOtpSent(false);
-                    }}
+                    className={`method-btn ${authMethod === 'mobile' ? 'active' : ''}`}
+                    onClick={() => setAuthMethod('mobile')}
                   >
                     <Phone size={14} />
-                    <span>Mobile OTP</span>
+                    <span>Mobile Number</span>
                   </button>
                 </div>
 
-                {/* Email Sign In (Works with ANY email immediately) */}
+                {errorMessage && (
+                  <div style={{ padding: '8px 12px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', color: '#991b1b', fontSize: '12px', marginBottom: '12px' }}>
+                    {errorMessage}
+                  </div>
+                )}
+
+                {/* Email Sign In */}
                 {authMethod === 'email' ? (
                   <form onSubmit={handleEmailSubmit} className="auth-form-stack">
                     <div className="field-group">
@@ -167,23 +180,32 @@ export const SignIn: React.FC = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="auth-text-input"
-                        placeholder={selectedRole === 'admin' ? 'admin@shohay.gov.bd' : 'volunteer@shohay.gov.bd'}
+                        placeholder={selectedRole === 'admin' ? 'admin@shohay.gov.bd' : selectedRole === 'volunteer' ? 'volunteer@shohay.gov.bd' : 'citizen@example.com'}
                         required
                         autoFocus
                       />
                     </div>
 
-                    <button type="submit" className="submit-btn-navy">
-                      <span>Sign In as {selectedRole === 'admin' ? 'Coordinator' : selectedRole === 'volunteer' ? 'Volunteer' : 'Public'}</span>
-                      <ArrowRight size={15} />
+                    <button type="submit" className="submit-btn-navy" disabled={isLoading}>
+                      {isLoading ? (
+                        <>
+                          <Loader2 size={15} className="animate-spin" />
+                          <span>Signing in...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Sign In as {selectedRole === 'admin' ? 'Coordinator' : selectedRole === 'volunteer' ? 'Volunteer' : 'Public'}</span>
+                          <ArrowRight size={15} />
+                        </>
+                      )}
                     </button>
                     <p className="otp-disclaimer">
-                      A verification link or sign-in code will be sent to your email.
+                      Direct secure authentication connected to the Shohay database.
                     </p>
                   </form>
-                ) : !otpSent ? (
-                  /* Mobile OTP Request Step */
-                  <form onSubmit={handleSendOtp} className="auth-form-stack">
+                ) : (
+                  /* Mobile Sign In */
+                  <form onSubmit={handleMobileSubmit} className="auth-form-stack">
                     <div className="field-group">
                       <label className="field-label" htmlFor="phone-input">MOBILE NUMBER</label>
                       <div className="phone-prefix-group">
@@ -196,51 +218,26 @@ export const SignIn: React.FC = () => {
                           className="phone-input"
                           placeholder="01XXXXXXXXX"
                           required
+                          autoFocus
                         />
                       </div>
                     </div>
 
-                    <button type="submit" className="submit-btn-navy">
-                      <span>Send OTP</span>
-                      <ArrowRight size={15} />
+                    <button type="submit" className="submit-btn-navy" disabled={isLoading}>
+                      {isLoading ? (
+                        <>
+                          <Loader2 size={15} className="animate-spin" />
+                          <span>Signing in...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Sign In as {selectedRole === 'admin' ? 'Coordinator' : selectedRole === 'volunteer' ? 'Volunteer' : 'Public'}</span>
+                          <ArrowRight size={15} />
+                        </>
+                      )}
                     </button>
                     <p className="otp-disclaimer">
-                      A one-time verification code will be generated.
-                    </p>
-                  </form>
-                ) : (
-                  /* Mobile OTP Verification Step */
-                  <form onSubmit={handleVerifyOtp} className="auth-form-stack">
-                    <div className="field-group">
-                      <div className="otp-header-row">
-                        <label className="field-label" htmlFor="otp-input">ENTER 6-DIGIT OTP</label>
-                        <button
-                          type="button"
-                          className="change-auth-btn"
-                          onClick={() => setOtpSent(false)}
-                        >
-                          <ArrowLeft size={11} />
-                          <span>Change</span>
-                        </button>
-                      </div>
-                      <input
-                        id="otp-input"
-                        type="text"
-                        maxLength={6}
-                        value={otpCode}
-                        onChange={(e) => setOtpCode(e.target.value)}
-                        className="auth-text-input otp-code-input"
-                        placeholder="123456"
-                        required
-                        autoFocus
-                      />
-                    </div>
-                    <button type="submit" className="submit-btn-navy">
-                      <span>Verify &amp; Sign In</span>
-                      <ArrowRight size={15} />
-                    </button>
-                    <p className="otp-disclaimer">
-                      Enter the 6-digit verification code sent to your phone.
+                      Direct secure authentication connected to the Shohay database.
                     </p>
                   </form>
                 )}

@@ -3,9 +3,11 @@ import { ChevronRight } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { volunteerService } from '../services/volunteerService';
 import { VolunteerProfile, VolunteerAssignment } from '../types';
+import { useAuth } from '../context/AuthContext';
 import './VolunteerDashboard.css';
 
 export const VolunteerDashboard: React.FC = () => {
+  const { user } = useAuth();
   const [profile, setProfile] = useState<VolunteerProfile | null>(null);
   const [assignments, setAssignments] = useState<VolunteerAssignment[]>([]);
   const [checkInStatus, setCheckInStatus] = useState<string>('Not Checked In');
@@ -34,6 +36,9 @@ export const VolunteerDashboard: React.FC = () => {
 
   if (!profile) return null;
 
+  const displayName = user?.name || profile.name;
+  const initials = displayName.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'VOL';
+
   return (
     <PageLayout showAlertBanner={false}>
       <div className="vol-dashboard-bg">
@@ -42,10 +47,10 @@ export const VolunteerDashboard: React.FC = () => {
           <div className="vol-profile-card">
             <div className="profile-top-row">
               <div className="profile-user-left">
-                <div className="avatar-square-navy">DV</div>
+                <div className="avatar-square-navy">{initials}</div>
                 <div className="user-details">
-                  <h3 className="vol-user-name">{profile.name}</h3>
-                  <div className="vol-user-id">ID: {profile.code} • {profile.district}</div>
+                  <h3 className="vol-user-name">{displayName}</h3>
+                  <div className="vol-user-id">ID: {user?.id || profile.code} • {profile.district}</div>
                   <div className="vol-joined-date">Joined: {profile.joinDate}</div>
                 </div>
               </div>

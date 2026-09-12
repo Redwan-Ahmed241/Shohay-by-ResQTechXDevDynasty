@@ -40,7 +40,7 @@ export const Header: React.FC = () => {
   const getDashboardPath = () => {
     if (user?.role === 'admin') return '/admin/command-center';
     if (user?.role === 'volunteer') return '/volunteer/dashboard';
-    return '/';
+    return '/get-help';
   };
 
   return (
@@ -74,7 +74,7 @@ export const Header: React.FC = () => {
             <div className="auth-header-pill hide-mobile">
               <Link to={getDashboardPath()} className="utility-btn utility-user" title="Open Dashboard">
                 <Shield size={14} />
-                <span>{user.role === 'admin' ? 'Coordinator' : 'Volunteer'}: {user.name.split(' ')[0]}</span>
+                <span>{user.role === 'admin' ? 'Coordinator' : user.role === 'volunteer' ? 'Volunteer' : 'Citizen'}: {user.name.split(' ')[0]}</span>
               </Link>
               <button onClick={handleSignOut} className="utility-btn utility-signout" title="Sign Out">
                 <LogOut size={12} />

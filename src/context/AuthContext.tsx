@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthUser, UserRole } from '../types';
+import { authService } from '../services/authService';
+import { TOKEN_STORAGE_KEY } from '../services/api';
 
 const AUTH_STORAGE_KEY = 'shohay_auth_user';
 
@@ -7,7 +9,16 @@ interface AuthContextType {
   user: AuthUser | null;
   role: UserRole;
   isAuthenticated: boolean;
-  login: (role: UserRole, phoneOrEmail: string, customName?: string) => void;
+  login: (role: UserRole, phoneOrEmail: string, customName?: string) => Promise<AuthUser>;
+  register: (data: {
+    firstName: string;
+    lastName: string;
+    mobile?: string;
+    email: string;
+    skills?: string[];
+    equipment?: string[];
+    gender?: string;
+  }) => Promise<AuthUser>;
   logout: () => void;
   setRole: (role: UserRole) => void;
 }
@@ -40,36 +51,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  const login = (role: UserRole, phoneOrEmail: string, customName?: string) => {
-    const isEmail = phoneOrEmail.includes('@');
-    const defaultName =
-      customName ||
-      (role === 'admin'
-        ? 'District Coordinator'
-        : role === 'volunteer'
-        ? 'Field Volunteer'
-        : 'Public Citizen');
-
-    const newUser: AuthUser = {
-      id: `usr-${Date.now()}`,
-      name: defaultName,
-      role,
-      phone: isEmail ? undefined : phoneOrEmail,
-      email: isEmail ? phoneOrEmail : undefined
-    };
-
-    setUser(newUser);
+  const login = async (role: UserRole, phoneOrEmail: string, customName?: string): Promise<AuthUser> => {
+    const result = await authService.login(phoneOrEmail, role, customName);
+    setUser(result.user);
     try {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(result.user));
     } catch {
       // ignore
     }
+    return result.user;
+  };
+
+  const register = async (data: {
+    firstName: string;
+    lastName: string;
+    mobile?: string;
+    email: string;
+    skills?: string[];
+    equipment?: string[];
+    gender?: string;
+  }): Promise<AuthUser> => {
+    const result = await authService.registerPublic(data);
+    setUser(result.user);
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(result.user));
+    } catch {
+      // ignore
+    }
+    return result.user;
   };
 
   const logout = () => {
     setUser(null);
     try {
       localStorage.removeItem(AUTH_STORAGE_KEY);
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
     } catch {
       // ignore
     }
@@ -79,12 +95,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) {
       const updated = { ...user, role: newRole };
       setUser(updated);
+      try {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
     } else {
       login(newRole, '01712345678');
     }
   };
 
-  const isAuthenticated = !!user && user.role !== 'public';
+  const isAuthenticated = !!user;
 
   return (
     <AuthContext.Provider
@@ -93,6 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: user?.role || 'public',
         isAuthenticated,
         login,
+        register,
         logout,
         setRole
       }}
