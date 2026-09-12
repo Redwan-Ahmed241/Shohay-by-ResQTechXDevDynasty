@@ -6,7 +6,7 @@ export type SeverityLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'ALL CLEAR'
 
 export type VerificationStatus = 'Government Verified' | 'Partner Verified' | 'Unverified';
 
-export type UserRole = 'public' | 'volunteer' | 'admin';
+export type UserRole = 'public' | 'volunteer' | 'fieldworker' | 'admin';
 
 /* ── Flood Alert ── */
 export interface FloodAlert {
@@ -186,6 +186,19 @@ export interface AuthUser {
   id: string;
   name: string;
   role: UserRole;
+  first_name?: string;
+  last_name?: string;
   phone?: string;
+  phone_number?: string;
   email?: string;
+  avatar?: string;
+  gender?: string;
+  skills?: string[];
+  equipment?: string[];
+  nid_number?: string;
+  address?: string;
+  dob?: string;
+  experience_certificate?: string;
+  verification_status?: string;
+  created_at?: string;
 }
