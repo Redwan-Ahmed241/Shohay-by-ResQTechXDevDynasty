@@ -142,7 +142,7 @@ export const authService = {
         method: 'POST',
         body: JSON.stringify({ email, otp })
       });
-    } catch {
+    } catch (err: any) {
       if (otp === '123456') {
         return {
           success: true,
