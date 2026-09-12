@@ -630,7 +630,7 @@ export const Home: React.FC = () => {
             </div>
             <h3>Our Impact</h3>
             <p>5,000+ rescues coordinated and 50,000+ meals distributed in the past 14 days.</p>
-            <Link to="/about" className="bottom-card-btn">Impact Report</Link>
+            <Link to="/campaigns" className="bottom-card-btn">Impact Report</Link>
           </div>
         </div>
       </section>

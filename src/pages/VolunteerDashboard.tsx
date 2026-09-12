@@ -18,11 +18,12 @@ export const VolunteerDashboard: React.FC = () => {
       ...base,
       id: user?.id || base.id,
       name,
-      code: user?.id ? user.id.toUpperCase() : base.code
+      code: user?.id ? user.id.toUpperCase() : base.code,
+      currentAssignment: undefined
     };
   });
 
-  const [assignments, setAssignments] = useState<VolunteerAssignment[]>(() => MOCK_VOLUNTEER_ASSIGNMENTS);
+  const [assignments, setAssignments] = useState<VolunteerAssignment[]>([]);
   const [checkInStatus, setCheckInStatus] = useState<'Not Checked In' | 'Checked In' | 'Paused'>('Not Checked In');
   const [notification, setNotification] = useState<string | null>(null);
 
@@ -42,7 +43,7 @@ export const VolunteerDashboard: React.FC = () => {
         }));
       }
       const openList = await volunteerService.getOpenAssignments();
-      if (openList && openList.length > 0) {
+      if (Array.isArray(openList)) {
         setAssignments(openList);
       }
     } catch (err) {
@@ -87,7 +88,6 @@ export const VolunteerDashboard: React.FC = () => {
 
   const handleAccept = async (id: string) => {
     const selectedTask = assignments.find((a) => a.id === id);
-    await volunteerService.acceptAssignment(id);
     setAssignments((prev) => prev.filter((a) => a.id !== id));
 
     if (selectedTask) {
@@ -99,20 +99,23 @@ export const VolunteerDashboard: React.FC = () => {
       setNotification(`Accepted assignment: "${selectedTask.title}". You can now Check In.`);
       setTimeout(() => setNotification(null), 4000);
     }
+    await volunteerService.acceptAssignment(id);
   };
 
   const handleDecline = async (id: string) => {
-    await volunteerService.declineAssignment(id);
     setAssignments((prev) => prev.filter((a) => a.id !== id));
     setNotification('Assignment declined.');
     setTimeout(() => setNotification(null), 3000);
+    await volunteerService.declineAssignment(id);
   };
 
-  const handleToggleAvailability = () => {
+  const handleToggleAvailability = async () => {
+    const nextVal = !profile.isAvailable;
     setProfile((prev) => ({
       ...prev,
-      isAvailable: !prev.isAvailable
+      isAvailable: nextVal
     }));
+    await volunteerService.checkIn(nextVal ? 'Checked In' : 'Paused', 0);
   };
 
   const displayName = user?.name || profile.name;
