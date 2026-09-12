@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Globe, Menu, Radio, Shield, X } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Globe, Menu, Radio, Shield, X, LogOut } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import './Header.css';
 
 const navigationItems = [
@@ -15,7 +16,9 @@ const navigationItems = [
 
 export const Header: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { toggleLanguage } = useLanguage();
+  const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -28,6 +31,17 @@ export const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleSignOut = () => {
+    logout();
+    navigate('/');
+  };
+
+  const getDashboardPath = () => {
+    if (user?.role === 'admin') return '/admin/command-center';
+    if (user?.role === 'volunteer') return '/volunteer/dashboard';
+    return '/';
+  };
 
   return (
     <header className={`header${scrolled ? ' header-scrolled' : ''}`}>
@@ -56,10 +70,23 @@ export const Header: React.FC = () => {
             <span>বাংলা</span>
           </button>
 
-          <Link to="/sign-in" className="utility-btn utility-signin hide-mobile">
-            <Shield size={14} />
-            <span>Sign In</span>
-          </Link>
+          {isAuthenticated && user ? (
+            <div className="auth-header-pill hide-mobile">
+              <Link to={getDashboardPath()} className="utility-btn utility-user" title="Open Dashboard">
+                <Shield size={14} />
+                <span>{user.role === 'admin' ? 'Coordinator' : 'Volunteer'}: {user.name.split(' ')[0]}</span>
+              </Link>
+              <button onClick={handleSignOut} className="utility-btn utility-signout" title="Sign Out">
+                <LogOut size={12} />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          ) : (
+            <Link to="/sign-in" className="utility-btn utility-signin hide-mobile">
+              <Shield size={14} />
+              <span>Sign In</span>
+            </Link>
+          )}
 
           <button
             className="mobile-menu-btn"
@@ -78,6 +105,32 @@ export const Header: React.FC = () => {
               {item.label}
             </Link>
           ))}
+          {isAuthenticated && user ? (
+            <>
+              <Link
+                to={getDashboardPath()}
+                onClick={() => setMobileMenuOpen(false)}
+                className="nav-link user-highlight"
+                style={{ color: '#a7f3d0', fontWeight: 600 }}
+              >
+                Dashboard ({user.name})
+              </Link>
+              <button
+                onClick={() => {
+                  handleSignOut();
+                  setMobileMenuOpen(false);
+                }}
+                className="nav-link"
+                style={{ color: '#fca5a5', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '12px 16px' }}
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <Link to="/sign-in" onClick={() => setMobileMenuOpen(false)} className="nav-link">
+              Sign In
+            </Link>
+          )}
         </div>
       )}
     </header>

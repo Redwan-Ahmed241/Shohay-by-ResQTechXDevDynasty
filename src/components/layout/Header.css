@@ -237,3 +237,36 @@
     display: none;
   }
 }
+
+/* ── Auth Pill & User Button ── */
+.auth-header-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.utility-user {
+  background: rgba(0, 106, 78, 0.25) !important;
+  border-color: rgba(0, 106, 78, 0.6) !important;
+  color: #6ee7b7 !important;
+  font-weight: 600 !important;
+}
+
+.utility-user:hover {
+  background: rgba(0, 106, 78, 0.45) !important;
+  color: #ffffff !important;
+}
+
+.utility-signout {
+  background: rgba(220, 38, 38, 0.15) !important;
+  border-color: rgba(220, 38, 38, 0.4) !important;
+  color: #fca5a5 !important;
+  cursor: pointer;
+  padding: 0 0.5rem !important;
+}
+
+.utility-signout:hover {
+  background: rgba(220, 38, 38, 0.35) !important;
+  color: #ffffff !important;
+}
+
