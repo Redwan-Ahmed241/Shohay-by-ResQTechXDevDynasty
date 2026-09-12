@@ -43,5 +43,62 @@ export const volunteerService = {
       console.warn('Backend unavailable, falling back to local assignment decline:', err);
       return mockFetch(true);
     }
+  },
+
+  async getAllVolunteers(): Promise<{ count: number; volunteers: any[] }> {
+    try {
+      return await apiFetch<{ count: number; volunteers: any[] }>('/api/volunteers');
+    } catch (err) {
+      console.warn('Backend volunteers unavailable, using fallback:', err);
+      return mockFetch({
+        count: 6,
+        volunteers: [
+          { id: 'vol-1', firstName: 'Nasrin', lastName: 'Akter', role: 'fieldworker', phone_number: '01812345678', district: 'Sunamganj', skills: ['Boat Rescue', 'First Aid'], equipment: ['Speedboat', 'VHF Radio'], verification_status: 'Verified' },
+          { id: 'vol-2', firstName: 'Karim', lastName: 'Uddin', role: 'fieldworker', phone_number: '01712345679', district: 'Sirajganj', skills: ['Relief Logistics', 'Shelter Admin'], equipment: ['First Aid Kit'], verification_status: 'Verified' },
+          { id: 'vol-3', firstName: 'Rahim', lastName: 'Ahmed', role: 'fieldworker', phone_number: '01712345678', district: 'Sunamganj', skills: ['Water Rescue'], equipment: ['Life Jackets'], verification_status: 'Verified' }
+        ]
+      });
+    }
+  },
+
+  async createAssignment(data: {
+    title: string;
+    location: string;
+    district: string;
+    durationHours?: number;
+    teamSize?: number;
+    priority?: string;
+  }): Promise<VolunteerAssignment> {
+    try {
+      return await apiFetch<VolunteerAssignment>('/api/volunteers/assignments', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+    } catch (err) {
+      console.warn('Backend create assignment unavailable, fallback:', err);
+      const newA: VolunteerAssignment = {
+        id: `assign-${Date.now()}`,
+        title: data.title,
+        location: data.location,
+        district: data.district,
+        durationHours: data.durationHours || 4,
+        teamSize: data.teamSize || 4,
+        priority: (data.priority as any) || 'high',
+        status: 'Available'
+      };
+      return mockFetch(newA);
+    }
+  },
+
+  async checkIn(status: string = 'Checked In', hours: number = 1): Promise<any> {
+    try {
+      return await apiFetch('/api/volunteers/checkin', {
+        method: 'POST',
+        body: JSON.stringify({ status, hours })
+      });
+    } catch (err) {
+      console.warn('Backend checkin unavailable, fallback:', err);
+      return mockFetch({ status, hoursLogged: hours });
+    }
   }
 };

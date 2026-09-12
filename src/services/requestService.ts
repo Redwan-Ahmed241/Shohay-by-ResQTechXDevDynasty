@@ -27,10 +27,12 @@ const MOCK_REQUESTS_DB: Record<string, AssistanceRequestRecord> = {
 export const requestService = {
   async submitRequest(payload: AssistanceRequestPayload): Promise<AssistanceRequestRecord> {
     try {
-      return await apiFetch<AssistanceRequestRecord>('/api/requests', {
+      const created = await apiFetch<AssistanceRequestRecord>('/api/requests', {
         method: 'POST',
         body: JSON.stringify(payload)
       });
+      MOCK_REQUESTS_DB[created.trackingId] = created;
+      return created;
     } catch (err) {
       console.warn('Backend unavailable, falling back to local request creation:', err);
       const randomNum = Math.floor(10000 + Math.random() * 90000);
@@ -57,6 +59,42 @@ export const requestService = {
       console.warn('Backend unavailable or not found, checking local request tracking:', err);
       const result = MOCK_REQUESTS_DB[cleanId];
       return mockFetch(result);
+    }
+  },
+
+  async getAllRequests(status?: string, district?: string): Promise<AssistanceRequestRecord[]> {
+    const params = new URLSearchParams();
+    if (status && status !== 'All') params.append('status', status);
+    if (district && district !== 'All') params.append('district', district);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+
+    try {
+      return await apiFetch<AssistanceRequestRecord[]>(`/api/requests${queryString}`);
+    } catch (err) {
+      console.warn('Backend requests unavailable, using local cache:', err);
+      let list = Object.values(MOCK_REQUESTS_DB);
+      if (status && status !== 'All') {
+        list = list.filter((r) => r.status.toLowerCase() === status.toLowerCase());
+      }
+      return mockFetch(list);
+    }
+  },
+
+  async updateRequestStatus(requestId: string, newStatus: string, notes?: string): Promise<AssistanceRequestRecord> {
+    try {
+      return await apiFetch<AssistanceRequestRecord>(`/api/requests/${encodeURIComponent(requestId)}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: newStatus, notes })
+      });
+    } catch (err) {
+      console.warn('Backend status update unavailable, fallback:', err);
+      const target = Object.values(MOCK_REQUESTS_DB).find((r) => r.id === requestId || r.trackingId === requestId);
+      if (target) {
+        target.status = newStatus as any;
+        if (notes) target.notes = `${target.notes || ''} | ${notes}`;
+        return mockFetch(target);
+      }
+      throw err;
     }
   }
 };
