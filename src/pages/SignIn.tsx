@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Phone, Mail, ArrowRight, ArrowLeft, Zap, CheckCircle2 } from 'lucide-react';
+import { Phone, Mail, ArrowRight, ArrowLeft } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
@@ -15,7 +15,7 @@ export const SignIn: React.FC = () => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
   const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('123456');
+  const [otpCode, setOtpCode] = useState('');
 
   const executeRedirect = (role: UserRole) => {
     if (role === 'admin') {
@@ -38,7 +38,6 @@ export const SignIn: React.FC = () => {
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
     setOtpSent(true);
-    setOtpCode('123456');
   };
 
   const handleVerifyOtp = (e: React.FormEvent) => {
@@ -47,13 +46,6 @@ export const SignIn: React.FC = () => {
     const name = selectedRole === 'admin' ? 'District Coordinator' : selectedRole === 'volunteer' ? 'Field Volunteer' : 'Public Citizen';
     login(selectedRole, identifier, name);
     executeRedirect(selectedRole);
-  };
-
-  const handleQuickDemoLogin = (role: UserRole) => {
-    const demoEmail = role === 'admin' ? 'admin@shohay.gov.bd' : role === 'volunteer' ? 'volunteer@shohay.gov.bd' : 'citizen@shohay.gov.bd';
-    const name = role === 'admin' ? 'District Coordinator' : role === 'volunteer' ? 'Field Volunteer' : 'Public Citizen';
-    login(role, demoEmail, name);
-    executeRedirect(role);
   };
 
   return (
@@ -186,7 +178,7 @@ export const SignIn: React.FC = () => {
                       <ArrowRight size={15} />
                     </button>
                     <p className="otp-disclaimer">
-                      Works with any email address. Instant sign-in enabled for presentation.
+                      A verification link or sign-in code will be sent to your email.
                     </p>
                   </form>
                 ) : !otpSent ? (
@@ -244,65 +236,14 @@ export const SignIn: React.FC = () => {
                       />
                     </div>
                     <button type="submit" className="submit-btn-navy">
-                      <CheckCircle2 size={15} />
-                      <span>Verify &amp; Enter System</span>
+                      <span>Verify &amp; Sign In</span>
+                      <ArrowRight size={15} />
                     </button>
-                    <p className="otp-disclaimer" style={{ color: '#006a4e', fontWeight: 500 }}>
-                      ✓ Demo Code 123456 is pre-filled. Click verify to enter.
+                    <p className="otp-disclaimer">
+                      Enter the 6-digit verification code sent to your phone.
                     </p>
                   </form>
                 )}
-
-                {/* 1-Click Fast Demo Sign-In Bar (Ideal for presentations) */}
-                <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px dashed #e2e8f0' }}>
-                  <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '8px', textTransform: 'uppercase' }}>
-                    ⚡ 1-Click Presentation Access:
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                      type="button"
-                      onClick={() => handleQuickDemoLogin('volunteer')}
-                      style={{
-                        flex: 1,
-                        padding: '7px 8px',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        borderRadius: '6px',
-                        border: '1px solid #10b981',
-                        background: '#ecfdf5',
-                        color: '#065f46',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <Zap size={12} /> Volunteer
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleQuickDemoLogin('admin')}
-                      style={{
-                        flex: 1,
-                        padding: '7px 8px',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        borderRadius: '6px',
-                        border: '1px solid #3b82f6',
-                        background: '#eff6ff',
-                        color: '#1e40af',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <Zap size={12} /> Admin
-                    </button>
-                  </div>
-                </div>
               </div>
 
               <div className="signin-footer-row">
