@@ -201,3 +201,31 @@
     padding: 20px 16px;
   }
 }
+
+/* Email verification step & errors */
+.register-error-box {
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #991b1b;
+  font-family: var(--font-family);
+  font-size: 13px;
+}
+
+.verify-hint {
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: #475569;
+  margin: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.verify-code-input {
+  letter-spacing: 4px;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}

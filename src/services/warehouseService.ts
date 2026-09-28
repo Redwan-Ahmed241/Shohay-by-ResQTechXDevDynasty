@@ -1,43 +1,38 @@
-import { MOCK_WAREHOUSE_ITEMS } from '../data/warehouse';
-import { WarehouseItem, InventoryCategory } from '../types';
-import { apiFetch, mockFetch } from './api';
+import { WarehouseItem, InventoryCategory, StockMovement } from '../types';
+import { apiFetch } from './api';
 
+export interface StockMovementInput {
+  itemId: string;
+  quantity: number;
+  fromTo: string;
+  reference?: string;
+  notes?: string;
+}
+
+/** Warehouse logistics (coordinators only). Stock changes are saved on the server. */
 export const warehouseService = {
-  async getInventory(categoryFilter?: InventoryCategory | 'All'): Promise<WarehouseItem[]> {
-    try {
-      const params = new URLSearchParams();
-      if (categoryFilter && categoryFilter !== 'All') {
-        params.append('category', categoryFilter);
-      }
-      const queryStr = params.toString() ? `?${params.toString()}` : '';
-      return await apiFetch<WarehouseItem[]>(`/api/warehouse/inventory${queryStr}`);
-    } catch (err) {
-      console.warn('Backend unavailable, falling back to local inventory:', err);
-      let results = [...MOCK_WAREHOUSE_ITEMS];
-      if (categoryFilter && categoryFilter !== 'All') {
-        results = results.filter((item) => item.category === categoryFilter);
-      }
-      return mockFetch(results);
-    }
+  getInventory(categoryFilter?: InventoryCategory | 'All'): Promise<WarehouseItem[]> {
+    const query = categoryFilter && categoryFilter !== 'All' ? `?category=${encodeURIComponent(categoryFilter)}` : '';
+    return apiFetch<WarehouseItem[]>(`/api/warehouse/inventory${query}`);
   },
 
-  async getLowStockAlerts(): Promise<WarehouseItem[]> {
-    try {
-      return await apiFetch<WarehouseItem[]>('/api/warehouse/alerts/low-stock');
-    } catch (err) {
-      console.warn('Backend unavailable, falling back to local low stock:', err);
-      const lowStock = MOCK_WAREHOUSE_ITEMS.filter((item) => item.status === 'LOW');
-      return mockFetch(lowStock);
-    }
+  getLowStockAlerts(): Promise<WarehouseItem[]> {
+    return apiFetch<WarehouseItem[]>('/api/warehouse/alerts/low-stock');
   },
 
-  async getExpiringItems(): Promise<WarehouseItem[]> {
-    try {
-      return await apiFetch<WarehouseItem[]>('/api/warehouse/alerts/expiring');
-    } catch (err) {
-      console.warn('Backend unavailable, falling back to local expiring items:', err);
-      const expiring = MOCK_WAREHOUSE_ITEMS.filter((item) => item.expiryDate);
-      return mockFetch(expiring);
-    }
+  getExpiringItems(): Promise<WarehouseItem[]> {
+    return apiFetch<WarehouseItem[]>('/api/warehouse/alerts/expiring');
+  },
+
+  getMovements(limit = 50): Promise<StockMovement[]> {
+    return apiFetch<StockMovement[]>(`/api/warehouse/movements?limit=${limit}`);
+  },
+
+  receiveStock(input: StockMovementInput): Promise<{ item: WarehouseItem; movement: StockMovement }> {
+    return apiFetch('/api/warehouse/receive', { method: 'POST', body: JSON.stringify(input) });
+  },
+
+  dispatchStock(input: StockMovementInput): Promise<{ item: WarehouseItem; movement: StockMovement }> {
+    return apiFetch('/api/warehouse/dispatch', { method: 'POST', body: JSON.stringify(input) });
   }
 };

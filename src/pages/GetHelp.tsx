@@ -16,13 +16,16 @@ import {
   HelpCircle,
   CheckCircle,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  MapPin,
+  PhoneCall
 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { Input } from '../components/ui/Input';
 import { Checkbox } from '../components/ui/Checkbox';
 import { StepIndicator } from '../components/ui/StepIndicator';
 import { requestService } from '../services/requestService';
+import { ApiError } from '../services/api';
 import { AssistanceType, AssistanceRequestPayload } from '../types';
 import './GetHelp.css';
 
@@ -35,24 +38,28 @@ export const GetHelp: React.FC = () => {
   const [selectedTypes, setSelectedTypes] = useState<AssistanceType[]>([]);
   const [householdSize, setHouseholdSize] = useState<number>(4);
   const [vulnerable, setVulnerable] = useState({
-    children: 1,
+    children: 0,
     elderly: 0,
     pregnant: 0,
     disabled: 0
   });
   const [location, setLocation] = useState({
-    district: 'Sunamganj',
-    upazila: 'Sunamganj Sadar',
-    union: 'Jahangirnagar',
-    address: 'Village Nabinagar, Ward 3',
-    landmark: 'Near Govt Primary School'
+    district: '',
+    upazila: '',
+    union: '',
+    address: '',
+    landmark: '',
+    gpsCoords: ''
   });
   const [contact, setContact] = useState({
-    name: 'Rahim Uddin',
-    phone: '01712345678',
+    name: '',
+    phone: '',
     altPhone: '',
     isAnonymous: false
   });
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [gpsStatus, setGpsStatus] = useState<string | null>(null);
 
   const steps = [
     { number: 1, label: 'Type' },
@@ -90,17 +97,64 @@ export const GetHelp: React.FC = () => {
     );
   };
 
+  const shareGps = () => {
+    if (!navigator.geolocation) {
+      setGpsStatus('This device cannot share its location.');
+      return;
+    }
+    setGpsStatus('Finding your location…');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords = `${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}`;
+        setLocation((prev) => ({ ...prev, gpsCoords: coords }));
+        setGpsStatus(`Location added (${coords}).`);
+      },
+      () => setGpsStatus('Could not get your location. Please describe it in the address instead.'),
+      { enableHighAccuracy: true, timeout: 15000 }
+    );
+  };
+
+  // Returns the step to fix and why, or null when the request can be sent.
+  const findMissing = (): { step: number; message: string } | null => {
+    if (selectedTypes.length === 0) return { step: 1, message: 'Choose at least one kind of help you need.' };
+    if (householdSize < 1) return { step: 2, message: 'Household size must be at least 1.' };
+    if (!location.district.trim()) return { step: 3, message: 'Enter your district.' };
+    if (!location.address.trim() && !location.gpsCoords) return { step: 3, message: 'Enter your village / address or share your GPS location so rescuers can find you.' };
+    if (!contact.phone.trim()) return { step: 4, message: 'Enter a mobile number so responders can call you back.' };
+    if (!contact.isAnonymous && !contact.name.trim()) return { step: 4, message: 'Enter your name, or tick "Keep my request anonymous".' };
+    return null;
+  };
+
   const handleSubmit = async () => {
+    setSubmitError(null);
+    const missing = findMissing();
+    if (missing) {
+      setSubmitError(missing.message);
+      setCurrentStep(missing.step);
+      return;
+    }
+
     const payload: AssistanceRequestPayload = {
       types: selectedTypes,
       householdSize,
       vulnerableCount: vulnerable,
-      location,
-      contact
+      location: { ...location, gpsCoords: location.gpsCoords || undefined, landmark: location.landmark || undefined },
+      contact: { ...contact, name: contact.isAnonymous ? contact.name || 'Anonymous' : contact.name }
     };
 
-    const res = await requestService.submitRequest(payload);
-    setSubmittedId(res.trackingId);
+    setIsSubmitting(true);
+    try {
+      const res = await requestService.submitRequest(payload);
+      setSubmittedId(res.trackingId);
+    } catch (err) {
+      setSubmitError(
+        err instanceof ApiError
+          ? `Your request was NOT sent: ${err.message}`
+          : 'Your request was NOT sent — there is no connection to the Shohay server. Please try again.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -143,9 +197,11 @@ export const GetHelp: React.FC = () => {
                       {assistanceOptionList.map((opt) => {
                         const selected = selectedTypes.includes(opt.id);
                         return (
-                          <div
+                          <button
+                            type="button"
                             key={opt.id}
                             className={`type-card ${selected ? 'selected' : ''}`}
+                            aria-pressed={selected}
                             onClick={() => toggleType(opt.id)}
                           >
                             <div className="type-icon-wrapper" style={{ color: opt.iconColor }}>
@@ -155,7 +211,7 @@ export const GetHelp: React.FC = () => {
                               <span className="type-label">{opt.label}</span>
                               {opt.priority && <span className="priority-text">Priority</span>}
                             </div>
-                          </div>
+                          </button>
                         );
                       })}
                     </div>
@@ -238,6 +294,13 @@ export const GetHelp: React.FC = () => {
                       value={location.landmark}
                       onChange={(e) => setLocation({ ...location, landmark: e.target.value })}
                     />
+
+                    <div>
+                      <button type="button" className="get-help-btn-outline" onClick={shareGps}>
+                        <MapPin size={16} /> {location.gpsCoords ? 'Update my GPS location' : 'Share my GPS location'}
+                      </button>
+                      {gpsStatus && <p style={{ fontSize: 13, color: '#475569', margin: '6px 0 0' }} role="status">{gpsStatus}</p>}
+                    </div>
                   </div>
                 )}
 
@@ -286,11 +349,21 @@ export const GetHelp: React.FC = () => {
                         <strong>Household Size:</strong> {householdSize} people ({vulnerable.children} children, {vulnerable.elderly} elderly)
                       </div>
                       <div className="review-row">
-                        <strong>Location:</strong> {location.address}, {location.upazila}, {location.district}
+                        <strong>Location:</strong> {[location.address, location.upazila, location.district].filter(Boolean).join(', ') || 'Not given'}
+                        {location.gpsCoords && <> (GPS {location.gpsCoords})</>}
                       </div>
                       <div className="review-row">
                         <strong>Contact:</strong> {contact.isAnonymous ? 'Anonymous' : contact.name} ({contact.phone})
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {submitError && (
+                  <div role="alert" style={{ margin: '16px 0 0', padding: '12px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, color: '#991b1b', fontSize: 14 }}>
+                    <div style={{ fontWeight: 600 }}>{submitError}</div>
+                    <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <PhoneCall size={14} /> In a life-threatening emergency call <a href="tel:999" style={{ fontWeight: 700, color: '#991b1b' }}>999</a> now.
                     </div>
                   </div>
                 )}
@@ -312,8 +385,8 @@ export const GetHelp: React.FC = () => {
                       Next <ChevronRight size={16} />
                     </button>
                   ) : (
-                    <button className="get-help-btn-success" onClick={handleSubmit}>
-                      Submit Assistance Request
+                    <button className="get-help-btn-success" onClick={handleSubmit} disabled={isSubmitting}>
+                      {isSubmitting ? 'Sending…' : submitError ? 'Try Again' : 'Submit Assistance Request'}
                     </button>
                   )}
                 </div>

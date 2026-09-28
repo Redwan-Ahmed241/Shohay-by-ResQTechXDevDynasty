@@ -1,100 +1,61 @@
-import { AssistanceRequestPayload, AssistanceRequestRecord } from '../types';
-import { apiFetch, mockFetch } from './api';
+import { AssistanceRequestPayload, AssistanceRequestRecord, RequestStatus, RequestTracking } from '../types';
+import { ApiError, apiFetch } from './api';
 
-const MOCK_REQUESTS_DB: Record<string, AssistanceRequestRecord> = {
-  'SHY-2024-89211': {
-    id: 'req-1',
-    trackingId: 'SHY-2024-89211',
-    types: ['rescue', 'water'],
-    householdSize: 5,
-    vulnerableCount: { children: 2, elderly: 1, pregnant: 0, disabled: 0 },
-    location: {
-      district: 'Sunamganj',
-      upazila: 'Sunamganj Sadar',
-      union: 'Jahangirnagar',
-      address: 'Village Nabinagar, Ward 3'
-    },
-    contact: {
-      name: 'Rahim Uddin',
-      phone: '01712345678',
-      isAnonymous: false
-    },
-    status: 'In Progress',
-    createdAt: '2024-07-15 08:30'
-  }
-};
+export interface DispatchTaskInput {
+  title: string;
+  location: string;
+  district: string;
+  durationHours: number;
+  teamSize: number;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+}
 
+/**
+ * Citizen requests. Nothing here falls back to fake data: a request that did not reach the
+ * server must never look submitted, so errors are passed on to the page.
+ */
 export const requestService = {
-  async submitRequest(payload: AssistanceRequestPayload): Promise<AssistanceRequestRecord> {
-    try {
-      const created = await apiFetch<AssistanceRequestRecord>('/api/requests', {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      });
-      MOCK_REQUESTS_DB[created.trackingId] = created;
-      return created;
-    } catch (err) {
-      console.warn('Backend unavailable, falling back to local request creation:', err);
-      const randomNum = Math.floor(10000 + Math.random() * 90000);
-      const trackingId = `SHY-2024-${randomNum}`;
-
-      const newRecord: AssistanceRequestRecord = {
-        ...payload,
-        id: `req-${Date.now()}`,
-        trackingId,
-        status: 'Pending',
-        createdAt: new Date().toISOString()
-      };
-
-      MOCK_REQUESTS_DB[trackingId] = newRecord;
-      return mockFetch(newRecord);
-    }
+  /** Public, no account needed. */
+  submitRequest(payload: AssistanceRequestPayload): Promise<AssistanceRequestRecord> {
+    return apiFetch<AssistanceRequestRecord>('/api/requests', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
   },
 
-  async trackRequest(trackingId: string): Promise<AssistanceRequestRecord | undefined> {
+  /** Public progress view. Returns undefined when the tracking ID does not exist. */
+  async trackRequest(trackingId: string): Promise<RequestTracking | undefined> {
     const cleanId = trackingId.trim().toUpperCase();
     try {
-      return await apiFetch<AssistanceRequestRecord>(`/api/requests/track/${encodeURIComponent(cleanId)}`);
+      return await apiFetch<RequestTracking>(`/api/requests/track/${encodeURIComponent(cleanId)}`);
     } catch (err) {
-      console.warn('Backend unavailable or not found, checking local request tracking:', err);
-      const result = MOCK_REQUESTS_DB[cleanId];
-      return mockFetch(result);
+      if (err instanceof ApiError && err.status === 404) return undefined;
+      throw err;
     }
   },
 
-  async getAllRequests(status?: string, district?: string): Promise<AssistanceRequestRecord[]> {
+  /** Coordinators only. */
+  getAllRequests(status?: string, district?: string): Promise<AssistanceRequestRecord[]> {
     const params = new URLSearchParams();
     if (status && status !== 'All') params.append('status', status);
     if (district && district !== 'All') params.append('district', district);
     const queryString = params.toString() ? `?${params.toString()}` : '';
-
-    try {
-      return await apiFetch<AssistanceRequestRecord[]>(`/api/requests${queryString}`);
-    } catch (err) {
-      console.warn('Backend requests unavailable, using local cache:', err);
-      let list = Object.values(MOCK_REQUESTS_DB);
-      if (status && status !== 'All') {
-        list = list.filter((r) => r.status.toLowerCase() === status.toLowerCase());
-      }
-      return mockFetch(list);
-    }
+    return apiFetch<AssistanceRequestRecord[]>(`/api/requests${queryString}`);
   },
 
-  async updateRequestStatus(requestId: string, newStatus: string, notes?: string): Promise<AssistanceRequestRecord> {
-    try {
-      return await apiFetch<AssistanceRequestRecord>(`/api/requests/${encodeURIComponent(requestId)}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: newStatus, notes })
-      });
-    } catch (err) {
-      console.warn('Backend status update unavailable, fallback:', err);
-      const target = Object.values(MOCK_REQUESTS_DB).find((r) => r.id === requestId || r.trackingId === requestId);
-      if (target) {
-        target.status = newStatus as any;
-        if (notes) target.notes = `${target.notes || ''} | ${notes}`;
-        return mockFetch(target);
-      }
-      throw err;
-    }
+  /** Coordinators only. */
+  updateRequestStatus(requestId: string, newStatus: RequestStatus, notes?: string): Promise<AssistanceRequestRecord> {
+    return apiFetch<AssistanceRequestRecord>(`/api/requests/${encodeURIComponent(requestId)}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: newStatus, notes })
+    });
+  },
+
+  /** Coordinators only: creates a volunteer task for the request and marks it Assigned. */
+  dispatchRequest(requestId: string, task: DispatchTaskInput): Promise<AssistanceRequestRecord> {
+    return apiFetch<AssistanceRequestRecord>(`/api/requests/${encodeURIComponent(requestId)}/dispatch`, {
+      method: 'POST',
+      body: JSON.stringify(task)
+    });
   }
 };

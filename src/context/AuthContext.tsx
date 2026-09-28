@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { AuthUser, UserRole } from '../types';
-import { authService } from '../services/authService';
-import { TOKEN_STORAGE_KEY } from '../services/api';
+import { authService, AuthMethod, SignUpMetadata, VolunteerSignupData } from '../services/authService';
+import { supabase } from '../services/supabaseClient';
 
 const AUTH_STORAGE_KEY = 'shohay_auth_user';
 
@@ -9,23 +9,18 @@ interface AuthContextType {
   user: AuthUser | null;
   role: UserRole;
   isAuthenticated: boolean;
-  login: (role: UserRole, phoneOrEmail: string, customName?: string) => Promise<AuthUser>;
-  register: (data: {
-    firstName: string;
-    lastName: string;
-    mobile?: string;
-    email: string;
-    skills?: string[];
-    equipment?: string[];
-    gender?: string;
-  }) => Promise<AuthUser>;
-  logout: () => void;
-  setRole: (role: UserRole) => void;
+  /** True until the saved Supabase session has been checked on page load. */
+  isLoading: boolean;
+  sendCode: (method: AuthMethod, identifier: string, metadata?: SignUpMetadata) => Promise<void>;
+  verifyCode: (method: AuthMethod, identifier: string, code: string) => Promise<AuthUser>;
+  registerVolunteer: (data: VolunteerSignupData) => Promise<AuthUser>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Cached profile so pages render instantly; replaced once the Supabase session is checked.
   const [user, setUser] = useState<AuthUser | null>(() => {
     try {
       const saved = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -38,8 +33,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return null;
   });
+  const [isLoading, setIsLoading] = useState<boolean>(Boolean(supabase));
+  const userRef = useRef(user);
 
   useEffect(() => {
+    userRef.current = user;
     try {
       if (user) {
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
@@ -51,57 +49,70 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  const login = async (role: UserRole, phoneOrEmail: string, customName?: string): Promise<AuthUser> => {
-    const result = await authService.login(phoneOrEmail, role, customName);
-    setUser(result.user);
-    try {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(result.user));
-    } catch {
-      // ignore
+  // One in-flight /me request shared by sign-in events and verifyCode.
+  const profileRequest = useRef<Promise<AuthUser> | null>(null);
+  const loadProfile = useCallback((): Promise<AuthUser> => {
+    if (!profileRequest.current) {
+      profileRequest.current = authService
+        .getMe()
+        .then((u) => {
+          setUser(u);
+          return u;
+        })
+        .finally(() => {
+          profileRequest.current = null;
+        });
     }
-    return result.user;
+    return profileRequest.current;
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) {
+      setUser(null);
+      return;
+    }
+
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+      // Restore on page load, or pick up a session from an emailed sign-in link.
+      const needsProfile = event === 'INITIAL_SESSION' || (event === 'SIGNED_IN' && !userRef.current);
+      if (!needsProfile) return;
+
+      // Deferred: calling Supabase from inside this callback (apiFetch reads the session) can deadlock.
+      setTimeout(() => {
+        loadProfile()
+          .catch((err) => console.warn('Could not load Shohay profile for this session:', err))
+          .finally(() => setIsLoading(false));
+      }, 0);
+    });
+
+    return () => data.subscription.unsubscribe();
+  }, [loadProfile]);
+
+  const sendCode = (method: AuthMethod, identifier: string, metadata?: SignUpMetadata) =>
+    authService.sendCode(method, identifier, metadata);
+
+  const verifyCode = async (method: AuthMethod, identifier: string, code: string): Promise<AuthUser> => {
+    await authService.verifyCode(method, identifier, code);
+    return loadProfile();
   };
 
-  const register = async (data: {
-    firstName: string;
-    lastName: string;
-    mobile?: string;
-    email: string;
-    skills?: string[];
-    equipment?: string[];
-    gender?: string;
-  }): Promise<AuthUser> => {
-    const result = await authService.registerPublic(data);
-    setUser(result.user);
-    try {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(result.user));
-    } catch {
-      // ignore
-    }
-    return result.user;
+  const registerVolunteer = async (data: VolunteerSignupData): Promise<AuthUser> => {
+    const updated = await authService.registerVolunteer(data);
+    setUser(updated);
+    return updated;
   };
 
-  const logout = () => {
+  const logout = async () => {
     setUser(null);
     try {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-      localStorage.removeItem(TOKEN_STORAGE_KEY);
-    } catch {
-      // ignore
-    }
-  };
-
-  const setRole = (newRole: UserRole) => {
-    if (user) {
-      const updated = { ...user, role: newRole };
-      setUser(updated);
-      try {
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
-      } catch {
-        // ignore
-      }
-    } else {
-      login(newRole, '01712345678');
+      await authService.signOut();
+    } catch (err) {
+      console.warn('Supabase sign-out failed:', err);
     }
   };
 
@@ -113,10 +124,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         role: user?.role || 'public',
         isAuthenticated,
-        login,
-        register,
-        logout,
-        setRole
+        isLoading,
+        sendCode,
+        verifyCode,
+        registerVolunteer,
+        logout
       }}
     >
       {children}

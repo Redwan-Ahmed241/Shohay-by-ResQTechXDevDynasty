@@ -59,6 +59,11 @@
 }
 
 .type-card {
+  /* <button>: reset browser defaults so it looks like the original card */
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
@@ -78,6 +83,11 @@
 .type-card:hover {
   border-color: #cbd5e1;
   background-color: #f8fafc;
+}
+
+.type-card:focus-visible {
+  outline: 2px solid #0f3460;
+  outline-offset: 2px;
 }
 
 .type-card.selected {

@@ -1,67 +1,58 @@
-import { MOCK_VOLUNTEER_PROFILE, MOCK_VOLUNTEER_ASSIGNMENTS } from '../data/volunteers';
-import { VolunteerProfile, VolunteerAssignment } from '../types';
-import { apiFetch, mockFetch } from './api';
+import { VolunteerProfile, VolunteerAssignment, VolunteerDirectoryEntry } from '../types';
+import { apiFetch } from './api';
 
+export type DutyAction = 'Checked In' | 'Paused' | 'Completed';
+
+/**
+ * Field volunteer operations. Every call acts on the signed-in volunteer; errors such as
+ * "another volunteer already accepted this task" (409) are passed on so the page can show them.
+ */
 export const volunteerService = {
-  async getProfile(): Promise<VolunteerProfile> {
-    try {
-      return await apiFetch<VolunteerProfile>('/api/volunteers/profile');
-    } catch (err) {
-      console.warn('Backend unavailable, falling back to local volunteer profile:', err);
-      return mockFetch(MOCK_VOLUNTEER_PROFILE);
-    }
+  getProfile(): Promise<VolunteerProfile> {
+    return apiFetch<VolunteerProfile>('/api/volunteers/profile');
   },
 
-  async getOpenAssignments(): Promise<VolunteerAssignment[]> {
-    try {
-      return await apiFetch<VolunteerAssignment[]>('/api/volunteers/assignments');
-    } catch (err) {
-      console.warn('Backend unavailable, falling back to local assignments:', err);
-      return mockFetch(MOCK_VOLUNTEER_ASSIGNMENTS);
-    }
+  getOpenAssignments(): Promise<VolunteerAssignment[]> {
+    return apiFetch<VolunteerAssignment[]>('/api/volunteers/assignments');
   },
 
-  async acceptAssignment(assignmentId: string): Promise<boolean> {
-    try {
-      await apiFetch(`/api/volunteers/assignments/${encodeURIComponent(assignmentId)}/accept`, {
-        method: 'POST'
-      });
-      return true;
-    } catch (err) {
-      console.warn('Backend unavailable, falling back to local assignment acceptance:', err);
-      return mockFetch(true);
-    }
+  acceptAssignment(assignmentId: string): Promise<{ assignment: VolunteerAssignment }> {
+    return apiFetch(`/api/volunteers/assignments/${encodeURIComponent(assignmentId)}/accept`, { method: 'POST' });
   },
 
-  async declineAssignment(assignmentId: string): Promise<boolean> {
-    try {
-      await apiFetch(`/api/volunteers/assignments/${encodeURIComponent(assignmentId)}/decline`, {
-        method: 'POST'
-      });
-      return true;
-    } catch (err) {
-      console.warn('Backend unavailable, falling back to local assignment decline:', err);
-      return mockFetch(true);
-    }
+  /** Hides an open task for me, or hands my current task back to other volunteers. */
+  declineAssignment(assignmentId: string): Promise<VolunteerProfile> {
+    return apiFetch<VolunteerProfile>(`/api/volunteers/assignments/${encodeURIComponent(assignmentId)}/decline`, {
+      method: 'POST'
+    });
   },
 
-  async getAllVolunteers(): Promise<{ count: number; volunteers: any[] }> {
-    try {
-      return await apiFetch<{ count: number; volunteers: any[] }>('/api/volunteers');
-    } catch (err) {
-      console.warn('Backend volunteers unavailable, using fallback:', err);
-      return mockFetch({
-        count: 6,
-        volunteers: [
-          { id: 'vol-1', firstName: 'Nasrin', lastName: 'Akter', role: 'fieldworker', phone_number: '01812345678', district: 'Sunamganj', skills: ['Boat Rescue', 'First Aid'], equipment: ['Speedboat', 'VHF Radio'], verification_status: 'Verified' },
-          { id: 'vol-2', firstName: 'Karim', lastName: 'Uddin', role: 'fieldworker', phone_number: '01712345679', district: 'Sirajganj', skills: ['Relief Logistics', 'Shelter Admin'], equipment: ['First Aid Kit'], verification_status: 'Verified' },
-          { id: 'vol-3', firstName: 'Rahim', lastName: 'Ahmed', role: 'fieldworker', phone_number: '01712345678', district: 'Sunamganj', skills: ['Water Rescue'], equipment: ['Life Jackets'], verification_status: 'Verified' }
-        ]
-      });
-    }
+  /** Starts, pauses or completes duty. Hours are counted by the server from the real time on duty. */
+  setDuty(status: DutyAction): Promise<VolunteerProfile> {
+    return apiFetch<VolunteerProfile>('/api/volunteers/checkin', {
+      method: 'POST',
+      body: JSON.stringify({ status })
+    });
   },
 
-  async createAssignment(data: {
+  setAvailability(isAvailable: boolean): Promise<VolunteerProfile> {
+    return apiFetch<VolunteerProfile>('/api/volunteers/availability', {
+      method: 'POST',
+      body: JSON.stringify({ isAvailable })
+    });
+  },
+
+  // ── Coordinator ──
+  getAllVolunteers(): Promise<{ count: number; volunteers: VolunteerDirectoryEntry[] }> {
+    return apiFetch('/api/volunteers');
+  },
+
+  getAllAssignments(status?: string): Promise<VolunteerAssignment[]> {
+    const query = status && status !== 'All' ? `?status=${encodeURIComponent(status)}` : '';
+    return apiFetch<VolunteerAssignment[]>(`/api/volunteers/assignments/all${query}`);
+  },
+
+  createAssignment(data: {
     title: string;
     location: string;
     district: string;
@@ -69,36 +60,15 @@ export const volunteerService = {
     teamSize?: number;
     priority?: string;
   }): Promise<VolunteerAssignment> {
-    try {
-      return await apiFetch<VolunteerAssignment>('/api/volunteers/assignments', {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
-    } catch (err) {
-      console.warn('Backend create assignment unavailable, fallback:', err);
-      const newA: VolunteerAssignment = {
-        id: `assign-${Date.now()}`,
-        title: data.title,
-        location: data.location,
-        district: data.district,
-        durationHours: data.durationHours || 4,
-        teamSize: data.teamSize || 4,
-        priority: (data.priority as any) || 'high',
-        status: 'Available'
-      };
-      return mockFetch(newA);
-    }
+    return apiFetch<VolunteerAssignment>('/api/volunteers/assignments', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
   },
 
-  async checkIn(status: string = 'Checked In', hours: number = 1): Promise<any> {
-    try {
-      return await apiFetch('/api/volunteers/checkin', {
-        method: 'POST',
-        body: JSON.stringify({ status, hours })
-      });
-    } catch (err) {
-      console.warn('Backend checkin unavailable, fallback:', err);
-      return mockFetch({ status, hoursLogged: hours });
-    }
+  cancelAssignment(assignmentId: string): Promise<VolunteerAssignment> {
+    return apiFetch<VolunteerAssignment>(`/api/volunteers/assignments/${encodeURIComponent(assignmentId)}/cancel`, {
+      method: 'POST'
+    });
   }
 };

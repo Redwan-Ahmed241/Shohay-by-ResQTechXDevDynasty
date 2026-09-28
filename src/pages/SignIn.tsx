@@ -1,59 +1,98 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Phone, Mail, ArrowRight, Loader2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Phone, Mail, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
+import { AuthMethod, SignUpMetadata } from '../services/authService';
 import { UserRole } from '../types';
 import './SignIn.css';
 
+const RESEND_COOLDOWN_SECONDS = 60;
+
+const dashboardPath = (role: UserRole) =>
+  role === 'admin' ? '/admin/command-center' : role === 'volunteer' ? '/volunteer/dashboard' : '/';
+
 export const SignIn: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  // Page the user was sent here from (see RequireRole), e.g. /admin/uav
+  const returnTo = (useLocation().state as { from?: string } | null)?.from;
+  const { user, isLoading: isRestoringSession, sendCode, verifyCode, logout } = useAuth();
 
   const [selectedRole, setSelectedRole] = useState<UserRole>('volunteer');
-  const [authMethod, setAuthMethod] = useState<'email' | 'mobile'>('email');
+  const [authMethod, setAuthMethod] = useState<AuthMethod>('email');
+  const [step, setStep] = useState<'identify' | 'verify'>('identify');
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
+  const [resendIn, setResendIn] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const executeRedirect = (role: UserRole) => {
-    if (role === 'admin') {
-      navigate('/admin/command-center');
-    } else if (role === 'volunteer') {
-      navigate('/volunteer/dashboard');
-    } else {
-      navigate('/');
+  const identifier = authMethod === 'email' ? email.trim() : mobileNumber.trim();
+  const roleLabel = selectedRole === 'admin' ? 'Coordinator' : selectedRole === 'volunteer' ? 'Volunteer' : 'Public';
+
+  // Already signed in (restored session, or arrived here from the emailed sign-in link)
+  useEffect(() => {
+    if (!isRestoringSession && user && step === 'identify') {
+      navigate(returnTo || dashboardPath(user.role));
     }
+  }, [isRestoringSession, user, step, navigate, returnTo]);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = setTimeout(() => setResendIn((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendIn]);
+
+  const resetToIdentify = () => {
+    setStep('identify');
+    setCode('');
+    setErrorMessage(null);
   };
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
+  const requestCode = async () => {
+    const metadata: SignUpMetadata =
+      selectedRole === 'volunteer' ? { requested_role: 'fieldworker' } : selectedRole === 'public' ? { requested_role: 'public' } : {};
+    await sendCode(authMethod, identifier, metadata);
+    setResendIn(RESEND_COOLDOWN_SECONDS);
+  };
+
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
     setIsLoading(true);
-
     try {
-      const effectiveEmail = email.trim() || (selectedRole === 'admin' ? 'admin@shohay.gov.bd' : 'volunteer@shohay.gov.bd');
-      const name = selectedRole === 'admin' ? 'District Coordinator' : selectedRole === 'volunteer' ? 'Field Volunteer' : 'Public Citizen';
-      const user = await login(selectedRole, effectiveEmail, name);
-      executeRedirect(user.role);
+      await requestCode();
+      setStep('verify');
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to sign in. Please try again.');
+      setErrorMessage(err.message || 'Could not send the code. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleMobileSubmit = async (e: React.FormEvent) => {
+  const handleResend = async () => {
+    setErrorMessage(null);
+    try {
+      await requestCode();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Could not resend the code. Please try again.');
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
     setIsLoading(true);
-
     try {
-      const identifier = mobileNumber.trim() || '01712345678';
-      const name = selectedRole === 'admin' ? 'District Coordinator' : selectedRole === 'volunteer' ? 'Field Volunteer' : 'Public Citizen';
-      const user = await login(selectedRole, identifier, name);
-      executeRedirect(user.role);
+      const signedIn = await verifyCode(authMethod, identifier, code);
+      if (selectedRole === 'admin' && signedIn.role !== 'admin') {
+        await logout();
+        resetToIdentify();
+        setErrorMessage('This account does not have coordinator access. Ask a district coordinator to grant it, or sign in as a field worker or public user.');
+        return;
+      }
+      navigate(returnTo || dashboardPath(signedIn.role));
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to sign in. Please try again.');
     } finally {
@@ -106,7 +145,7 @@ export const SignIn: React.FC = () => {
               <div className="signin-header-block">
                 <h1 className="signin-title">Sign In</h1>
                 <p className="signin-subtitle">
-                  Choose your role and sign in with your registered email or phone number.
+                  Choose your role and we'll send a one-time sign-in code to your email or phone. No password needed.
                 </p>
               </div>
 
@@ -117,7 +156,7 @@ export const SignIn: React.FC = () => {
                   role="tab"
                   aria-selected={selectedRole === 'public'}
                   className={`role-tab ${selectedRole === 'public' ? 'active' : ''}`}
-                  onClick={() => setSelectedRole('public')}
+                  onClick={() => { setSelectedRole('public'); resetToIdentify(); }}
                 >
                   PUBLIC ACCESS
                 </button>
@@ -126,7 +165,7 @@ export const SignIn: React.FC = () => {
                   role="tab"
                   aria-selected={selectedRole === 'volunteer'}
                   className={`role-tab ${selectedRole === 'volunteer' ? 'active' : ''}`}
-                  onClick={() => setSelectedRole('volunteer')}
+                  onClick={() => { setSelectedRole('volunteer'); resetToIdentify(); }}
                 >
                   FIELD WORKER
                 </button>
@@ -135,7 +174,7 @@ export const SignIn: React.FC = () => {
                   role="tab"
                   aria-selected={selectedRole === 'admin'}
                   className={`role-tab ${selectedRole === 'admin' ? 'active' : ''}`}
-                  onClick={() => setSelectedRole('admin')}
+                  onClick={() => { setSelectedRole('admin'); resetToIdentify(); }}
                 >
                   COORDINATOR / ADMIN
                 </button>
@@ -148,7 +187,7 @@ export const SignIn: React.FC = () => {
                   <button
                     type="button"
                     className={`method-btn ${authMethod === 'email' ? 'active' : ''}`}
-                    onClick={() => setAuthMethod('email')}
+                    onClick={() => { setAuthMethod('email'); resetToIdentify(); }}
                   >
                     <Mail size={14} />
                     <span>Email Address</span>
@@ -156,7 +195,7 @@ export const SignIn: React.FC = () => {
                   <button
                     type="button"
                     className={`method-btn ${authMethod === 'mobile' ? 'active' : ''}`}
-                    onClick={() => setAuthMethod('mobile')}
+                    onClick={() => { setAuthMethod('mobile'); resetToIdentify(); }}
                   >
                     <Phone size={14} />
                     <span>Mobile Number</span>
@@ -164,80 +203,115 @@ export const SignIn: React.FC = () => {
                 </div>
 
                 {errorMessage && (
-                  <div style={{ padding: '8px 12px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', color: '#991b1b', fontSize: '12px', marginBottom: '12px' }}>
+                  <div role="alert" style={{ padding: '8px 12px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', color: '#991b1b', fontSize: '12px', marginBottom: '12px' }}>
                     {errorMessage}
                   </div>
                 )}
 
-                {/* Email Sign In */}
-                {authMethod === 'email' ? (
-                  <form onSubmit={handleEmailSubmit} className="auth-form-stack">
-                    <div className="field-group">
-                      <label className="field-label" htmlFor="email-input">EMAIL ADDRESS</label>
-                      <input
-                        id="email-input"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="auth-text-input"
-                        placeholder={selectedRole === 'admin' ? 'admin@shohay.gov.bd' : selectedRole === 'volunteer' ? 'volunteer@shohay.gov.bd' : 'citizen@example.com'}
-                        required
-                        autoFocus
-                      />
-                    </div>
-
-                    <button type="submit" className="submit-btn-navy" disabled={isLoading}>
-                      {isLoading ? (
-                        <>
-                          <Loader2 size={15} className="animate-spin" />
-                          <span>Signing in...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Sign In as {selectedRole === 'admin' ? 'Coordinator' : selectedRole === 'volunteer' ? 'Volunteer' : 'Public'}</span>
-                          <ArrowRight size={15} />
-                        </>
-                      )}
-                    </button>
-                    <p className="otp-disclaimer">
-                      Direct secure authentication connected to the Shohay database.
-                    </p>
-                  </form>
-                ) : (
-                  /* Mobile Sign In */
-                  <form onSubmit={handleMobileSubmit} className="auth-form-stack">
-                    <div className="field-group">
-                      <label className="field-label" htmlFor="phone-input">MOBILE NUMBER</label>
-                      <div className="phone-prefix-group">
-                        <span className="phone-prefix">+880</span>
+                {step === 'identify' ? (
+                  <form onSubmit={handleSendCode} className="auth-form-stack">
+                    {authMethod === 'email' ? (
+                      <div className="field-group">
+                        <label className="field-label" htmlFor="email-input">EMAIL ADDRESS</label>
                         <input
-                          id="phone-input"
-                          type="tel"
-                          value={mobileNumber}
-                          onChange={(e) => setMobileNumber(e.target.value)}
-                          className="phone-input"
-                          placeholder="01XXXXXXXXX"
+                          id="email-input"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="auth-text-input"
+                          placeholder={selectedRole === 'admin' ? 'coordinator@example.org' : selectedRole === 'volunteer' ? 'volunteer@example.org' : 'citizen@example.com'}
+                          autoComplete="email"
                           required
                           autoFocus
                         />
                       </div>
-                    </div>
+                    ) : (
+                      <div className="field-group">
+                        <label className="field-label" htmlFor="phone-input">MOBILE NUMBER</label>
+                        <div className="phone-prefix-group">
+                          <span className="phone-prefix">+880</span>
+                          <input
+                            id="phone-input"
+                            type="tel"
+                            value={mobileNumber}
+                            onChange={(e) => setMobileNumber(e.target.value)}
+                            className="phone-input"
+                            placeholder="01XXXXXXXXX"
+                            autoComplete="tel-national"
+                            required
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+                    )}
 
                     <button type="submit" className="submit-btn-navy" disabled={isLoading}>
                       {isLoading ? (
                         <>
                           <Loader2 size={15} className="animate-spin" />
-                          <span>Signing in...</span>
+                          <span>Sending code...</span>
                         </>
                       ) : (
                         <>
-                          <span>Sign In as {selectedRole === 'admin' ? 'Coordinator' : selectedRole === 'volunteer' ? 'Volunteer' : 'Public'}</span>
+                          <span>Send Sign-In Code</span>
                           <ArrowRight size={15} />
                         </>
                       )}
                     </button>
                     <p className="otp-disclaimer">
-                      Direct secure authentication connected to the Shohay database.
+                      {authMethod === 'email'
+                        ? "We'll email you a one-time code and a sign-in link."
+                        : "We'll text you a one-time code."}
+                    </p>
+                  </form>
+                ) : (
+                  <form onSubmit={handleVerify} className="auth-form-stack">
+                    <div className="field-group">
+                      <div className="otp-header-row">
+                        <label className="field-label" htmlFor="code-input">ENTER CODE</label>
+                        <button type="button" className="change-auth-btn" onClick={resetToIdentify}>
+                          <ArrowLeft size={12} />
+                          {authMethod === 'email' ? 'Change email' : 'Change number'}
+                        </button>
+                      </div>
+                      <input
+                        id="code-input"
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        pattern="[0-9]{6,10}"
+                        maxLength={10}
+                        value={code}
+                        onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                        className="auth-text-input otp-code-input"
+                        placeholder="••••••"
+                        required
+                        autoFocus
+                      />
+                      <p className="otp-disclaimer" style={{ textAlign: 'left' }}>
+                        Sent to <strong>{authMethod === 'mobile' ? `+880 ${identifier.replace(/^0/, '')}` : identifier}</strong>.
+                        {authMethod === 'email' && ' You can also tap the sign-in link in the email.'}
+                      </p>
+                    </div>
+
+                    <button type="submit" className="submit-btn-navy" disabled={isLoading || code.length < 6}>
+                      {isLoading ? (
+                        <>
+                          <Loader2 size={15} className="animate-spin" />
+                          <span>Verifying...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Verify &amp; Sign In as {roleLabel}</span>
+                          <ArrowRight size={15} />
+                        </>
+                      )}
+                    </button>
+                    <p className="otp-disclaimer">
+                      Didn't get it?{' '}
+                      <button type="button" className="change-auth-btn" onClick={handleResend} disabled={resendIn > 0}>
+                        {resendIn > 0 ? `Resend code in ${resendIn}s` : 'Resend code'}
+                      </button>
                     </p>
                   </form>
                 )}
