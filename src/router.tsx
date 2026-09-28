@@ -12,6 +12,7 @@ import { Shelters } from './pages/Shelters';
 import { GetHelp } from './pages/GetHelp';
 import { Campaigns } from './pages/Campaigns';
 import { Donate } from './pages/Donate';
+import { DonateResult } from './pages/DonateResult';
 import { Contacts } from './pages/Contacts';
 import { News } from './pages/News';
 import { NewsArticle } from './pages/NewsArticle';
@@ -39,6 +40,9 @@ export const AppRouter: React.FC = () => {
               <Route path="/get-help" element={<GetHelp />} />
               <Route path="/campaigns" element={<Campaigns />} />
               <Route path="/donate/:id" element={<Donate />} />
+              <Route path="/donate/success" element={<DonateResult outcome="success" />} />
+              <Route path="/donate/fail" element={<DonateResult outcome="fail" />} />
+              <Route path="/donate/cancel" element={<DonateResult outcome="cancel" />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/news" element={<News />} />
               <Route path="/news/:id" element={<NewsArticle />} />

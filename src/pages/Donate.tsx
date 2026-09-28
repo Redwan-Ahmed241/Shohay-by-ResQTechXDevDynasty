@@ -1,58 +1,46 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, ShieldCheck, CheckCircle2, Loader2 } from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useCampaigns } from '../hooks/queries';
+import { donationService } from '../services/donationService';
+import { ApiError } from '../services/api';
 import './Donate.css';
-
-type PayMethod = 'bkash' | 'nagad' | 'rocket' | 'card';
 
 const PRESET_AMOUNTS = [500, 1000, 2500, 5000];
 
-const METHODS: Array<{ id: PayMethod; label: string; color: string }> = [
-  { id: 'bkash', label: 'bKash', color: '#e2136e' },
-  { id: 'nagad', label: 'Nagad', color: '#f6921e' },
-  { id: 'rocket', label: 'Rocket', color: '#8c3494' },
-  { id: 'card', label: 'Card', color: '#0f172a' }
-];
-
 export const Donate: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { data: campaigns = [] } = useCampaigns();
   const campaign = campaigns.find((c) => c.id === id);
 
   const [amount, setAmount] = useState<number>(1000);
-  const [method, setMethod] = useState<PayMethod>('bkash');
-  const [phone, setPhone] = useState('');
-  const [status, setStatus] = useState<'idle' | 'processing' | 'done'>('idle');
+  const [donorName, setDonorName] = useState('');
+  const [donorEmail, setDonorEmail] = useState('');
+  const [donorPhone, setDonorPhone] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handlePay = (e: React.FormEvent) => {
+  const handlePay = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('processing');
-    // Demo checkout only — no real payment gateway is called.
-    setTimeout(() => setStatus('done'), 1400);
+    if (!id) return;
+    setError(null);
+    setBusy(true);
+    try {
+      const { gatewayUrl } = await donationService.initDonation({
+        campaignId: id,
+        amount,
+        donorName,
+        donorEmail,
+        donorPhone
+      });
+      // Full browser redirect — this leaves the app for SSLCommerz's real hosted checkout.
+      window.location.href = gatewayUrl;
+    } catch (err) {
+      setBusy(false);
+      setError(err instanceof ApiError ? err.message : 'Could not start the payment. Check your connection and try again.');
+    }
   };
-
-  if (status === 'done') {
-    return (
-      <PageLayout showAlertBanner={false}>
-        <div className="donate-page-bg">
-          <div className="donate-card donate-success">
-            <CheckCircle2 size={40} color="#059669" />
-            <h2>Thank you for your support</h2>
-            <p>
-              ৳{amount.toLocaleString()} for {campaign ? campaign.title : 'this campaign'} — a confirmation would
-              normally be emailed to you. This is a demo checkout, so no real payment was made.
-            </p>
-            <button className="donate-btn-primary" onClick={() => navigate('/campaigns')}>
-              Back to Campaigns
-            </button>
-          </div>
-        </div>
-      </PageLayout>
-    );
-  }
 
   return (
     <PageLayout showAlertBanner={false}>
@@ -66,7 +54,7 @@ export const Donate: React.FC = () => {
             {/* Order summary */}
             <div className="donate-summary-card">
               <div className="donate-gateway-badge">
-                <ShieldCheck size={14} /> Secured Checkout (Demo)
+                <ShieldCheck size={14} /> Secured by SSLCommerz (Sandbox)
               </div>
               <h3>{campaign ? campaign.title : 'Relief Campaign'}</h3>
               {campaign && <p className="donate-summary-org">{campaign.organization} • {campaign.district}</p>}
@@ -75,13 +63,21 @@ export const Donate: React.FC = () => {
                 <strong>৳{amount.toLocaleString()}</strong>
               </div>
               <p className="donate-summary-note">
-                This is a demo checkout page styled after SSLCommerz, Bangladesh's common payment
-                gateway. No real transaction or money transfer happens here.
+                You'll be redirected to SSLCommerz's real sandbox checkout to choose a card, bKash,
+                Nagad, Rocket, or net banking test payment. No real money moves — this is SSLCommerz's
+                own test environment, not a simulation built by Shohay.
               </p>
             </div>
 
-            {/* Payment form */}
+            {/* Donor + amount form */}
             <form className="donate-form-card" onSubmit={handlePay}>
+              {error && (
+                <div role="alert" style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', borderRadius: 6, padding: '10px 12px', fontSize: 13, marginBottom: 16 }}>
+                  <AlertCircle size={16} />
+                  <span>{error}</span>
+                </div>
+              )}
+
               <h3 className="donate-form-title">Choose Amount (BDT)</h3>
               <div className="donate-amount-grid">
                 {PRESET_AMOUNTS.map((a) => (
@@ -97,51 +93,49 @@ export const Donate: React.FC = () => {
               </div>
               <input
                 type="number"
-                min={50}
+                min={10}
+                max={500000}
                 className="donate-amount-input"
                 value={amount}
                 onChange={(e) => setAmount(Math.max(0, parseInt(e.target.value) || 0))}
                 placeholder="Custom amount"
+                required
               />
 
-              <h3 className="donate-form-title" style={{ marginTop: 20 }}>Payment Method</h3>
-              <div className="donate-method-grid">
-                {METHODS.map((m) => (
-                  <button
-                    type="button"
-                    key={m.id}
-                    className={`donate-method-btn ${method === m.id ? 'active' : ''}`}
-                    style={{ ['--method-color' as any]: m.color }}
-                    onClick={() => setMethod(m.id)}
-                  >
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-
-              {method !== 'card' ? (
+              <h3 className="donate-form-title" style={{ marginTop: 20 }}>Your Details</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <input
+                  type="text"
+                  className="donate-text-input"
+                  placeholder="Full name"
+                  value={donorName}
+                  onChange={(e) => setDonorName(e.target.value)}
+                  required
+                  minLength={2}
+                />
+                <input
+                  type="email"
+                  className="donate-text-input"
+                  placeholder="Email address"
+                  value={donorEmail}
+                  onChange={(e) => setDonorEmail(e.target.value)}
+                  required
+                />
                 <input
                   type="tel"
                   className="donate-text-input"
-                  placeholder={`${METHODS.find((m) => m.id === method)?.label} account number`}
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Mobile number"
+                  value={donorPhone}
+                  onChange={(e) => setDonorPhone(e.target.value)}
                   required
+                  minLength={6}
                 />
-              ) : (
-                <div className="donate-card-fields">
-                  <input type="text" className="donate-text-input" placeholder="Card number" required />
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <input type="text" className="donate-text-input" placeholder="MM/YY" required />
-                    <input type="text" className="donate-text-input" placeholder="CVC" required />
-                  </div>
-                </div>
-              )}
+              </div>
 
-              <button type="submit" className="donate-btn-primary" disabled={status === 'processing' || amount <= 0} style={{ width: '100%', marginTop: 16 }}>
-                {status === 'processing' ? <Loader2 size={16} className="animate-spin" /> : `Pay ৳${amount.toLocaleString()}`}
+              <button type="submit" className="donate-btn-primary" disabled={busy || amount < 10 || !campaign} style={{ width: '100%', marginTop: 18 }}>
+                {busy ? <Loader2 size={16} className="animate-spin" /> : `Continue to Payment — ৳${amount.toLocaleString()}`}
               </button>
-              <p className="donate-disclaimer">Demo gateway — for evaluation purposes only.</p>
+              <p className="donate-disclaimer">You'll leave Shohay to complete payment on SSLCommerz's secure sandbox page.</p>
             </form>
           </div>
         </div>
