@@ -1,0 +1,136 @@
+.about-page-bg {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 120px);
+  padding: 56px 16px 80px 16px;
+  width: 100%;
+}
+
+.about-hero {
+  max-width: 720px;
+  margin: 0 auto 48px auto;
+  text-align: center;
+}
+
+.about-tag {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #006a4e;
+}
+
+.about-title {
+  font-family: var(--font-family);
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 10px 0 14px 0;
+  line-height: 1.25;
+}
+
+.about-lead {
+  font-family: var(--font-family);
+  font-size: 15px;
+  line-height: 1.7;
+  color: #64748b;
+  margin: 0;
+}
+
+.about-grid {
+  max-width: 960px;
+  margin: 0 auto 48px auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.about-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+.about-card-icon {
+  color: #006a4e;
+  margin-bottom: 12px;
+}
+
+.about-card h3 {
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.about-card p {
+  font-family: var(--font-family);
+  font-size: 13px;
+  line-height: 1.65;
+  color: #64748b;
+  margin: 0;
+}
+
+.about-cta {
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+  background: #0f3460;
+  border-radius: 10px;
+  padding: 36px 24px;
+}
+
+.about-cta h2 {
+  font-family: var(--font-family);
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+}
+
+.about-cta p {
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: #cad5e2;
+  margin: 0 0 20px 0;
+}
+
+.about-cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.about-btn-primary,
+.about-btn-outline {
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.about-btn-primary {
+  background: #006a4e;
+  color: #ffffff;
+}
+
+.about-btn-outline {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 640px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-title {
+    font-size: 24px;
+  }
+}

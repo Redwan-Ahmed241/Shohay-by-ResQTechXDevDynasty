@@ -50,11 +50,41 @@ const TRACK_STATUS_TEXT: Record<string, string> = {
   Resolved: 'Marked as resolved. If you still need help, submit a new request or call 999.'
 };
 
+const UPAZILAS = ['Sunamganj Sadar', 'Bishwambarpur', 'Tahirpur'];
+
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const [trackingId, setTrackingId] = useState('');
   const [trackingResult, setTrackingResult] = useState<RequestTracking | null>(null);
   const [trackingError, setTrackingError] = useState('');
+
+  const [locationDismissed, setLocationDismissed] = useState(false);
+  const [selectedUpazila, setSelectedUpazila] = useState('');
+  const [gpsStatus, setGpsStatus] = useState<string | null>(null);
+  const [gpsBusy, setGpsBusy] = useState(false);
+
+  const shareGps = () => {
+    if (!navigator.geolocation) {
+      setGpsStatus('This device cannot share its location.');
+      return;
+    }
+    setGpsBusy(true);
+    setGpsStatus(null);
+    navigator.geolocation.getCurrentPosition(
+      () => {
+        setSelectedUpazila('');
+        setGpsStatus('Current location detected');
+        setGpsBusy(false);
+      },
+      () => {
+        setGpsStatus('Could not get your location. Try selecting an upazila instead.');
+        setGpsBusy(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000 }
+    );
+  };
+
+  const locationDisplay = gpsStatus || (selectedUpazila ? `Location: ${selectedUpazila}` : 'Set Location:');
 
   const handleTrackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,26 +143,35 @@ export const Home: React.FC = () => {
       {/* ═══════════════════════════════════════
          2. LOCATION ROW
          ═══════════════════════════════════════ */}
-      <div className="location-row">
-        <div className="location-row-inner">
-          <div className="location-label">
-            <MapPin />
-            <span>Set Location:</span>
+      {!locationDismissed && (
+        <div className="location-row">
+          <div className="location-row-inner">
+            <div className="location-label">
+              <MapPin />
+              <span>{locationDisplay}</span>
+            </div>
+            <button className="location-gps-btn" onClick={shareGps} disabled={gpsBusy} type="button">
+              <Navigation />
+              <span>{gpsBusy ? 'Locating…' : 'GPS'}</span>
+            </button>
+            <select
+              className="location-dropdown"
+              value={selectedUpazila}
+              onChange={(e) => {
+                setSelectedUpazila(e.target.value);
+                setGpsStatus(null);
+              }}
+            >
+              <option value="">Select Upazila...</option>
+              {UPAZILAS.map((u) => (
+                <option key={u} value={u}>{u}</option>
+              ))}
+            </select>
+            <span className="location-separator">|</span>
+            <button className="location-skip" onClick={() => setLocationDismissed(true)} type="button">Skip</button>
           </div>
-          <button className="location-gps-btn">
-            <Navigation />
-            <span>GPS</span>
-          </button>
-          <select className="location-dropdown">
-            <option>Select Upazila...</option>
-            <option>Sunamganj Sadar</option>
-            <option>Bishwambarpur</option>
-            <option>Tahirpur</option>
-          </select>
-          <span className="location-separator">|</span>
-          <button className="location-skip">Skip</button>
         </div>
-      </div>
+      )}
 
       {/* ═══════════════════════════════════════
          3. QUICK STATS BAR

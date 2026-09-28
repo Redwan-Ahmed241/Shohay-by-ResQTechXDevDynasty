@@ -11,7 +11,11 @@ import { Alerts } from './pages/Alerts';
 import { Shelters } from './pages/Shelters';
 import { GetHelp } from './pages/GetHelp';
 import { Campaigns } from './pages/Campaigns';
+import { Donate } from './pages/Donate';
 import { Contacts } from './pages/Contacts';
+import { News } from './pages/News';
+import { NewsArticle } from './pages/NewsArticle';
+import { About } from './pages/About';
 import { SignIn } from './pages/SignIn';
 import { VolunteerLanding } from './pages/VolunteerLanding';
 import { VolunteerRegister } from './pages/VolunteerRegister';
@@ -34,7 +38,11 @@ export const AppRouter: React.FC = () => {
               <Route path="/shelters" element={<Shelters />} />
               <Route path="/get-help" element={<GetHelp />} />
               <Route path="/campaigns" element={<Campaigns />} />
+              <Route path="/donate/:id" element={<Donate />} />
               <Route path="/contacts" element={<Contacts />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/news/:id" element={<NewsArticle />} />
+              <Route path="/about" element={<About />} />
               <Route path="/sign-in" element={<SignIn />} />
 
               {/* Volunteer Routes */}

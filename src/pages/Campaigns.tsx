@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useCampaigns, useCampaignSummary } from '../hooks/queries';
 import './Campaigns.css';
 
 export const Campaigns: React.FC = () => {
+  const navigate = useNavigate();
   const { data: summaryStats } = useCampaignSummary();
   const { data: campaigns = [] } = useCampaigns();
 
@@ -66,7 +68,7 @@ export const Campaigns: React.FC = () => {
                     <span className="c-households-text">
                       {camp.householdsReached.toLocaleString()} / {camp.householdsTarget.toLocaleString()} households reached
                     </span>
-                    <button className="c-btn-donate">
+                    <button className="c-btn-donate" onClick={() => navigate(`/donate/${camp.id}`)}>
                       View &amp; Donate →
                     </button>
                   </div>
