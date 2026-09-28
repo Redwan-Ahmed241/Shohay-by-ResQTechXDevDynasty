@@ -28,6 +28,7 @@ import {
 import { PageLayout } from '../components/layout/PageLayout';
 import { requestService } from '../services/requestService';
 import { MOCK_ALERTS } from '../data/alerts';
+import { BD_UPAZILAS } from '../data/upazilas';
 import { RequestTracking } from '../types';
 import './Home.css';
 
@@ -49,8 +50,6 @@ const TRACK_STATUS_TEXT: Record<string, string> = {
   'In Progress': 'A volunteer is on the way / working on your request.',
   Resolved: 'Marked as resolved. If you still need help, submit a new request or call 999.'
 };
-
-const UPAZILAS = ['Sunamganj Sadar', 'Bishwambarpur', 'Tahirpur'];
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -163,8 +162,12 @@ export const Home: React.FC = () => {
               }}
             >
               <option value="">Select Upazila...</option>
-              {UPAZILAS.map((u) => (
-                <option key={u} value={u}>{u}</option>
+              {BD_UPAZILAS.map((d) => (
+                <optgroup key={d.district} label={d.district}>
+                  {d.upazilas.map((u) => (
+                    <option key={`${d.district}-${u}`} value={u}>{u}</option>
+                  ))}
+                </optgroup>
               ))}
             </select>
             <span className="location-separator">|</span>
