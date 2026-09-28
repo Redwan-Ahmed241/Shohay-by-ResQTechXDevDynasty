@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './lib/queryClient';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 
@@ -22,33 +24,35 @@ import { RequireRole } from './components/auth/RequireRole';
 
 export const AppRouter: React.FC = () => {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <LanguageProvider>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/shelters" element={<Shelters />} />
-            <Route path="/get-help" element={<GetHelp />} />
-            <Route path="/campaigns" element={<Campaigns />} />
-            <Route path="/contacts" element={<Contacts />} />
-            <Route path="/sign-in" element={<SignIn />} />
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <LanguageProvider>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/alerts" element={<Alerts />} />
+              <Route path="/shelters" element={<Shelters />} />
+              <Route path="/get-help" element={<GetHelp />} />
+              <Route path="/campaigns" element={<Campaigns />} />
+              <Route path="/contacts" element={<Contacts />} />
+              <Route path="/sign-in" element={<SignIn />} />
 
-            {/* Volunteer Routes */}
-            <Route path="/volunteer" element={<VolunteerLanding />} />
-            <Route path="/volunteer/register" element={<VolunteerRegister />} />
-            <Route path="/volunteer/dashboard" element={<RequireRole roles={['volunteer', 'admin']}><VolunteerDashboard /></RequireRole>} />
+              {/* Volunteer Routes */}
+              <Route path="/volunteer" element={<VolunteerLanding />} />
+              <Route path="/volunteer/register" element={<VolunteerRegister />} />
+              <Route path="/volunteer/dashboard" element={<RequireRole roles={['volunteer', 'admin']}><VolunteerDashboard /></RequireRole>} />
 
-            {/* Admin Routes */}
-            <Route path="/admin/command-center" element={<RequireRole roles={['admin']}><CommandCenter /></RequireRole>} />
-            <Route path="/admin/warehouse" element={<RequireRole roles={['admin']}><Warehouse /></RequireRole>} />
-            <Route path="/admin/uav" element={<RequireRole roles={['admin']}><UavMonitor /></RequireRole>} />
+              {/* Admin Routes */}
+              <Route path="/admin/command-center" element={<RequireRole roles={['admin']}><CommandCenter /></RequireRole>} />
+              <Route path="/admin/warehouse" element={<RequireRole roles={['admin']}><Warehouse /></RequireRole>} />
+              <Route path="/admin/uav" element={<RequireRole roles={['admin']}><UavMonitor /></RequireRole>} />
 
-            {/* Fallback 404 */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </LanguageProvider>
-      </AuthProvider>
-    </BrowserRouter>
+              {/* Fallback 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </LanguageProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };

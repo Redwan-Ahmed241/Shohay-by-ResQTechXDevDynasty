@@ -1,24 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Phone, Copy, Bookmark, AlertCircle, Check } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { contactService } from '../services/contactService';
-import { EmergencyContact, ContactCategory } from '../types';
+import { useContacts } from '../hooks/queries';
+import { ContactCategory } from '../types';
 import './Contacts.css';
 
 export const Contacts: React.FC = () => {
-  const [contacts, setContacts] = useState<EmergencyContact[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<ContactCategory | 'All'>('All');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('All Districts');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchContacts();
-  }, [selectedCategory, selectedDistrict]);
-
-  const fetchContacts = async () => {
-    const list = await contactService.getContacts(selectedCategory, selectedDistrict);
-    setContacts(list);
-  };
+  const { data: contacts = [] } = useContacts(selectedCategory, selectedDistrict);
 
   const handleCopy = (id: string, phone: string) => {
     navigator.clipboard.writeText(phone);

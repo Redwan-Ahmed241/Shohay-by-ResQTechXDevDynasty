@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Droplets,
   RotateCw,
@@ -11,14 +11,11 @@ import {
 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { Checkbox } from '../components/ui/Checkbox';
-import { shelterService } from '../services/shelterService';
-import { Shelter, ShelterStatus } from '../types';
+import { useShelters, useShelterSummary } from '../hooks/queries';
+import { ShelterStatus } from '../types';
 import './Shelters.css';
 
 export const Shelters: React.FC = () => {
-  const [shelters, setShelters] = useState<Shelter[]>([]);
-  const [summaryStats, setSummaryStats] = useState<any>(null);
-
   // Filters
   const [selectedStatus, setSelectedStatus] = useState<ShelterStatus | 'All'>('All');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('All');
@@ -32,21 +29,12 @@ export const Shelters: React.FC = () => {
     medicalSupport: false
   });
 
-  useEffect(() => {
-    fetchData();
-  }, [selectedStatus, selectedDistrict, amenitiesFilter]);
-
-  const fetchData = async () => {
-    const stats = await shelterService.getShelterSummaryStats();
-    setSummaryStats(stats);
-
-    const list = await shelterService.getShelters({
-      status: selectedStatus,
-      district: selectedDistrict,
-      amenities: amenitiesFilter
-    });
-    setShelters(list);
-  };
+  const { data: summaryStats } = useShelterSummary();
+  const { data: shelters = [] } = useShelters({
+    status: selectedStatus,
+    district: selectedDistrict,
+    amenities: amenitiesFilter
+  });
 
   const districts = ['All', 'Sunamganj', 'Sirajganj', 'Kurigram', 'Feni', 'Gaibandha'];
 

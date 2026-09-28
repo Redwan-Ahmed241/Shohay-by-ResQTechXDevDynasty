@@ -1,24 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { campaignService } from '../services/campaignService';
-import { ReliefCampaign } from '../types';
+import { useCampaigns, useCampaignSummary } from '../hooks/queries';
 import './Campaigns.css';
 
 export const Campaigns: React.FC = () => {
-  const [campaigns, setCampaigns] = useState<ReliefCampaign[]>([]);
-  const [summaryStats, setSummaryStats] = useState<any>(null);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    const stats = await campaignService.getCampaignSummaryStats();
-    setSummaryStats(stats);
-
-    const list = await campaignService.getCampaigns();
-    setCampaigns(list);
-  };
+  const { data: summaryStats } = useCampaignSummary();
+  const { data: campaigns = [] } = useCampaigns();
 
   return (
     <PageLayout showAlertBanner={false}>

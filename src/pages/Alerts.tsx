@@ -1,34 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Clock, CheckCircle } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { alertService } from '../services/alertService';
-import { FloodAlert, SeverityLevel } from '../types';
+import { useAlerts } from '../hooks/queries';
+import { SeverityLevel } from '../types';
 import './Alerts.css';
 
 export const Alerts: React.FC = () => {
-  const [alerts, setAlerts] = useState<FloodAlert[]>([]);
   const [selectedSeverity, setSelectedSeverity] = useState<SeverityLevel | 'All'>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
 
-  // Wait until the user pauses typing before updating the value the API call depends on.
+  // Wait until the user pauses typing before updating the value the query key depends on.
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearchQuery(searchQuery), 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  useEffect(() => {
-    fetchAlerts();
-  }, [selectedSeverity, debouncedSearchQuery]);
-
-  const fetchAlerts = async () => {
-    setLoading(true);
-    const filter = selectedSeverity === 'All' ? undefined : (selectedSeverity as SeverityLevel);
-    const res = await alertService.getAlerts(filter, debouncedSearchQuery);
-    setAlerts(res);
-    setLoading(false);
-  };
+  const { data: alerts = [], isLoading: loading } = useAlerts(selectedSeverity, debouncedSearchQuery);
 
   const categories: Array<SeverityLevel | 'All'> = ['All', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'ALL CLEAR'];
 
