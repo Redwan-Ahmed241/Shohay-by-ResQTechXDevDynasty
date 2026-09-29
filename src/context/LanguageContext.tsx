@@ -19,9 +19,13 @@ const DICTIONARY: Record<string, Record<Language, string>> = {
   campaigns: { en: 'Campaigns', bn: 'ক্যাম্পেইন' },
   contacts: { en: 'Contacts', bn: 'যোগাযোগ' },
   signIn: { en: 'Sign In', bn: 'সাইন ইন' },
+  signOut: { en: 'Sign Out', bn: 'সাইন আউট' },
+  exit: { en: 'Exit', bn: 'বাহির' },
   volunteer: { en: 'Volunteer', bn: 'স্বেচ্ছাসেবক' },
   admin: { en: 'Command Center', bn: 'কমান্ড সেন্টার' },
-  banglaBtn: { en: 'বাং', bn: 'EN' }
+  fieldDashboard: { en: 'Field Dashboard', bn: 'ফিল্ড ড্যাশবোর্ড' },
+  banglaBtn: { en: 'বাং', bn: 'EN' },
+  signedInAs: { en: 'Signed in as', bn: 'লগইন আছেন' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
