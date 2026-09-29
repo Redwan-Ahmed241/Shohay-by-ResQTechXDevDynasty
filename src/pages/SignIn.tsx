@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, ArrowRight, ArrowLeft, CheckCircle2, ShieldCheck, Plus, X, Sparkles } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { UserRole } from '../types';
 import { authService, AuthOptionsResponse, PRESET_AVATARS, FALLBACK_OPTIONS } from '../services/authService';
 import './SignIn.css';
@@ -12,6 +13,7 @@ type AuthMode = 'signin' | 'signup';
 export const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useLanguage();
 
   // Role: 'public' or 'fieldworker' (admin deferred as requested)
   const [selectedRole, setSelectedRole] = useState<UserRole>('public');
@@ -265,27 +267,27 @@ export const SignIn: React.FC = () => {
           <div className="signin-glass-panel">
             <div className="quote-container">
               <blockquote className="hadith-quote">
-                “And whoever helps his brother (in need), Allah will be helping him; and whoever helps a believer to be free of a grievance, Allah will remove one of his grievances on the Day of Resurrection.”
+                {t('hadithQuote')}
               </blockquote>
-              <cite className="hadith-citation">(Sahih Muslim 2699)</cite>
+              <cite className="hadith-citation">{t('hadithCitation')}</cite>
             </div>
 
             <div className="signin-stats-grid">
               <div className="signin-stat-card">
                 <div className="signin-stat-number">1.2M+</div>
-                <div className="signin-stat-label">People helped</div>
+                <div className="signin-stat-label">{t('peopleHelped')}</div>
               </div>
               <div className="signin-stat-card">
                 <div className="signin-stat-number">847</div>
-                <div className="signin-stat-label">Special shelters</div>
+                <div className="signin-stat-label">{t('specialShelters')}</div>
               </div>
               <div className="signin-stat-card">
                 <div className="signin-stat-number">38</div>
-                <div className="signin-stat-label">Partner orgs</div>
+                <div className="signin-stat-label">{t('partnerOrgs')}</div>
               </div>
               <div className="signin-stat-card">
                 <div className="signin-stat-number">98%</div>
-                <div className="signin-stat-label">Special ops</div>
+                <div className="signin-stat-label">{t('specialOps')}</div>
               </div>
             </div>
           </div>
@@ -297,17 +299,17 @@ export const SignIn: React.FC = () => {
               <div className="auth-header-block">
                 <h1 className="signin-title">
                   {authMode === 'signin'
-                    ? 'Sign In'
+                    ? t('signIn')
                     : selectedRole === 'fieldworker'
-                    ? 'Fieldworker Registration'
-                    : 'Public Registration'}
+                    ? t('fieldworkerRegistration')
+                    : t('publicRegistration')}
                 </h1>
                 <p className="signin-subtitle">
                   {authMode === 'signin'
-                    ? 'Bangladesh Flood Relief Coordination Platform'
+                    ? t('subTitle')
                     : selectedRole === 'fieldworker'
-                    ? 'Fieldworker credentials and personal verification'
-                    : 'Minimal, fast registration for community volunteers'}
+                    ? t('fieldworkerSub')
+                    : t('publicSub')}
                 </p>
               </div>
 
@@ -318,14 +320,14 @@ export const SignIn: React.FC = () => {
                   className={`role-tab ${selectedRole === 'public' ? 'active' : ''}`}
                   onClick={() => setSelectedRole('public')}
                 >
-                  PUBLIC ACCESS
+                  {t('publicAccessTab')}
                 </button>
                 <button
                   type="button"
                   className={`role-tab ${selectedRole === 'fieldworker' ? 'active' : ''}`}
                   onClick={() => setSelectedRole('fieldworker')}
                 >
-                  FIELD WORKER
+                  {t('fieldWorkerTab')}
                 </button>
               </div>
 
@@ -339,7 +341,7 @@ export const SignIn: React.FC = () => {
                     setSignInError('');
                   }}
                 >
-                  Sign In
+                  {t('signIn')}
                 </button>
                 <button
                   type="button"
@@ -349,7 +351,7 @@ export const SignIn: React.FC = () => {
                     setSignUpError('');
                   }}
                 >
-                  Create Account
+                  {t('createAccount')}
                 </button>
               </div>
 
@@ -364,7 +366,7 @@ export const SignIn: React.FC = () => {
                       <form onSubmit={handleDirectSignIn} className="auth-form-stack">
                         <div className="field-group">
                           <label className="field-label" htmlFor="signin-email-input">
-                            EMAIL ADDRESS
+                            {t('emailAddressLabel')}
                           </label>
                           <div className="input-with-icon-row">
                             <Mail size={16} className="input-leading-icon" />
@@ -393,7 +395,7 @@ export const SignIn: React.FC = () => {
                                   setAuthMode('signup');
                                 }}
                               >
-                                Create Account
+                                {t('createAccount')}
                               </button>
                             )}
                           </div>
@@ -404,13 +406,13 @@ export const SignIn: React.FC = () => {
                           className="submit-btn-navy"
                           disabled={signInLoading}
                         >
-                          <span>{signInLoading ? 'Signing In...' : 'Sign In'}</span>
+                          <span>{signInLoading ? t('signingInBtn') : t('signIn')}</span>
                           <ArrowRight size={15} />
                         </button>
 
                         <div className="or-divider-row">
                           <span className="or-line" />
-                          <span className="or-text">or</span>
+                          <span className="or-text">{t('orDivider')}</span>
                           <span className="or-line" />
                         </div>
 
@@ -422,18 +424,18 @@ export const SignIn: React.FC = () => {
                             if (signInEmail) handleSendSignInOtp();
                           }}
                         >
-                          Sign In with Email OTP
+                          {t('signInWithOtpBtn')}
                         </button>
 
                         <p className="otp-disclaimer">
-                          Registered accounts log in directly without waiting for OTP.
+                          {t('otpDisclaimerText')}
                         </p>
                       </form>
                     ) : (
                       /* Sign In with OTP flow */
                       <div className="auth-form-stack">
                         <div className="otp-header-row">
-                          <span className="field-label">SIGN IN VIA RESEND OTP</span>
+                          <span className="field-label">{t('signInViaResendOtp')}</span>
                           <button
                             type="button"
                             className="change-auth-btn"
@@ -443,14 +445,14 @@ export const SignIn: React.FC = () => {
                             }}
                           >
                             <ArrowLeft size={11} />
-                            <span>Direct Login</span>
+                            <span>{t('directLoginBtn')}</span>
                           </button>
                         </div>
 
                         {!signInOtpSent ? (
                           <div className="auth-form-stack">
                             <div className="field-group">
-                              <label className="field-label">CONFIRM EMAIL</label>
+                              <label className="field-label">{t('confirmEmailLabel')}</label>
                               <input
                                 type="email"
                                 value={signInEmail}
@@ -466,14 +468,14 @@ export const SignIn: React.FC = () => {
                               onClick={handleSendSignInOtp}
                               disabled={signInLoading}
                             >
-                              <span>{signInLoading ? 'Dispatching...' : 'Send OTP via Resend'}</span>
+                              <span>{signInLoading ? t('dispatchingBtn') : t('sendOtpViaResendBtn')}</span>
                               <ArrowRight size={15} />
                             </button>
                           </div>
                         ) : (
                           <form onSubmit={handleVerifySignInOtp} className="auth-form-stack">
                             <div className="field-group">
-                              <label className="field-label">ENTER 6-DIGIT OTP CODE</label>
+                              <label className="field-label">{t('enter6DigitOtp')}</label>
                               <input
                                 type="text"
                                 maxLength={6}
@@ -508,7 +510,7 @@ export const SignIn: React.FC = () => {
                               className="submit-btn-navy"
                               disabled={signInLoading}
                             >
-                              <span>{signInLoading ? 'Verifying...' : 'Verify & Enter System'}</span>
+                              <span>{signInLoading ? t('verifyingBtn') : t('verifyAndEnterBtn')}</span>
                               <ArrowRight size={15} />
                             </button>
                           </form>
@@ -530,7 +532,7 @@ export const SignIn: React.FC = () => {
                           <form onSubmit={handleSendSignUpOtp} className="auth-form-stack">
                             <div className="field-group">
                               <label className="field-label" htmlFor="signup-email-input">
-                                EMAIL ADDRESS (VERIFIED VIA RESEND)
+                                {t('emailVerifiedViaResend')}
                               </label>
                               <div className="input-with-icon-row">
                                 <Mail size={16} className="input-leading-icon" />
@@ -558,11 +560,11 @@ export const SignIn: React.FC = () => {
                               className="submit-btn-navy"
                               disabled={signUpLoading}
                             >
-                              <span>{signUpLoading ? 'Sending...' : 'Send Verification OTP'}</span>
+                              <span>{signUpLoading ? t('sendingBtn') : t('sendVerificationOtpBtn')}</span>
                               <ArrowRight size={15} />
                             </button>
                             <p className="otp-disclaimer">
-                              A 6-digit security code will be sent to your email via Resend.
+                              {t('otpWillBeSentNotice')}
                             </p>
                           </form>
                         ) : (
@@ -570,7 +572,7 @@ export const SignIn: React.FC = () => {
                             <div className="field-group">
                               <div className="otp-header-row">
                                 <label className="field-label" htmlFor="signup-otp-input">
-                                  ENTER 6-DIGIT CODE SENT TO {signUpEmail}
+                                  {t('enterCodeSentTo')} {signUpEmail}
                                 </label>
                                 <button
                                   type="button"
@@ -578,7 +580,7 @@ export const SignIn: React.FC = () => {
                                   onClick={() => setSignUpOtpSent(false)}
                                 >
                                   <ArrowLeft size={11} />
-                                  <span>Edit</span>
+                                  <span>{t('editBtn')}</span>
                                 </button>
                               </div>
                               <input
@@ -616,7 +618,7 @@ export const SignIn: React.FC = () => {
                               className="submit-btn-navy"
                               disabled={signUpLoading}
                             >
-                              <span>{signUpLoading ? 'Verifying...' : 'Verify & Continue Profile'}</span>
+                              <span>{signUpLoading ? t('verifyingBtn') : t('verifyAndContinueProfile')}</span>
                               <ArrowRight size={15} />
                             </button>
                           </form>
@@ -631,13 +633,13 @@ export const SignIn: React.FC = () => {
                         <div className="verified-email-badge">
                           <CheckCircle2 size={15} className="verified-icon" />
                           <span className="verified-text">{signUpEmail}</span>
-                          <span className="verified-tag">Email Verified</span>
+                          <span className="verified-tag">{t('emailVerifiedBadge')}</span>
                         </div>
 
                         {/* First Name & Last Name */}
                         <div className="form-two-cols">
                           <div className="field-group">
-                            <label className="field-label" htmlFor="first-name">FIRST NAME *</label>
+                            <label className="field-label" htmlFor="first-name">{t('firstNameLabel')}</label>
                             <input
                               id="first-name"
                               type="text"
@@ -649,7 +651,7 @@ export const SignIn: React.FC = () => {
                             />
                           </div>
                           <div className="field-group">
-                            <label className="field-label" htmlFor="last-name">LAST NAME *</label>
+                            <label className="field-label" htmlFor="last-name">{t('lastNameLabel')}</label>
                             <input
                               id="last-name"
                               type="text"
@@ -665,7 +667,7 @@ export const SignIn: React.FC = () => {
                         {/* Gender & Phone */}
                         <div className="form-two-cols">
                           <div className="field-group">
-                            <label className="field-label">GENDER</label>
+                            <label className="field-label">{t('genderLabel')}</label>
                             <select
                               value={gender}
                               onChange={(e) => setGender(e.target.value)}
@@ -677,7 +679,7 @@ export const SignIn: React.FC = () => {
                             </select>
                           </div>
                           <div className="field-group">
-                            <label className="field-label" htmlFor="phone-number">PHONE (OPTIONAL)</label>
+                            <label className="field-label" htmlFor="phone-number">{t('phoneOptionalLabel')}</label>
                             <input
                               id="phone-number"
                               type="tel"
@@ -691,7 +693,7 @@ export const SignIn: React.FC = () => {
 
                         {/* Avatar Picker */}
                         <div className="field-group">
-                          <label className="field-label">CHOOSE AVATAR</label>
+                          <label className="field-label">{t('chooseAvatarLabel')}</label>
                           <div className="avatar-picker-row">
                             {PRESET_AVATARS.map((av) => (
                               <button
@@ -730,8 +732,8 @@ export const SignIn: React.FC = () => {
                         {/* Skills Selection (Predefined + Custom) */}
                         <div className="field-group">
                           <div className="chips-header-row">
-                            <label className="field-label">SKILLS (SELECT OR ADD CUSTOM)</label>
-                            <span className="chips-count">{selectedSkills.length} selected</span>
+                            <label className="field-label">{t('skillsLabel')}</label>
+                            <span className="chips-count">{selectedSkills.length} {t('selectedLabel')}</span>
                           </div>
                           <div className="chips-container">
                             {authOptions.skills.map((skill) => {
@@ -776,14 +778,14 @@ export const SignIn: React.FC = () => {
                                 }
                               }}
                               className="auth-text-input tag-input-field"
-                              placeholder="Type custom skill..."
+                              placeholder={t('typeCustomSkill')}
                             />
                             <button
                               type="button"
                               className="add-tag-btn"
                               onClick={addCustomSkill}
                             >
-                              <Plus size={13} /> Add
+                              <Plus size={13} /> {t('addBtn')}
                             </button>
                           </div>
                         </div>
@@ -791,8 +793,8 @@ export const SignIn: React.FC = () => {
                         {/* Equipment Selection (Predefined + Custom) */}
                         <div className="field-group">
                           <div className="chips-header-row">
-                            <label className="field-label">EQUIPMENT (SELECT OR ADD CUSTOM)</label>
-                            <span className="chips-count">{selectedEquipment.length} selected</span>
+                            <label className="field-label">{t('equipmentLabel')}</label>
+                            <span className="chips-count">{selectedEquipment.length} {t('selectedLabel')}</span>
                           </div>
                           <div className="chips-container">
                             {authOptions.equipment.map((item) => {
@@ -837,14 +839,14 @@ export const SignIn: React.FC = () => {
                                 }
                               }}
                               className="auth-text-input tag-input-field"
-                              placeholder="Type custom equipment..."
+                              placeholder={t('typeCustomEquipment')}
                             />
                             <button
                               type="button"
                               className="add-tag-btn"
                               onClick={addCustomEquipment}
                             >
-                              <Plus size={13} /> Add
+                              <Plus size={13} /> {t('addBtn')}
                             </button>
                           </div>
                         </div>
@@ -857,14 +859,14 @@ export const SignIn: React.FC = () => {
                             <div className="verification-box-header">
                               <ShieldCheck size={16} className="text-emerald-500" />
                               <span className="verification-box-title">
-                                Personal Verification &amp; Certification
+                                {t('personalVerificationTitle')}
                               </span>
                             </div>
 
                             <div className="form-two-cols">
                               <div className="field-group">
                                 <label className="field-label" htmlFor="nid-input">
-                                  NID NUMBER *
+                                  {t('nidNumberLabel')}
                                 </label>
                                 <input
                                   id="nid-input"
@@ -880,7 +882,7 @@ export const SignIn: React.FC = () => {
 
                               <div className="field-group">
                                 <label className="field-label" htmlFor="dob-input">
-                                  DATE OF BIRTH *
+                                  {t('dobLabel')}
                                 </label>
                                 <input
                                   id="dob-input"
@@ -895,7 +897,7 @@ export const SignIn: React.FC = () => {
 
                             <div className="field-group">
                               <label className="field-label" htmlFor="address-input">
-                                RESIDENTIAL / OPERATING ADDRESS *
+                                {t('addressLabel')}
                               </label>
                               <input
                                 id="address-input"
@@ -910,7 +912,7 @@ export const SignIn: React.FC = () => {
 
                             <div className="field-group">
                               <label className="field-label" htmlFor="cert-input">
-                                EXPERIENCE CERTIFICATE / CREDENTIALS
+                                {t('certLabel')}
                               </label>
                               <input
                                 id="cert-input"
@@ -935,7 +937,7 @@ export const SignIn: React.FC = () => {
                           className="submit-btn-navy"
                           disabled={signUpLoading}
                         >
-                          <span>{signUpLoading ? 'Creating Profile...' : 'Complete Registration & Enter'}</span>
+                          <span>{signUpLoading ? t('creatingProfileBtn') : t('completeRegistrationBtn')}</span>
                           <ArrowRight size={15} />
                         </button>
                       </form>
@@ -948,7 +950,7 @@ export const SignIn: React.FC = () => {
               <div className="signin-footer-row">
                 {authMode === 'signin' ? (
                   <>
-                    <span>Don't have an account? </span>
+                    <span>{t('dontHaveAccount')} </span>
                     <button
                       type="button"
                       className="inline-toggle-link"
@@ -957,18 +959,18 @@ export const SignIn: React.FC = () => {
                         setSignUpStep(1);
                       }}
                     >
-                      Create one
+                      {t('createOne')}
                     </button>
                   </>
                 ) : (
                   <>
-                    <span>Already have an account? </span>
+                    <span>{t('alreadyHaveAccount')} </span>
                     <button
                       type="button"
                       className="inline-toggle-link"
                       onClick={() => setAuthMode('signin')}
                     >
-                      Sign In
+                      {t('signIn')}
                     </button>
                   </>
                 )}
