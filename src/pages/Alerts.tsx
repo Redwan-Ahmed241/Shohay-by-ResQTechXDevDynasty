@@ -3,9 +3,11 @@ import { Search, Clock, CheckCircle } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { alertService } from '../services/alertService';
 import { FloodAlert, SeverityLevel } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 import './Alerts.css';
 
 export const Alerts: React.FC = () => {
+  const { t } = useLanguage();
   const [alerts, setAlerts] = useState<FloodAlert[]>([]);
   const [selectedSeverity, setSelectedSeverity] = useState<SeverityLevel | 'All'>('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,7 +25,14 @@ export const Alerts: React.FC = () => {
     setLoading(false);
   };
 
-  const categories: Array<SeverityLevel | 'All'> = ['All', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'ALL CLEAR'];
+  const categories: Array<{ id: SeverityLevel | 'All'; labelKey: string }> = [
+    { id: 'All', labelKey: 'filterAll' },
+    { id: 'CRITICAL', labelKey: 'sevCritical' },
+    { id: 'HIGH', labelKey: 'sevHigh' },
+    { id: 'MEDIUM', labelKey: 'sevMedium' },
+    { id: 'LOW', labelKey: 'sevLow' },
+    { id: 'ALL CLEAR', labelKey: 'sevAllClear' }
+  ];
 
   const getSeverityHeaderClass = (severity: SeverityLevel) => {
     switch (severity) {
@@ -48,8 +57,8 @@ export const Alerts: React.FC = () => {
         <div className="alerts-container">
           {/* Header Title + Count */}
           <div className="alerts-header-row">
-            <h1 className="alerts-title">Flood Alerts</h1>
-            <span className="active-count-badge">{alerts.length} active</span>
+            <h1 className="alerts-title">{t('floodAlerts')}</h1>
+            <span className="active-count-badge">{alerts.length} {t('activeLabel')}</span>
           </div>
 
           {/* Search Bar */}
@@ -57,7 +66,7 @@ export const Alerts: React.FC = () => {
             <input
               type="text"
               className="alerts-search-input"
-              placeholder="Search by area or keyword..."
+              placeholder={t('alertsSearchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -65,13 +74,13 @@ export const Alerts: React.FC = () => {
 
           {/* Severity Filter Pills */}
           <div className="severity-filters">
-            {categories.map((sev) => (
+            {categories.map((cat) => (
               <button
-                key={sev}
-                className={`filter-btn ${selectedSeverity === sev ? 'active' : ''}`}
-                onClick={() => setSelectedSeverity(sev)}
+                key={cat.id}
+                className={`filter-btn ${selectedSeverity === cat.id ? 'active' : ''}`}
+                onClick={() => setSelectedSeverity(cat.id)}
               >
-                {sev}
+                {t(cat.labelKey)}
               </button>
             ))}
           </div>
@@ -82,7 +91,7 @@ export const Alerts: React.FC = () => {
               <div className="skeleton-loading h-40" />
             ) : alerts.length === 0 ? (
               <div className="no-alerts-box">
-                <p>No flood alerts found matching your criteria.</p>
+                <p>{t('noAlertsFound')}</p>
               </div>
             ) : (
               alerts.map((alert) => (

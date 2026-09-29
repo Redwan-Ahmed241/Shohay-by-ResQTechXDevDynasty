@@ -189,6 +189,16 @@ const DICTIONARY: Record<string, Record<Language, string>> = {
   yourTrackingIdLabel: { en: 'YOUR TRACKING ID:', bn: 'আপনার ট্র্যাকিং আইডি:' },
   saveIdHint: { en: 'Save this ID to check rescue or relief status on the homepage.', bn: 'হোমপেজে উদ্ধার বা ত্রাণ আবেদনের অগ্রগতি দেখতে এই আইডিটি সংরক্ষণ করুন।' },
   returnToHomeBtn: { en: 'Return to Home', bn: 'হোমে ফিরে যান' },
+  // Alerts Page
+  activeLabel: { en: 'active', bn: 'সক্রিয়' },
+  alertsSearchPlaceholder: { en: 'Search by area or keyword...', bn: 'এলাকা বা কীওয়ার্ড দিয়ে অনুসন্ধান করুন...' },
+  filterAll: { en: 'All', bn: 'সকল' },
+  sevCritical: { en: 'CRITICAL', bn: 'সংকটপূর্ণ' },
+  sevHigh: { en: 'HIGH', bn: 'উচ্চ ঝুঁকি' },
+  sevMedium: { en: 'MEDIUM', bn: 'মাঝারি' },
+  sevLow: { en: 'LOW', bn: 'কম ঝুঁকি' },
+  sevAllClear: { en: 'ALL CLEAR', bn: 'স্বাভাবিক' },
+  noAlertsFound: { en: 'No flood alerts found matching your criteria.', bn: 'আপনার অনুসন্ধানের সাথে মিলে এমন কোনো বন্যা সতর্কতা পাওয়া যায়নি।' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
