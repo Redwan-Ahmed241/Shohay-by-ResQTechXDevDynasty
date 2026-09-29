@@ -222,6 +222,15 @@ const DICTIONARY: Record<string, Record<Language, string>> = {
   routeBlocked: { en: 'Blocked', bn: 'বন্ধ' },
   routeOk: { en: 'Route OK', bn: 'সচল' },
   sheltersShown: { en: 'shelters shown', bn: 'টি আশ্রয়কেন্দ্র প্রদর্শিত' },
+  // Campaigns Page
+  campaignsTitle: { en: 'Relief Campaigns & Donations', bn: 'ত্রাণ ক্যাম্পেইন ও অনুদান' },
+  campaignsSubtitle: { en: 'All campaigns are verified by SHOHAY before listing. Track fund usage transparently.', bn: 'তালিকভুক্তির পূর্বে সহায় কর্তৃক সকল ক্যাম্পেইন যাচাই করা হয়। অনুদানের সঠিক ব্যবহার স্বচ্ছভাবে পর্যবেক্ষণ করুন।' },
+  activeCampaignsLabel: { en: 'Active Campaigns', bn: 'সক্রিয় ক্যাম্পেইন' },
+  householdsReachedLabel: { en: 'Households Reached', bn: 'সাহায্যপ্রাপ্ত পরিবার' },
+  totalRaisedBDTLabel: { en: 'Total Raised (BDT)', bn: 'মোট সংগৃহীত অনুদান (টাকা)' },
+  ofTarget: { en: 'of', bn: 'এর মধ্যে' },
+  householdsReachedText: { en: 'households reached', bn: 'টি পরিবারে সাহায্য পৌঁছেছে' },
+  viewDonateBtn: { en: 'View & Donate →', bn: 'বিস্তারিত ও অনুদান →' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
