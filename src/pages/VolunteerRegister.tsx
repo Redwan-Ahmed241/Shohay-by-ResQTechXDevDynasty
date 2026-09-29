@@ -5,11 +5,13 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { Checkbox } from '../components/ui/Checkbox';
 import { StepIndicator } from '../components/ui/StepIndicator';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import './VolunteerRegister.css';
 
 export const VolunteerRegister: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -33,9 +35,9 @@ export const VolunteerRegister: React.FC = () => {
   });
 
   const steps = [
-    { number: 1, label: '' },
-    { number: 2, label: '' },
-    { number: 3, label: '' }
+    { number: 1, label: t('basicInfoStep') },
+    { number: 2, label: t('skillsStep') },
+    { number: 3, label: t('availabilityStep') }
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -50,7 +52,7 @@ export const VolunteerRegister: React.FC = () => {
         <div className="vol-register-container">
           {/* Top Back Link */}
           <button className="top-back-btn" onClick={() => navigate('/volunteer')}>
-            <ArrowLeft size={14} /> Back
+            <ArrowLeft size={14} /> {t('backBtn')}
           </button>
 
           {/* Stepper Bar */}
@@ -63,10 +65,10 @@ export const VolunteerRegister: React.FC = () => {
             {isCompleted ? (
               <div className="submission-success text-center flex flex-col items-center gap-4 py-8 animate-fade-in">
                 <CheckCircle size={56} style={{ color: '#006a4e' }} />
-                <h2 className="success-title">Registration Complete!</h2>
-                <p className="success-sub">Welcome to the SHOHAY volunteer network. Your ID is <strong>VOL-2024-DEMO</strong>.</p>
+                <h2 className="success-title">{t('registrationComplete')}</h2>
+                <p className="success-sub">{t('welcomeVolunteerNotice')} <strong>VOL-2024-DEMO</strong>.</p>
                 <button className="btn-navy-primary mt-4" onClick={() => navigate('/volunteer/dashboard')}>
-                  Go to Volunteer Dashboard
+                  {t('goToVolunteerDashboard')}
                 </button>
               </div>
             ) : (
@@ -74,12 +76,12 @@ export const VolunteerRegister: React.FC = () => {
                 {/* Step 1: Basic Information */}
                 {currentStep === 1 && (
                   <div className="step-content-stack">
-                    <h2 className="step-card-title">Basic Information</h2>
+                    <h2 className="step-card-title">{t('basicInformationTitle')}</h2>
 
                     <div className="name-inputs-grid">
                       <input
                         type="text"
-                        placeholder="First Name"
+                        placeholder={t('firstNamePlaceholder')}
                         className="form-input-field"
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
@@ -87,7 +89,7 @@ export const VolunteerRegister: React.FC = () => {
                       />
                       <input
                         type="text"
-                        placeholder="Last Name"
+                        placeholder={t('lastNamePlaceholder')}
                         className="form-input-field"
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
@@ -97,7 +99,7 @@ export const VolunteerRegister: React.FC = () => {
 
                     <input
                       type="text"
-                      placeholder="Mobile Number"
+                      placeholder={t('mobileNumberPlaceholder')}
                       className="form-input-field"
                       value={formData.mobile}
                       onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
@@ -106,7 +108,7 @@ export const VolunteerRegister: React.FC = () => {
 
                     <input
                       type="email"
-                      placeholder="Email (optional)"
+                      placeholder={t('emailOptionalPlaceholder')}
                       className="form-input-field"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -117,13 +119,13 @@ export const VolunteerRegister: React.FC = () => {
                 {/* Step 2: Skills & Equipment */}
                 {currentStep === 2 && (
                   <div className="step-content-stack">
-                    <h2 className="step-card-title">Skills &amp; Equipment</h2>
+                    <h2 className="step-card-title">{t('skillsEquipmentTitle')}</h2>
 
                     <div className="checkbox-section">
-                      <label className="checkbox-section-label">Select Your Skills:</label>
+                      <label className="checkbox-section-label">{t('selectYourSkillsLabel')}</label>
                       <div className="checkbox-stack">
                         <Checkbox
-                          label="Boat Driving / Water Rescue"
+                          label={t('skillBoatRescue')}
                           checked={formData.skills.boatRescue}
                           onChange={(e) =>
                             setFormData({
@@ -133,7 +135,7 @@ export const VolunteerRegister: React.FC = () => {
                           }
                         />
                         <Checkbox
-                          label="Relief & Food Distribution"
+                          label={t('skillFoodDistribution')}
                           checked={formData.skills.foodDistribution}
                           onChange={(e) =>
                             setFormData({
@@ -143,7 +145,7 @@ export const VolunteerRegister: React.FC = () => {
                           }
                         />
                         <Checkbox
-                          label="First Aid / Medical Care"
+                          label={t('skillFirstAid')}
                           checked={formData.skills.firstAid}
                           onChange={(e) =>
                             setFormData({
@@ -153,7 +155,7 @@ export const VolunteerRegister: React.FC = () => {
                           }
                         />
                         <Checkbox
-                          label="Shelter Management & Admin"
+                          label={t('skillShelterAdmin')}
                           checked={formData.skills.shelterAdmin}
                           onChange={(e) =>
                             setFormData({
@@ -166,15 +168,15 @@ export const VolunteerRegister: React.FC = () => {
                     </div>
 
                     <div className="checkbox-section">
-                      <label className="checkbox-section-label">Do you have personal equipment?</label>
+                      <label className="checkbox-section-label">{t('doYouHaveEquipment')}</label>
                       <div className="checkbox-stack">
                         <Checkbox
-                          label="I have access to an engine boat / speed boat"
+                          label={t('equipBoat')}
                           checked={formData.hasBoat}
                           onChange={(e) => setFormData({ ...formData, hasBoat: e.target.checked })}
                         />
                         <Checkbox
-                          label="I have a vehicle (Truck / Pickup / Bike)"
+                          label={t('equipVehicle')}
                           checked={formData.hasVehicle}
                           onChange={(e) => setFormData({ ...formData, hasVehicle: e.target.checked })}
                         />
@@ -186,10 +188,10 @@ export const VolunteerRegister: React.FC = () => {
                 {/* Step 3: Availability & District */}
                 {currentStep === 3 && (
                   <div className="step-content-stack">
-                    <h2 className="step-card-title">Availability &amp; Preferred District</h2>
+                    <h2 className="step-card-title">{t('availabilityDistrictTitle')}</h2>
 
                     <div className="field-group-item">
-                      <label className="field-label-text">Primary Operating District</label>
+                      <label className="field-label-text">{t('primaryOperatingDistrict')}</label>
                       <input
                         type="text"
                         className="form-input-field"
@@ -200,7 +202,7 @@ export const VolunteerRegister: React.FC = () => {
                     </div>
 
                     <div className="field-group-item">
-                      <label className="field-label-text">Availability</label>
+                      <label className="field-label-text">{t('availabilityFieldLabel')}</label>
                       <input
                         type="text"
                         className="form-input-field"
@@ -219,7 +221,7 @@ export const VolunteerRegister: React.FC = () => {
                     className="btn-outline-subtle"
                     onClick={() => (currentStep > 1 ? setCurrentStep(currentStep - 1) : navigate('/volunteer'))}
                   >
-                    Back
+                    {t('backBtn')}
                   </button>
 
                   {currentStep < 3 ? (
@@ -228,11 +230,11 @@ export const VolunteerRegister: React.FC = () => {
                       className="btn-navy-primary"
                       onClick={() => setCurrentStep(currentStep + 1)}
                     >
-                      Next
+                      {t('nextBtn')}
                     </button>
                   ) : (
                     <button type="submit" className="btn-green-submit">
-                      Complete Registration
+                      {t('completeRegistrationBtn')}
                     </button>
                   )}
                 </div>
