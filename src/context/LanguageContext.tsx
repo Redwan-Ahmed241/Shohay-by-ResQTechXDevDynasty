@@ -350,6 +350,11 @@ const DICTIONARY: Record<string, Record<Language, string>> = {
   pageNotFoundTitle: { en: '404 — Page Not Found', bn: '৪০৪ — পৃষ্ঠাটি পাওয়া যায়নি' },
   pageNotFoundDesc: { en: 'The page or resource you requested does not exist or has been relocated in the flood relief network.', bn: 'আপনার অনুরোধ করা পৃষ্ঠা বা তথ্যটি পাওয়া যায়নি অথবা বন্যা ত্রাণ নেটওয়ার্কে স্থানান্তরিত হয়েছে।' },
   pageNotFoundReturnHome: { en: 'Return to Homepage', bn: 'হোমপেজে ফিরে যান' },
+  alertBannerCritical: { en: 'CRITICAL ALERT', bn: 'জরুরি সতর্কতা' },
+  alertBannerEvacOrder: { en: 'Immediate Evacuation Order:', bn: 'অবিলম্বে সরিয়ে নেওয়ার নির্দেশ:' },
+  alertBannerWarningDetail: { en: 'Extreme Flash Flood Warning — Sunamganj Sadar & Surrounding Areas.', bn: 'তীব্র আকস্মিক বন্যার সতর্কতা — সুনামগঞ্জ সদর ও পার্শ্ববর্তী এলাকা।' },
+  alertBannerViewAlert: { en: 'View Alert', bn: 'সতর্কতা দেখুন' },
+  alertBannerGetHelpNow: { en: 'GET HELP NOW', bn: 'এখনই সাহায্য নিন' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
