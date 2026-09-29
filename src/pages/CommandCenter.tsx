@@ -36,6 +36,7 @@ import { alertService } from '../services/alertService';
 import { warehouseService } from '../services/warehouseService';
 import { uavService } from '../services/uavService';
 import { ApiError } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import {
   AssistanceRequestRecord,
   AssistanceType,
@@ -101,6 +102,7 @@ function lastSevenDays(requests: AssistanceRequestRecord[]) {
 
 export const CommandCenter: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
 
   // Live data
@@ -254,7 +256,7 @@ export const CommandCenter: React.FC = () => {
           {/* Top Header Row */}
           <div className="cc-header-row">
             <div>
-              <h1 className="cc-title">Command Center</h1>
+              <h1 className="cc-title">{t('ccTitle')}</h1>
               <p className="cc-subtitle">Disaster Response Operations, Citizen Requests &amp; Volunteer Deployment</p>
             </div>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -266,7 +268,7 @@ export const CommandCenter: React.FC = () => {
                 <Plus size={15} />
                 <span>New Volunteer Task</span>
               </button>
-              <span className="cc-ops-active-pill">■ Operations Active</span>
+              <span className="cc-ops-active-pill">{t('ccOpsActive')}</span>
             </div>
           </div>
 
@@ -308,16 +310,16 @@ export const CommandCenter: React.FC = () => {
           <div className="cc-top-stats-grid">
             <div className="cc-stat-card card-red" onClick={() => setActiveTab('requests')} style={{ cursor: 'pointer' }}>
               <div className="cc-stat-info">
-                <span className="cc-stat-label label-red">OPEN ASSISTANCE REQUESTS</span>
+                <span className="cc-stat-label label-red">{t('ccOpenRequests')}</span>
                 <div className="cc-stat-value text-red">{openRequests.length}</div>
-                <div className="cc-stat-sub text-red">{urgentOpen} life-threatening</div>
+                <div className="cc-stat-sub text-red">{urgentOpen} {t('ccCriticalSub')}</div>
               </div>
               <AlertTriangle size={24} className="icon-red" />
             </div>
 
             <div className="cc-stat-card card-blue" onClick={() => setActiveTab('volunteers')} style={{ cursor: 'pointer' }}>
               <div className="cc-stat-info">
-                <span className="cc-stat-label label-blue">REGISTERED VOLUNTEERS</span>
+                <span className="cc-stat-label label-blue">{t('ccActiveVolunteers')}</span>
                 <div className="cc-stat-value text-blue">{volunteers.length}</div>
                 <div className="cc-stat-sub text-blue">{onDutyCount} on duty now</div>
               </div>
@@ -326,16 +328,16 @@ export const CommandCenter: React.FC = () => {
 
             <div className="cc-stat-card card-green" onClick={() => navigate('/shelters')} style={{ cursor: 'pointer' }}>
               <div className="cc-stat-info">
-                <span className="cc-stat-label label-green">SHELTER OCCUPANCY</span>
+                <span className="cc-stat-label label-green">{t('ccShelterOccupancy')}</span>
                 <div className="cc-stat-value text-green">{totalOccupancy.toLocaleString()}/{totalCapacity.toLocaleString()}</div>
-                <div className="cc-stat-sub text-green">{nearlyFull} nearly full</div>
+                <div className="cc-stat-sub text-green">{nearlyFull} {t('ccNearlyFullSub')}</div>
               </div>
               <Home size={24} className="icon-green" />
             </div>
 
             <div className="cc-stat-card card-purple" onClick={() => navigate('/campaigns')} style={{ cursor: 'pointer' }}>
               <div className="cc-stat-info">
-                <span className="cc-stat-label label-purple">HOUSEHOLDS REACHED</span>
+                <span className="cc-stat-label label-purple">{t('ccHouseholdsReached')}</span>
                 <div className="cc-stat-value text-purple">{householdsReached}</div>
                 <div className="cc-stat-sub text-purple">Through relief campaigns</div>
               </div>
@@ -346,10 +348,10 @@ export const CommandCenter: React.FC = () => {
           {/* Navigation Tabs */}
           <div className="cc-nav-tabs">
             <button className={`cc-tab-item ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
-              Overview &amp; Trends
+              {t('ccTabOverview')}
             </button>
             <button className={`cc-tab-item ${activeTab === 'requests' ? 'active' : ''}`} onClick={() => setActiveTab('requests')}>
-              Requests &amp; Approvals ({requests.length})
+              {t('ccTabRequests')} ({requests.length})
             </button>
             <button className={`cc-tab-item ${activeTab === 'tasks' ? 'active' : ''}`} onClick={() => setActiveTab('tasks')}>
               Volunteer Tasks ({tasks.filter((t) => t.status === 'Available' || t.status === 'In Progress').length})
@@ -371,7 +373,7 @@ export const CommandCenter: React.FC = () => {
               <div className="cc-secondary-stats-grid">
                 <div className="cc-sec-stat-card">
                   <div className="sec-stat-val text-amber">{requests.filter((r) => r.status === 'Pending').length}</div>
-                  <div className="sec-stat-lbl">Awaiting Verification</div>
+                  <div className="sec-stat-lbl">{t('ccAwaitingVerification')}</div>
                 </div>
                 <div className="cc-sec-stat-card">
                   <div className="sec-stat-val text-blue">{requests.filter((r) => ['Verified', 'Assigned', 'In Progress'].includes(r.status)).length}</div>
@@ -379,7 +381,7 @@ export const CommandCenter: React.FC = () => {
                 </div>
                 <div className="cc-sec-stat-card">
                   <div className="sec-stat-val text-red">{lowStockCount}</div>
-                  <div className="sec-stat-lbl">Low Stock Items</div>
+                  <div className="sec-stat-lbl">{t('ccLowStockItems')}</div>
                 </div>
                 <div className="cc-sec-stat-card">
                   <div className="sec-stat-val text-orange">{requests.filter((r) => r.status === 'Resolved').length}</div>
@@ -402,13 +404,13 @@ export const CommandCenter: React.FC = () => {
                     </ResponsiveContainer>
                   </div>
                   <div className="chart-legend">
-                    <span className="legend-item"><span className="legend-dot green" /> Submitted</span>
-                    <span className="legend-item"><span className="legend-dot dark" /> Resolved</span>
+                    <span className="legend-item"><span className="legend-dot green" /> {t('ccLegendSubmitted')}</span>
+                    <span className="legend-item"><span className="legend-dot dark" /> {t('ccLegendResolved')}</span>
                   </div>
                 </div>
 
                 <div className="cc-chart-card">
-                  <h3 className="chart-title">SHELTER OCCUPANCY BY DISTRICT</h3>
+                  <h3 className="chart-title">{t('ccShelterOccupancyByDistrict')}</h3>
                   <div className="chart-container">
                     <ResponsiveContainer width="100%" height={220}>
                       <BarChart data={occupancyByDistrictData}>
@@ -424,7 +426,7 @@ export const CommandCenter: React.FC = () => {
 
               <div className="cc-bottom-lists-grid">
                 <div className="cc-list-card">
-                  <h4 className="list-card-title">Districts Active</h4>
+                  <h4 className="list-card-title">{t('ccDistrictsActiveTitle')}</h4>
                   <ul className="cc-bullet-list">
                     {activeDistricts.length === 0 && <li className="text-muted">None yet</li>}
                     {activeDistricts.slice(0, 8).map((d) => <li key={d}>{d}</li>)}
@@ -432,16 +434,16 @@ export const CommandCenter: React.FC = () => {
                 </div>
 
                 <div className="cc-list-card">
-                  <h4 className="list-card-title">Partner Organizations</h4>
+                  <h4 className="list-card-title">{t('ccPartnerOrgsTitle')}</h4>
                   <ul className="cc-bullet-list">
                     {partnerOrgs.length === 0 && <li className="text-muted">None yet</li>}
                     {partnerOrgs.slice(0, 6).map((o) => <li key={o}>{o}</li>)}
-                    {partnerOrgs.length > 6 && <li className="text-muted">+ {partnerOrgs.length - 6} more</li>}
+                    {partnerOrgs.length > 6 && <li className="text-muted">+ {partnerOrgs.length - 6} {t('ccMoreSuffix')}</li>}
                   </ul>
                 </div>
 
                 <div className="cc-list-card">
-                  <h4 className="list-card-title">Active Flood Alerts</h4>
+                  <h4 className="list-card-title">{t('ccActiveAlertsTitle')}</h4>
                   <ul className="cc-bullet-list">
                     {alerts.length === 0 && <li className="text-muted">No alerts</li>}
                     {alerts.slice(0, 5).map((a) => (

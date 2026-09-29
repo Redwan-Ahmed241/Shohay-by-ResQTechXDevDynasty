@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Phone, Mail, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { AuthMethod, SignUpMetadata } from '../services/authService';
 import { UserRole } from '../types';
 import './SignIn.css';
@@ -17,6 +18,7 @@ export const SignIn: React.FC = () => {
   // Page the user was sent here from (see RequireRole), e.g. /admin/uav
   const returnTo = (useLocation().state as { from?: string } | null)?.from;
   const { user, isLoading: isRestoringSession, sendCode, verifyCode } = useAuth();
+  const { t } = useLanguage();
 
   const [selectedRole, setSelectedRole] = useState<Exclude<UserRole, 'admin'>>('volunteer');
   const [authMethod, setAuthMethod] = useState<AuthMethod>('email');
@@ -101,27 +103,27 @@ export const SignIn: React.FC = () => {
           <div className="signin-glass-panel">
             <div className="quote-container">
               <blockquote className="hadith-quote">
-                “And whoever helps his brother (in need), Allah will be helping him; and whoever helps a believer to be free of a grievance, Allah will remove one of his grievances on the Day of Resurrection.”
+                {t('hadithQuote')}
               </blockquote>
-              <cite className="hadith-citation">(Sahih Muslim 2699)</cite>
+              <cite className="hadith-citation">{t('hadithCitation')}</cite>
             </div>
 
             <div className="signin-stats-grid">
               <div className="signin-stat-card">
                 <div className="signin-stat-number">1.2M+</div>
-                <div className="signin-stat-label">People helped</div>
+                <div className="signin-stat-label">{t('peopleHelped')}</div>
               </div>
               <div className="signin-stat-card">
                 <div className="signin-stat-number">847</div>
-                <div className="signin-stat-label">Special shelters</div>
+                <div className="signin-stat-label">{t('specialShelters')}</div>
               </div>
               <div className="signin-stat-card">
                 <div className="signin-stat-number">38</div>
-                <div className="signin-stat-label">Partner orgs</div>
+                <div className="signin-stat-label">{t('partnerOrgs')}</div>
               </div>
               <div className="signin-stat-card">
                 <div className="signin-stat-number">98%</div>
-                <div className="signin-stat-label">Special ops</div>
+                <div className="signin-stat-label">{t('specialOps')}</div>
               </div>
             </div>
 
@@ -136,13 +138,13 @@ export const SignIn: React.FC = () => {
           <div className="signin-form-panel">
             <div className="signin-form-box">
               <div className="signin-header-block">
-                <h1 className="signin-title">Sign In</h1>
+                <h1 className="signin-title">{t('signIn')}</h1>
                 <p className="signin-subtitle">
                   Choose your role and we'll send a one-time sign-in code to your email or phone. No password needed.
                 </p>
               </div>
 
-              {/* Role Selection Tabs */}
+              {/* Role Selection Tabs: Public Access vs Field Worker */}
               <div className="role-selector-tabs" role="tablist">
                 <button
                   type="button"
@@ -151,7 +153,7 @@ export const SignIn: React.FC = () => {
                   className={`role-tab ${selectedRole === 'public' ? 'active' : ''}`}
                   onClick={() => { setSelectedRole('public'); resetToIdentify(); }}
                 >
-                  PUBLIC ACCESS
+                  {t('publicAccessTab')}
                 </button>
                 <button
                   type="button"
@@ -160,7 +162,7 @@ export const SignIn: React.FC = () => {
                   className={`role-tab ${selectedRole === 'volunteer' ? 'active' : ''}`}
                   onClick={() => { setSelectedRole('volunteer'); resetToIdentify(); }}
                 >
-                  FIELD WORKER
+                  {t('fieldWorkerTab')}
                 </button>
               </div>
 
@@ -302,9 +304,9 @@ export const SignIn: React.FC = () => {
               </div>
 
               <div className="signin-footer-row">
-                <span>Don't have an account? </span>
+                <span>{t('dontHaveAccount')} </span>
                 <Link to="/volunteer/register" className="create-link">
-                  Create one
+                  {t('createOne')}
                 </Link>
               </div>
             </div>

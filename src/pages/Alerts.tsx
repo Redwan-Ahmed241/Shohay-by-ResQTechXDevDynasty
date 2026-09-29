@@ -8,6 +8,7 @@ import { useAlerts } from '../hooks/queries';
 import { alertService } from '../services/alertService';
 import { ApiError } from '../services/api';
 import { SeverityLevel } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 import './CommandCenter.css';
 import './Alerts.css';
 
@@ -18,6 +19,7 @@ export const Alerts: React.FC = () => {
   const isAdmin = user?.role === 'admin';
   const queryClient = useQueryClient();
   const { notice, flash } = useFlash();
+  const { t } = useLanguage();
 
   const [selectedSeverity, setSelectedSeverity] = useState<SeverityLevel | 'All'>('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,7 +36,14 @@ export const Alerts: React.FC = () => {
 
   const { data: alerts = [], isLoading: loading } = useAlerts(selectedSeverity, debouncedSearchQuery);
 
-  const categories: Array<SeverityLevel | 'All'> = ['All', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'ALL CLEAR'];
+  const categories: Array<{ id: SeverityLevel | 'All'; labelKey: string }> = [
+    { id: 'All', labelKey: 'filterAll' },
+    { id: 'CRITICAL', labelKey: 'sevCritical' },
+    { id: 'HIGH', labelKey: 'sevHigh' },
+    { id: 'MEDIUM', labelKey: 'sevMedium' },
+    { id: 'LOW', labelKey: 'sevLow' },
+    { id: 'ALL CLEAR', labelKey: 'sevAllClear' }
+  ];
   const createCategories: SeverityLevel[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'ALL CLEAR'];
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -82,9 +91,9 @@ export const Alerts: React.FC = () => {
         <div className="alerts-container">
           {/* Header Title + Count */}
           <div className="alerts-header-row">
-            <h1 className="alerts-title">Flood Alerts</h1>
+            <h1 className="alerts-title">{t('floodAlerts')}</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span className="active-count-badge">{alerts.length} active</span>
+              <span className="active-count-badge">{alerts.length} {t('activeLabel')}</span>
               {isAdmin && (
                 <button className="btn-table-action btn-action-assign" onClick={() => setShowCreate(true)} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 6 }}>
                   <Plus size={14} /> New Alert
@@ -104,7 +113,7 @@ export const Alerts: React.FC = () => {
             <input
               type="text"
               className="alerts-search-input"
-              placeholder="Search by area or keyword..."
+              placeholder={t('alertsSearchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -112,13 +121,13 @@ export const Alerts: React.FC = () => {
 
           {/* Severity Filter Pills */}
           <div className="severity-filters">
-            {categories.map((sev) => (
+            {categories.map((cat) => (
               <button
-                key={sev}
-                className={`filter-btn ${selectedSeverity === sev ? 'active' : ''}`}
-                onClick={() => setSelectedSeverity(sev)}
+                key={cat.id}
+                className={`filter-btn ${selectedSeverity === cat.id ? 'active' : ''}`}
+                onClick={() => setSelectedSeverity(cat.id)}
               >
-                {sev}
+                {t(cat.labelKey)}
               </button>
             ))}
           </div>
@@ -129,7 +138,7 @@ export const Alerts: React.FC = () => {
               <div className="skeleton-loading h-40" />
             ) : alerts.length === 0 ? (
               <div className="no-alerts-box">
-                <p>No flood alerts found matching your criteria.</p>
+                <p>{t('noAlertsFound')}</p>
               </div>
             ) : (
               alerts.map((alert) => (

@@ -7,6 +7,7 @@ import { uavService } from '../services/uavService';
 import { ApiError } from '../services/api';
 import { VolunteerProfile, VolunteerAssignment, UavDetection, UavDrone } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import './VolunteerDashboard.css';
 
 const DRONE_POLL_MS = 10_000;
@@ -22,7 +23,7 @@ function errorText(err: unknown): string {
 
 export const VolunteerDashboard: React.FC = () => {
   const { user } = useAuth();
-
+  const { t } = useLanguage();
   const [profile, setProfile] = useState<VolunteerProfile | null>(null);
   const [assignments, setAssignments] = useState<VolunteerAssignment[]>([]);
   const [drones, setDrones] = useState<UavDrone[]>([]);
@@ -176,7 +177,7 @@ export const VolunteerDashboard: React.FC = () => {
                 <div className="user-details">
                   <h3 className="vol-user-name">{displayName}</h3>
                   <div className="vol-user-id">{profile.code} • {profile.district}</div>
-                  <div className="vol-joined-date">Joined: {profile.joinDate}</div>
+                  <div className="vol-joined-date">{t('volJoinedLabel')} {profile.joinDate}</div>
                 </div>
               </div>
 
@@ -191,22 +192,22 @@ export const VolunteerDashboard: React.FC = () => {
                 <span className={profile.isAvailable ? 'badge-available' : 'badge-in-progress'} style={{ background: profile.isAvailable ? '#ecfdf5' : '#fef3c7', color: profile.isAvailable ? '#065f46' : '#92400e', border: profile.isAvailable ? '1px solid #10b981' : '1px solid #f59e0b' }}>
                   {profile.isAvailable ? '● Available' : '○ On Break'}
                 </span>
-                <span className="toggle-hint">Tap to toggle</span>
+                <span className="toggle-hint">{t('volTapToToggle')}</span>
               </button>
             </div>
 
             <div className="profile-counters-row">
               <div className="counter-col">
                 <div className="counter-num">{(profile.hoursLogged + minutesOnDuty / 60).toFixed(1)}</div>
-                <div className="counter-lbl">Hours</div>
+                <div className="counter-lbl">{t('volHoursLabel')}</div>
               </div>
               <div className="counter-col">
                 <div className="counter-num">{profile.tasksCompleted}</div>
-                <div className="counter-lbl">Tasks</div>
+                <div className="counter-lbl">{t('volTasksLabel')}</div>
               </div>
               <div className="counter-col">
                 <div className="counter-num">{profile.rating ? profile.rating.toFixed(1) : '—'}</div>
-                <div className="counter-lbl">Rating</div>
+                <div className="counter-lbl">{t('volRatingLabel')}</div>
               </div>
             </div>
           </div>
@@ -215,7 +216,7 @@ export const VolunteerDashboard: React.FC = () => {
           {task ? (
             <div className="current-assignment-navy-card">
               <div className="assign-header-row">
-                <span className="assign-header-tag">Current Assignment</span>
+                <span className="assign-header-tag">{t('volCurrentAssignmentTitle')}</span>
                 <span className="badge-in-progress" style={{ background: onDuty ? '#10b981' : undefined, color: onDuty ? '#ffffff' : undefined }}>
                   {onDuty ? `On duty · ${minutesOnDuty} min` : profile.dutyStatus === 'Paused' ? 'Duty Paused' : 'Accepted (check in to start)'}
                 </span>
@@ -225,7 +226,7 @@ export const VolunteerDashboard: React.FC = () => {
               <div className="assign-meta-row">
                 <span>⏱ {task.durationHours} hours estimated</span>
                 <span>📍 {task.location || profile.district}</span>
-                <span>👥 Team of {task.teamSize}</span>
+                <span>👥 {t('volTeamOf')} {task.teamSize}</span>
               </div>
 
               <div className="assign-button-group">
@@ -238,7 +239,7 @@ export const VolunteerDashboard: React.FC = () => {
                   style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
                 >
                   {onDuty ? <Pause size={14} /> : <Play size={14} />}
-                  <span>{onDuty ? 'Pause Duty' : profile.dutyStatus === 'Paused' ? 'Resume Duty' : 'Check In (Start Duty)'}</span>
+                  <span>{onDuty ? 'Pause Duty' : profile.dutyStatus === 'Paused' ? 'Resume Duty' : t('volCheckInBtn')}</span>
                 </button>
 
                 <button
@@ -315,7 +316,7 @@ export const VolunteerDashboard: React.FC = () => {
 
           {/* My Skills */}
           <div className="skills-card">
-            <h4 className="skills-title">My Skills</h4>
+            <h4 className="skills-title">{t('volMySkillsTitle')}</h4>
             <div className="skills-chips-row">
               {profile.skills.length === 0 && <span style={{ fontSize: 13, color: '#64748b' }}>No skills added yet.</span>}
               {profile.skills.map((skill) => (
@@ -326,7 +327,7 @@ export const VolunteerDashboard: React.FC = () => {
 
           {/* Open Assignments */}
           <div className="open-assignments-section">
-            <h2 className="open-section-title">Open Assignments ({assignments.length})</h2>
+            <h2 className="open-section-title">{t('volOpenAssignmentsTitle')} ({assignments.length})</h2>
 
             {assignments.length === 0 ? (
               <div style={{ background: '#f8fafc', borderRadius: '8px', padding: '24px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
@@ -340,7 +341,7 @@ export const VolunteerDashboard: React.FC = () => {
                       <div className="open-item-left">
                         <h3 className="open-item-title">{item.title}</h3>
                         <div className="open-item-meta">
-                          ⏱ {item.durationHours} hours &nbsp;•&nbsp; 📍 {item.location}, {item.district} &nbsp;•&nbsp; 👥 Team of {item.teamSize}
+                          ⏱ {item.durationHours} {t('volHoursLabel')} &nbsp;•&nbsp; 📍 {item.location}, {item.district} &nbsp;•&nbsp; 👥 {t('volTeamOf')} {item.teamSize}
                           {item.requestId && <> &nbsp;•&nbsp; citizen request</>}
                         </div>
                       </div>
@@ -357,10 +358,10 @@ export const VolunteerDashboard: React.FC = () => {
                         title={task ? 'Finish your current task first' : undefined}
                         onClick={() => handleAccept(item)}
                       >
-                        {busy === `accept-${item.id}` ? 'Accepting…' : 'Accept Task'}
+                        {busy === `accept-${item.id}` ? 'Accepting…' : t('volAcceptBtn')}
                       </button>
                       <button className="btn-decline-outline" disabled={busy !== null} onClick={() => handleDecline(item)}>
-                        Decline
+                        {t('volDeclineBtn')}
                       </button>
                     </div>
                   </div>

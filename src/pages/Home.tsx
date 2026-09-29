@@ -32,6 +32,7 @@ import { MOCK_ALERTS } from '../data/alerts';
 import { BD_UPAZILAS } from '../data/upazilas';
 import { TRACK_STATUS_TEXT } from '../utils/requestStatus';
 import { RequestTracking } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 import './Home.css';
 
 // Local image assets from public/
@@ -47,6 +48,7 @@ const HELP_IMAGE_2 = '/photo-1649134799042-ccca78a3f9bf.jpg';
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { t } = useLanguage();
   const [trackingId, setTrackingId] = useState('');
   const [trackingResult, setTrackingResult] = useState<RequestTracking | null>(null);
   const [trackingError, setTrackingError] = useState('');
@@ -85,7 +87,7 @@ export const Home: React.FC = () => {
     setTrackingResult(null);
 
     if (!trackingId.trim()) {
-      setTrackingError('Please enter a valid tracking ID');
+      setTrackingError(t('homeTrackErrorEmpty'));
       return;
     }
 
@@ -94,7 +96,7 @@ export const Home: React.FC = () => {
       if (res) {
         setTrackingResult(res);
       } else {
-        setTrackingError('No request found with that tracking ID. Check it and try again.');
+        setTrackingError(t('homeTrackErrorNotFound'));
       }
     } catch {
       setTrackingError('Could not reach the Shohay server. Please try again in a moment.');
@@ -114,21 +116,21 @@ export const Home: React.FC = () => {
         </div>
         <div className="alert-banner-content">
           <div className="alert-banner-label">
-            Critical Alert — Immediate Action Required
+            {t('homeAlertLabel')}
           </div>
           <div className="alert-banner-title">
-            Extreme Flash Flood Warning — Sunamganj Sadar
+            {t('homeAlertTitle')}
           </div>
           <div className="alert-banner-areas">
-            Sunamganj Sadar, Bishwambarpur, Tahirpur, Derai
+            {t('homeAlertAreas')}
           </div>
         </div>
         <div className="alert-banner-actions">
           <button className="alert-btn-outline" onClick={() => navigate('/alerts')}>
-            View Alert
+            {t('homeViewAlert')}
           </button>
           <button className="alert-btn-solid" onClick={() => navigate('/get-help')}>
-            Get Help Now
+            {t('homeGetHelpNow')}
           </button>
         </div>
       </div>
@@ -145,7 +147,7 @@ export const Home: React.FC = () => {
             </div>
             <button className="location-gps-btn" onClick={shareGps} disabled={gpsBusy} type="button">
               <Navigation />
-              <span>{gpsBusy ? 'Locating…' : 'GPS'}</span>
+              <span>{gpsBusy ? 'Locating…' : t('homeGps')}</span>
             </button>
             <select
               className="location-dropdown"
@@ -155,7 +157,7 @@ export const Home: React.FC = () => {
                 setGpsStatus(null);
               }}
             >
-              <option value="">Select Upazila...</option>
+              <option value="">{t('homeSelectUpazila')}</option>
               {BD_UPAZILAS.map((d) => (
                 <optgroup key={d.district} label={d.district}>
                   {d.upazilas.map((u) => (
@@ -165,7 +167,7 @@ export const Home: React.FC = () => {
               ))}
             </select>
             <span className="location-separator">|</span>
-            <button className="location-skip" onClick={() => setLocationDismissed(true)} type="button">Skip</button>
+            <button className="location-skip" onClick={() => setLocationDismissed(true)} type="button">{t('homeSkip')}</button>
           </div>
         </div>
       )}
@@ -179,22 +181,22 @@ export const Home: React.FC = () => {
             <div className="stat-chip">
               <Users size={14} />
               <span className="stat-chip-value">1.2M+</span>
-              <span className="stat-chip-label">Reached</span>
+              <span className="stat-chip-label">{t('homeStatReached')}</span>
             </div>
             <div className="stat-chip">
               <HomeIcon size={14} />
               <span className="stat-chip-value">847</span>
-              <span className="stat-chip-label">Shelters</span>
+              <span className="stat-chip-label">{t('homeStatShelters')}</span>
             </div>
             <div className="stat-chip">
               <Package size={14} />
               <span className="stat-chip-value">50K+</span>
-              <span className="stat-chip-label">Packages</span>
+              <span className="stat-chip-label">{t('homeStatPackages')}</span>
             </div>
             <div className="stat-chip">
               <Anchor size={14} />
               <span className="stat-chip-value">340</span>
-              <span className="stat-chip-label">Rescues</span>
+              <span className="stat-chip-label">{t('homeStatRescues')}</span>
             </div>
           </div>
 
@@ -203,7 +205,7 @@ export const Home: React.FC = () => {
           <div className="water-risk-section">
             <div className="water-risk-label">
               <Droplets />
-              <span>Water Risk</span>
+              <span>{t('homeWaterRisk')}</span>
             </div>
             <div className="water-risk-item">
               <span className="water-risk-name">Sunamganj</span>
@@ -242,8 +244,8 @@ export const Home: React.FC = () => {
          ═══════════════════════════════════════ */}
       <div className="live-ticker">
         <span className="live-ticker-text">
-          🔴 LIVE — Sunamganj: Water level 3.2m above danger level · Brahmaputra rising at 5cm/hr · 14 upazilas on red alert · Evacuations ongoing in Bishwambarpur · BNCC deploying additional rescue boats &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          🔴 LIVE — Sunamganj: Water level 3.2m above danger level · Brahmaputra rising at 5cm/hr · 14 upazilas on red alert · Evacuations ongoing in Bishwambarpur · BNCC deploying additional rescue boats
+          {t('homeLiveTicker')} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          {t('homeLiveTicker')}
         </span>
       </div>
 
@@ -256,25 +258,25 @@ export const Home: React.FC = () => {
         <div className="hero-gradient-left" />
 
         <div className="hero-content">
-          <div className="hero-badge-tag">Emergency Response · Bangladesh</div>
-          <h1 className="hero-title">Standing With Bangladesh in Times of Crisis.</h1>
+          <div className="hero-badge-tag">{t('homeHeroBadge')}</div>
+          <h1 className="hero-title">{t('homeHeroTitle')}</h1>
           <p className="hero-description">
-            Coordinating immediate rescue, shelter access, and transparent relief tracking for flood-affected communities across Bangladesh.
+            {t('homeHeroDesc')}
           </p>
           <div className="hero-buttons">
             <Link to="/get-help" className="hero-btn-primary">
               <Hand size={16} />
-              Request Assistance
+              {t('homeHeroRequestAssistance')}
             </Link>
             <Link to="/campaigns" className="hero-btn-secondary">
               <Heart size={16} />
-              Donate
+              {t('homeHeroDonate')}
             </Link>
           </div>
         </div>
 
         <div className="hero-scroll-indicator">
-          <span>Scroll</span>
+          <span>{t('homeHeroScroll')}</span>
           <ChevronDown size={16} />
         </div>
       </section>
@@ -284,26 +286,26 @@ export const Home: React.FC = () => {
          ═══════════════════════════════════════ */}
       <section className="mission-section">
         <div className="mission-left">
-          <div className="mission-tag">Our Mission</div>
+          <div className="mission-tag">{t('homeMissionTag')}</div>
           <h2 className="mission-heading">
-            We coordinate with communities impacted by floods to save lives, restore dignity, and rebuild resilience across Bangladesh.
+            {t('homeMissionHeading')}
           </h2>
           <Link to="/about" className="mission-learn-more">
-            Learn More
+            {t('homeLearnMore')}
             <ArrowRight size={16} />
           </Link>
           <div className="mission-stats">
             <div>
               <div className="mission-stat-value">1.2M</div>
-              <div className="mission-stat-label">people served in 2024</div>
+              <div className="mission-stat-label">{t('homeMissionStat1Label')}</div>
             </div>
             <div>
               <div className="mission-stat-value">38</div>
-              <div className="mission-stat-label">partner orgs nationwide</div>
+              <div className="mission-stat-label">{t('homeMissionStat2Label')}</div>
             </div>
             <div>
               <div className="mission-stat-value">98%</div>
-              <div className="mission-stat-label">led by local staff</div>
+              <div className="mission-stat-label">{t('homeMissionStat3Label')}</div>
             </div>
           </div>
         </div>
@@ -312,9 +314,9 @@ export const Home: React.FC = () => {
           <img src={MISSION_IMG} alt="Mother and child receiving humanitarian assistance" className="mission-image" />
           <div className="mission-image-gradient" />
           <div className="mission-image-badge">
-            <div className="badge-label">Rescue Ops</div>
+            <div className="badge-label">{t('homeRescueOpsBadge')}</div>
             <div className="badge-value">5,200+</div>
-            <div className="badge-sub">coordinated rescues · 2024</div>
+            <div className="badge-sub">{t('homeRescueOpsSub')}</div>
           </div>
         </div>
       </section>
@@ -329,8 +331,8 @@ export const Home: React.FC = () => {
               <Shield />
             </div>
             <div>
-              <h3>Find Shelter</h3>
-              <p>Real-time capacity at safe havens near you</p>
+              <h3>{t('homeFindShelterTitle')}</h3>
+              <p>{t('homeFindShelterDesc')}</p>
             </div>
             <ArrowUpRight className="service-block-arrow" />
           </Link>
@@ -340,8 +342,8 @@ export const Home: React.FC = () => {
               <AlertTriangle />
             </div>
             <div>
-              <h3>Report Hazard</h3>
-              <p>Anonymously flag flooded roads or dangers</p>
+              <h3>{t('homeReportHazardTitle')}</h3>
+              <p>{t('homeReportHazardDesc')}</p>
             </div>
             <ArrowUpRight className="service-block-arrow" />
           </Link>
@@ -351,8 +353,8 @@ export const Home: React.FC = () => {
               <HelpCircle />
             </div>
             <div>
-              <h3>Request Help</h3>
-              <p>Submit rescue or relief assistance requests</p>
+              <h3>{t('homeRequestHelpTitle')}</h3>
+              <p>{t('homeRequestHelpDesc')}</p>
             </div>
             <ArrowUpRight className="service-block-arrow" />
           </Link>
@@ -362,8 +364,8 @@ export const Home: React.FC = () => {
               <PhoneCall />
             </div>
             <div>
-              <h3>Emergency Lines</h3>
-              <p>Direct lines to rescue and medical services</p>
+              <h3>{t('homeEmergencyLinesTitle')}</h3>
+              <p>{t('homeEmergencyLinesDesc')}</p>
             </div>
             <ArrowUpRight className="service-block-arrow" />
           </Link>
@@ -377,7 +379,7 @@ export const Home: React.FC = () => {
         <div className="live-situation-inner">
           <div className="live-situation-header">
             <div className="live-situation-line" />
-            <span className="live-situation-title">Live Situation · Bangladesh Floods 2024</span>
+            <span className="live-situation-title">{t('homeLiveSituationTitle')}</span>
             <div className="live-situation-line" />
           </div>
 
@@ -385,26 +387,26 @@ export const Home: React.FC = () => {
             <div className="live-stat-card">
               <Users size={16} />
               <div className="live-stat-value">4.8M</div>
-              <div className="live-stat-label">People Affected</div>
-              <div className="live-stat-sublabel">across 18 districts</div>
+              <div className="live-stat-label">{t('homePeopleAffected')}</div>
+              <div className="live-stat-sublabel">{t('homeAcrossDistricts')}</div>
             </div>
             <div className="live-stat-card">
               <HomeIcon size={16} />
               <div className="live-stat-value">847K</div>
-              <div className="live-stat-label">Homes Damaged</div>
-              <div className="live-stat-sublabel">full or partial damage</div>
+              <div className="live-stat-label">{t('homeHomesDamaged')}</div>
+              <div className="live-stat-sublabel">{t('homeFullPartialDamage')}</div>
             </div>
             <div className="live-stat-card">
               <Droplets size={16} />
               <div className="live-stat-value">2,300+</div>
-              <div className="live-stat-label">km² Submerged</div>
-              <div className="live-stat-sublabel">croplands inundated</div>
+              <div className="live-stat-label">{t('homeKmSubmerged')}</div>
+              <div className="live-stat-sublabel">{t('homeCroplandsInundated')}</div>
             </div>
             <div className="live-stat-card">
               <Anchor size={16} />
               <div className="live-stat-value">340</div>
-              <div className="live-stat-label">Rescue Boats Active</div>
-              <div className="live-stat-sublabel">BNCC + Army deployed</div>
+              <div className="live-stat-label">{t('homeRescueBoatsActive')}</div>
+              <div className="live-stat-sublabel">{t('homeBnccArmyDeployed')}</div>
             </div>
           </div>
         </div>
@@ -417,11 +419,11 @@ export const Home: React.FC = () => {
         <div className="news-inner">
           <div className="news-header">
             <div className="news-header-left">
-              <span className="news-section-tag">Our Work Across Bangladesh</span>
-              <h2 className="news-section-title">News and Stories</h2>
+              <span className="news-section-tag">{t('homeNewsTag')}</span>
+              <h2 className="news-section-title">{t('homeNewsTitle')}</h2>
             </div>
             <Link to="/news" className="news-read-more">
-              Read More
+              {t('homeReadMore')}
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -432,20 +434,20 @@ export const Home: React.FC = () => {
               <div className="news-featured-image-wrapper">
                 <img src={NEWS_FEATURED_IMG} alt="Evacuation during flood" className="news-featured-img" />
                 <div className="news-featured-overlay" />
-                <div className="news-featured-tag">FIELD REPORT</div>
+                <div className="news-featured-tag">{t('homeFieldReport')}</div>
                 <div className="news-featured-bottom-text">
-                  <div className="news-featured-category">RESCUE</div>
+                  <div className="news-featured-category">{t('homeRescueCat')}</div>
                   <div className="news-featured-title">
-                    Over 12,000 families evacuated as floodwaters breach Sunamganj embankments
+                    {t('homeFeaturedNewsTitle')}
                   </div>
                 </div>
               </div>
               <div className="news-featured-body">
                 <p className="news-featured-excerpt">
-                  Coordinated rescue boats deployed across 14 upazilas to move stranded families to safety.
+                  {t('homeFeaturedNewsExcerpt')}
                 </p>
                 <Link to="/news/1" className="news-featured-link">
-                  Read More
+                  {t('homeReadMore')}
                   <ArrowRight size={14} />
                 </Link>
               </div>
@@ -456,12 +458,12 @@ export const Home: React.FC = () => {
               <div className="news-sidebar-item">
                 <img src={NEWS_THUMB_1} alt="Medical team" className="news-sidebar-thumb" />
                 <div className="news-sidebar-content">
-                  <span className="news-sidebar-cat">HEALTH</span>
+                  <span className="news-sidebar-cat">{t('homeHealthCat')}</span>
                   <div className="news-sidebar-title">
-                    Mobile medical units reach flood-isolated char communities in Sirajganj
+                    {t('homeNews2Title')}
                   </div>
                   <Link to="/news/2" className="news-sidebar-link">
-                    Read
+                    {t('homeRead')}
                     <ArrowRight size={12} />
                   </Link>
                 </div>
@@ -470,12 +472,12 @@ export const Home: React.FC = () => {
               <div className="news-sidebar-item">
                 <img src={NEWS_THUMB_2} alt="Relief distribution" className="news-sidebar-thumb" />
                 <div className="news-sidebar-content">
-                  <span className="news-sidebar-cat">COMMUNITY</span>
+                  <span className="news-sidebar-cat">{t('homeCommunityCat')}</span>
                   <div className="news-sidebar-title">
-                    Women-led distribution networks ensure equitable relief in Netrokona
+                    {t('homeNews3Title')}
                   </div>
                   <Link to="/news/3" className="news-sidebar-link">
-                    Read
+                    {t('homeRead')}
                     <ArrowRight size={12} />
                   </Link>
                 </div>
@@ -484,12 +486,12 @@ export const Home: React.FC = () => {
               <div className="news-sidebar-item">
                 <img src={NEWS_THUMB_3} alt="Recovery effort" className="news-sidebar-thumb" />
                 <div className="news-sidebar-content">
-                  <span className="news-sidebar-cat">RESILIENCE</span>
+                  <span className="news-sidebar-cat">{t('homeResilienceCat')}</span>
                   <div className="news-sidebar-title">
-                    Local leaders coordinate post-flood recovery in Kurigram char areas
+                    {t('homeNews4Title')}
                   </div>
                   <Link to="/news/4" className="news-sidebar-link">
-                    Read
+                    {t('homeRead')}
                     <ArrowRight size={12} />
                   </Link>
                 </div>
@@ -505,14 +507,14 @@ export const Home: React.FC = () => {
       <section className="how-help-section">
         <div className="how-help-inner">
           <div className="how-help-copy">
-            <div className="how-help-tag">There are many ways to help flood-affected families</div>
-            <h2 className="how-help-title">How You Can Help</h2>
+            <div className="how-help-tag">{t('homeHowHelpTag')}</div>
+            <h2 className="how-help-title">{t('homeHowHelpTitle')}</h2>
             <p className="how-help-description">
-              Support rescue logistics, deliver relief supplies, and help families reach safe shelter through the most urgent response channels.
+              {t('homeHowHelpDesc')}
             </p>
             <div className="how-help-actions">
-              <Link to="/get-help" className="how-help-primary">Request Help</Link>
-              <Link to="/volunteer" className="how-help-secondary">Volunteer</Link>
+              <Link to="/get-help" className="how-help-primary">{t('homeRequestHelpTitle')}</Link>
+              <Link to="/volunteer" className="how-help-secondary">{t('volunteer')}</Link>
             </div>
           </div>
 
@@ -521,8 +523,8 @@ export const Home: React.FC = () => {
               <img src={HELP_IMAGE_1} alt="Relief transport by boat" className="help-photo-img" />
               <div className="help-photo-overlay" />
               <div className="help-photo-caption">
-                <span className="help-photo-kicker">Relief Transport</span>
-                <span className="help-photo-title">Supplies moving into flooded communities</span>
+                <span className="help-photo-kicker">{t('homeReliefTransport')}</span>
+                <span className="help-photo-title">{t('homeReliefTransportTitle')}</span>
               </div>
             </div>
 
@@ -530,8 +532,8 @@ export const Home: React.FC = () => {
               <img src={HELP_IMAGE_2} alt="Flood response by local residents" className="help-photo-img" />
               <div className="help-photo-overlay" />
               <div className="help-photo-caption">
-                <span className="help-photo-kicker">Community Support</span>
-                <span className="help-photo-title">Local responders guiding families to safety</span>
+                <span className="help-photo-kicker">{t('homeCommunitySupport')}</span>
+                <span className="help-photo-title">{t('homeCommunitySupportTitle')}</span>
               </div>
             </div>
           </div>
@@ -546,9 +548,9 @@ export const Home: React.FC = () => {
           {/* Left: Latest Situation Updates */}
           <div className="updates-main">
             <div className="updates-header">
-              <h2 className="updates-title">Latest Situation Updates</h2>
+              <h2 className="updates-title">{t('homeLatestUpdates')}</h2>
               <Link to="/alerts" className="updates-all-link">
-                All Alerts
+                {t('homeAllAlerts')}
                 <ArrowRight size={16} />
               </Link>
             </div>
@@ -569,7 +571,7 @@ export const Home: React.FC = () => {
                     <div className="alert-card-body">
                       <div className="alert-card-header-row">
                         <h3 className="alert-card-title">{alert.title}</h3>
-                        <span className="alert-verified-badge">Government Verified</span>
+                        <span className="alert-verified-badge">{t('homeGovtVerified')}</span>
                       </div>
                       <p className="alert-card-desc">{alert.description}</p>
                       <div className="alert-card-tags">
@@ -594,10 +596,10 @@ export const Home: React.FC = () => {
             <div className="widget-card">
               <div className="widget-header">
                 <Search size={20} />
-                <h3>Track Your Request</h3>
+                <h3>{t('homeTrackYourRequest')}</h3>
               </div>
               <p className="widget-desc">
-                Enter your tracking ID to view rescue or relief status in real-time.
+                {t('homeTrackDesc')}
                 {isAuthenticated && (
                   <> Signed in? <Link to="/my-requests">See all your requests</Link> without typing an ID.</>
                 )}
@@ -610,7 +612,7 @@ export const Home: React.FC = () => {
                   onChange={(e) => setTrackingId(e.target.value)}
                   className="track-input"
                 />
-                <button type="submit" className="track-btn">Go</button>
+                <button type="submit" className="track-btn">{t('homeTrackSubmit')}</button>
               </form>
               {trackingError && <div className="track-error">{trackingError}</div>}
               {trackingResult && (
@@ -620,7 +622,7 @@ export const Home: React.FC = () => {
                     <span className="track-status-badge">{trackingResult.status}</span>
                   </div>
                   <p className="track-result-location">
-                    {trackingResult.types.map((t) => t.replace(/_/g, ' ')).join(', ')} · {[trackingResult.upazila, trackingResult.district].filter(Boolean).join(', ')}
+                    {trackingResult.types.map((ty) => ty.replace(/_/g, ' ')).join(', ')} · {[trackingResult.upazila, trackingResult.district].filter(Boolean).join(', ')}
                   </p>
                   <p className="track-result-location">{TRACK_STATUS_TEXT[trackingResult.status] || trackingResult.status}</p>
                 </div>
@@ -631,24 +633,24 @@ export const Home: React.FC = () => {
             <div className="widget-card">
               <div className="widget-header">
                 <PhoneCall size={20} />
-                <h3>Emergency Hotlines</h3>
+                <h3>{t('homeEmergencyHotlines')}</h3>
               </div>
               <div className="hotline-list">
                 <div className="hotline-item">
-                  <span className="hotline-name">National Emergency</span>
+                  <span className="hotline-name">{t('homeNationalEmergency')}</span>
                   <span className="hotline-number">999</span>
                 </div>
                 <div className="hotline-item">
-                  <span className="hotline-name">Fire Service & Civil Defence</span>
+                  <span className="hotline-name">{t('homeFireService')}</span>
                   <span className="hotline-number">102</span>
                 </div>
                 <div className="hotline-item">
-                  <span className="hotline-name">Ambulance Service</span>
+                  <span className="hotline-name">{t('homeAmbulanceService')}</span>
                   <span className="hotline-number">199</span>
                 </div>
               </div>
               <Link to="/contacts" className="all-contacts-link">
-                All Contacts →
+                {t('homeAllContacts')}
               </Link>
             </div>
           </div>
@@ -664,27 +666,27 @@ export const Home: React.FC = () => {
             <div className="bottom-card-icon">
               <Users />
             </div>
-            <h3>Volunteer</h3>
-            <p>Join field teams and help distribute relief to families in need across affected districts.</p>
-            <Link to="/volunteer/register" className="bottom-card-btn">Join Now</Link>
+            <h3>{t('homeBottomVolunteerTitle')}</h3>
+            <p>{t('homeBottomVolunteerDesc')}</p>
+            <Link to="/volunteer/register" className="bottom-card-btn">{t('homeJoinNow')}</Link>
           </div>
 
           <div className="bottom-card">
             <div className="bottom-card-icon">
               <FileText />
             </div>
-            <h3>Transparency</h3>
-            <p>Track how donated funds and materials are utilized with real-time audit logs and field reports.</p>
-            <Link to="/campaigns" className="bottom-card-btn">View Reports</Link>
+            <h3>{t('homeBottomTransparencyTitle')}</h3>
+            <p>{t('homeBottomTransparencyDesc')}</p>
+            <Link to="/campaigns" className="bottom-card-btn">{t('homeViewReports')}</Link>
           </div>
 
           <div className="bottom-card">
             <div className="bottom-card-icon">
               <Activity />
             </div>
-            <h3>Our Impact</h3>
-            <p>5,000+ rescues coordinated and 50,000+ meals distributed in the past 14 days.</p>
-            <Link to="/campaigns" className="bottom-card-btn">Impact Report</Link>
+            <h3>{t('homeBottomImpactTitle')}</h3>
+            <p>{t('homeBottomImpactDesc')}</p>
+            <Link to="/campaigns" className="bottom-card-btn">{t('homeImpactReport')}</Link>
           </div>
         </div>
       </section>
@@ -692,4 +694,5 @@ export const Home: React.FC = () => {
     </PageLayout>
   );
 };
+
 

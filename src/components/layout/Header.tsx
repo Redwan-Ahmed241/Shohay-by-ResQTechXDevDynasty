@@ -3,53 +3,58 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Globe, Menu, Radio, Shield, X, LogOut } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import { UserRole } from '../../types';
 import './Header.css';
 
 // Each role sees only what's relevant to their job — a coordinator doesn't submit
-// rescue requests, a volunteer isn't managing shelters or drones.
+// rescue requests, a volunteer isn't managing shelters or drones. `key` maps to a
+// LanguageContext dictionary entry where one exists; items without one stay English.
 const PUBLIC_NAV = [
-  { label: 'Home', path: '/' },
-  { label: 'Alerts', path: '/alerts' },
-  { label: 'Shelters', path: '/shelters' },
-  { label: 'Get Help', path: '/get-help' },
-  { label: 'Campaigns', path: '/campaigns' },
-  { label: 'Contacts', path: '/contacts' },
+  { key: 'home', label: 'Home', path: '/' },
+  { key: 'alerts', label: 'Alerts', path: '/alerts' },
+  { key: 'shelters', label: 'Shelters', path: '/shelters' },
+  { key: 'getHelp', label: 'Get Help', path: '/get-help' },
+  { key: 'campaigns', label: 'Campaigns', path: '/campaigns' },
+  { key: 'contacts', label: 'Contacts', path: '/contacts' },
 ];
 
 const VOLUNTEER_NAV = [
-  { label: 'Home', path: '/' },
-  { label: 'My Dashboard', path: '/volunteer/dashboard' },
-  { label: 'Alerts', path: '/alerts' },
-  { label: 'Shelters', path: '/shelters' },
-  { label: 'Campaigns', path: '/campaigns' },
-  { label: 'Contacts', path: '/contacts' },
+  { key: 'home', label: 'Home', path: '/' },
+  { key: 'fieldDashboard', label: 'My Dashboard', path: '/volunteer/dashboard' },
+  { key: 'alerts', label: 'Alerts', path: '/alerts' },
+  { key: 'shelters', label: 'Shelters', path: '/shelters' },
+  { key: 'campaigns', label: 'Campaigns', path: '/campaigns' },
+  { key: 'contacts', label: 'Contacts', path: '/contacts' },
 ];
 
 const ADMIN_NAV = [
-  { label: 'Command Center', path: '/admin/command-center' },
-  { label: 'Alerts', path: '/alerts' },
-  { label: 'Shelters', path: '/shelters' },
+  { key: 'admin', label: 'Command Center', path: '/admin/command-center' },
+  { key: 'alerts', label: 'Alerts', path: '/alerts' },
+  { key: 'shelters', label: 'Shelters', path: '/shelters' },
   { label: 'Warehouse', path: '/admin/warehouse' },
   { label: 'UAV Monitor', path: '/admin/uav' },
-  { label: 'Contacts', path: '/contacts' },
+  { key: 'contacts', label: 'Contacts', path: '/contacts' },
 ];
 
-function getNavItems(role: 'public' | 'volunteer' | 'admin' | undefined) {
+function getNavItems(role: UserRole | undefined) {
   if (role === 'admin') return ADMIN_NAV;
-  if (role === 'volunteer') return VOLUNTEER_NAV;
+  if (role === 'volunteer' || role === 'fieldworker') return VOLUNTEER_NAV;
   return PUBLIC_NAV;
 }
 
 export const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { toggleLanguage } = useLanguage();
+  const { t, toggleLanguage } = useLanguage();
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
-  const navigationItems = getNavItems(isAuthenticated ? user?.role : undefined);
+  const navigationItems = getNavItems(isAuthenticated ? user?.role : undefined).map((item) => ({
+    ...item,
+    label: item.key ? t(item.key) : item.label,
+  }));
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,7 +99,7 @@ export const Header: React.FC = () => {
         <div className="header-actions">
           <button className="utility-btn utility-lang hide-mobile" onClick={toggleLanguage} aria-label="Toggle language">
             <Globe size={14} />
-            <span>বাংলা</span>
+            <span>{t('banglaBtn')}</span>
           </button>
 
           {isAuthenticated && user ? (
@@ -103,15 +108,15 @@ export const Header: React.FC = () => {
                 <Shield size={14} />
                 <span>{user.role === 'admin' ? 'Coordinator' : user.role === 'volunteer' ? 'Volunteer' : 'Citizen'}: {user.name.split(' ')[0]}</span>
               </Link>
-              <button onClick={handleSignOut} className="utility-btn utility-signout" title="Sign Out">
+              <button onClick={handleSignOut} className="utility-btn utility-signout" title={t('signOut')}>
                 <LogOut size={12} />
-                <span>Sign Out</span>
+                <span>{t('signOut')}</span>
               </button>
             </div>
           ) : (
             <Link to="/sign-in" className="utility-btn utility-signin hide-mobile">
               <Shield size={14} />
-              <span>Sign In</span>
+              <span>{t('signIn')}</span>
             </Link>
           )}
 
@@ -150,12 +155,12 @@ export const Header: React.FC = () => {
                 className="nav-link"
                 style={{ color: '#fca5a5', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: '12px 16px' }}
               >
-                Sign Out
+                {t('signOut')}
               </button>
             </>
           ) : (
             <Link to="/sign-in" onClick={() => setMobileMenuOpen(false)} className="nav-link">
-              Sign In
+              {t('signIn')}
             </Link>
           )}
         </div>

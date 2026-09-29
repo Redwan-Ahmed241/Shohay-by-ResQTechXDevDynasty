@@ -5,6 +5,7 @@ import { useFlash } from '../hooks/useFlash';
 import { warehouseService } from '../services/warehouseService';
 import { ApiError } from '../services/api';
 import { WarehouseItem, InventoryCategory, StockMovement } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 import './Warehouse.css';
 
 type MoveMode = 'receive' | 'dispatch';
@@ -25,6 +26,7 @@ const fieldStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', bo
 const labelStyle: React.CSSProperties = { display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' };
 
 export const Warehouse: React.FC = () => {
+  const { t } = useLanguage();
   const [items, setItems] = useState<WarehouseItem[]>([]);
   const [allItems, setAllItems] = useState<WarehouseItem[]>([]); // unfiltered, for banners and the form
   const [movements, setMovements] = useState<StockMovement[]>([]);
@@ -88,7 +90,15 @@ export const Warehouse: React.FC = () => {
     }
   };
 
-  const categories: Array<InventoryCategory | 'All'> = ['All', 'Food', 'Water', 'Medicine', 'Hygiene', 'Rescue Equipment', 'Shelter'];
+  const categories: Array<{ id: InventoryCategory | 'All'; labelKey: string }> = [
+    { id: 'All', labelKey: 'whCatAll' },
+    { id: 'Food', labelKey: 'whCatFood' },
+    { id: 'Water', labelKey: 'whCatWater' },
+    { id: 'Medicine', labelKey: 'whCatMedicine' },
+    { id: 'Hygiene', labelKey: 'whCatHygiene' },
+    { id: 'Rescue Equipment', labelKey: 'whCatRescueEquipment' },
+    { id: 'Shelter', labelKey: 'whCatShelter' }
+  ];
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -113,15 +123,15 @@ export const Warehouse: React.FC = () => {
         <div className="warehouse-container">
           <div className="warehouse-header-row">
             <div>
-              <h1 className="warehouse-title">Warehouse &amp; Inventory</h1>
-              <p className="warehouse-subtitle">Live inventory across all registered warehouses</p>
+              <h1 className="warehouse-title">{t('warehouseTitle')}</h1>
+              <p className="warehouse-subtitle">{t('warehouseSubtitle')}</p>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button className="btn-receive-stock" onClick={() => openForm('dispatch')} disabled={allItems.length === 0} style={{ background: '#1e40af' }}>
                 <Truck size={14} /> Dispatch Stock
               </button>
               <button className="btn-receive-stock" onClick={() => openForm('receive')} disabled={allItems.length === 0}>
-                <Plus size={14} /> Receive Stock
+                <Plus size={14} /> {t('warehouseReceiveStock')}
               </button>
             </div>
           </div>
@@ -163,20 +173,31 @@ export const Warehouse: React.FC = () => {
           </div>
 
           <div className="warehouse-sub-tabs">
-            <button className={`w-sub-tab ${activeTab === 'inventory' ? 'active' : ''}`} onClick={() => setActiveTab('inventory')}>
-              Inventory
+            <button
+              className={`w-sub-tab ${activeTab === 'inventory' ? 'active' : ''}`}
+              onClick={() => setActiveTab('inventory')}
+            >
+              {t('warehouseTabInventory')}
             </button>
-            <button className={`w-sub-tab ${activeTab === 'movements' ? 'active' : ''}`} onClick={() => setActiveTab('movements')}>
-              Movements ({movements.length})
+            <button
+              className={`w-sub-tab ${activeTab === 'movements' ? 'active' : ''}`}
+              onClick={() => setActiveTab('movements')}
+            >
+              {t('warehouseTabMovements')} ({movements.length})
             </button>
           </div>
 
           {activeTab === 'inventory' ? (
             <>
+              {/* Category Filter Chips */}
               <div className="warehouse-category-chips">
                 {categories.map((cat) => (
-                  <button key={cat} className={`w-cat-chip ${selectedCategory === cat ? 'active' : ''}`} onClick={() => setSelectedCategory(cat)}>
-                    {cat}
+                  <button
+                    key={cat.id}
+                    className={`w-cat-chip ${selectedCategory === cat.id ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(cat.id)}
+                  >
+                    {t(cat.labelKey)}
                   </button>
                 ))}
               </div>
@@ -185,15 +206,15 @@ export const Warehouse: React.FC = () => {
                 <table className="inventory-data-table">
                   <thead>
                     <tr>
-                      <th>Item</th>
-                      <th>Category</th>
-                      <th>Available</th>
-                      <th>Reserved</th>
-                      <th>Min Stock</th>
-                      <th>Status</th>
-                      <th>Expiry</th>
-                      <th>Warehouse</th>
-                      <th>Last Count</th>
+                      <th>{t('whThItem')}</th>
+                      <th>{t('whThCategory')}</th>
+                      <th>{t('whThAvailable')}</th>
+                      <th>{t('whThReserved')}</th>
+                      <th>{t('whThMinStock')}</th>
+                      <th>{t('whThStatus')}</th>
+                      <th>{t('whThExpiry')}</th>
+                      <th>{t('whThWarehouse')}</th>
+                      <th>{t('whThLastCount')}</th>
                     </tr>
                   </thead>
                   <tbody>
