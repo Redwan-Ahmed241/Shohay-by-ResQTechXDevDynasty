@@ -8,6 +8,15 @@ export interface ShelterFilterParams {
   amenities?: Record<string, boolean>;
 }
 
+export interface ShelterCreateInput {
+  name: string;
+  address: string;
+  upazila: string;
+  district: string;
+  capacity: number;
+  category: Shelter['category'];
+}
+
 export const shelterService = {
   async getShelters(filters?: ShelterFilterParams): Promise<Shelter[]> {
     try {
@@ -80,5 +89,12 @@ export const shelterService = {
         freeSpaces: freeSpaces.toLocaleString('en-US')
       });
     }
+  },
+
+  createShelter(input: ShelterCreateInput): Promise<Shelter> {
+    return apiFetch<Shelter>('/api/shelters', {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
   }
 };

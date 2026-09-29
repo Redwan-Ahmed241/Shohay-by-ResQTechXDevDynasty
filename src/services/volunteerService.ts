@@ -70,5 +70,12 @@ export const volunteerService = {
     return apiFetch<VolunteerAssignment>(`/api/volunteers/assignments/${encodeURIComponent(assignmentId)}/cancel`, {
       method: 'POST'
     });
+  },
+
+  setVerification(userId: string, status: 'Verified' | 'Pending' | 'Rejected'): Promise<{ id: string; verification_status: string }> {
+    return apiFetch(`/api/volunteers/${encodeURIComponent(userId)}/verification`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status })
+    });
   }
 };

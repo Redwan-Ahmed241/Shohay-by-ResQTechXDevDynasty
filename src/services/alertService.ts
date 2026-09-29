@@ -2,6 +2,14 @@ import { MOCK_ALERTS } from '../data/alerts';
 import { FloodAlert, SeverityLevel } from '../types';
 import { apiFetch, mockFetch } from './api';
 
+export interface AlertCreateInput {
+  severity: SeverityLevel;
+  type: string;
+  title: string;
+  description: string;
+  affectedAreas: string[];
+}
+
 export const alertService = {
   async getAlerts(severityFilter?: SeverityLevel, search?: string): Promise<FloodAlert[]> {
     try {
@@ -45,5 +53,12 @@ export const alertService = {
       const alert = MOCK_ALERTS.find((a) => a.id === id);
       return mockFetch(alert);
     }
+  },
+
+  createAlert(input: AlertCreateInput): Promise<FloodAlert> {
+    return apiFetch<FloodAlert>('/api/alerts', {
+      method: 'POST',
+      body: JSON.stringify(input)
+    });
   }
 };

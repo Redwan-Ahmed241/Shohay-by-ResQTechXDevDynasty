@@ -197,6 +197,19 @@ export const CommandCenter: React.FC = () => {
     }
   };
 
+  const handleVerify = async (vol: VolunteerDirectoryEntry, newStatus: 'Verified' | 'Rejected') => {
+    setBusyId(vol.id);
+    try {
+      await volunteerService.setVerification(vol.id, newStatus);
+      setVolunteers((prev) => prev.map((v) => (v.id === vol.id ? { ...v, verification_status: newStatus } : v)));
+      flash('ok', `${vol.first_name} ${vol.last_name} is now ${newStatus.toLowerCase()}.`);
+    } catch (err) {
+      flash('error', errorText(err));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const handleCancelTask = async (task: VolunteerAssignment) => {
     if (!window.confirm(`Cancel "${task.title}"? Its volunteer (if any) is released and the request goes back to Verified.`)) return;
     setBusyId(task.id);
@@ -651,6 +664,12 @@ export const CommandCenter: React.FC = () => {
                   const volName = `${vol.first_name || ''} ${vol.last_name || ''}`.trim() || 'Volunteer';
                   const volInitials = volName.split(' ').filter(Boolean).map((n) => n[0]).join('').slice(0, 2).toUpperCase() || 'VOL';
                   const dutyColor = vol.dutyStatus === 'On Duty' ? '#059669' : vol.dutyStatus === 'Paused' ? '#d97706' : '#64748b';
+                  const vStatus = vol.verification_status || 'Pending';
+                  const vColors = vStatus === 'Verified'
+                    ? { bg: '#ecfdf5', fg: '#006a4e' }
+                    : vStatus === 'Rejected'
+                      ? { bg: '#fef2f2', fg: '#991b1b' }
+                      : { bg: '#fffbeb', fg: '#92400e' };
 
                   return (
                     <div key={vol.id} className="vol-dir-card">
@@ -661,13 +680,26 @@ export const CommandCenter: React.FC = () => {
                           </div>
                           <div>
                             <h4 className="vol-dir-name">{volName}</h4>
-                            <span style={{ fontSize: '11px', color: '#006a4e', fontWeight: 600, background: '#ecfdf5', padding: '2px 8px', borderRadius: '12px' }}>
-                              {vol.verification_status || 'Pending'}
+                            <span style={{ fontSize: '11px', color: vColors.fg, fontWeight: 600, background: vColors.bg, padding: '2px 8px', borderRadius: '12px' }}>
+                              {vStatus}
                             </span>
                             <span style={{ fontSize: '11px', color: dutyColor, fontWeight: 600, marginLeft: 6 }}>● {vol.dutyStatus}</span>
                           </div>
                         </div>
                       </div>
+
+                      {vStatus !== 'Verified' && (
+                        <div className="action-btns-group" style={{ marginTop: 8, marginBottom: 4 }}>
+                          <button className="btn-table-action btn-action-verify" disabled={busyId === vol.id} onClick={() => handleVerify(vol, 'Verified')}>
+                            <Check size={12} /> Verify
+                          </button>
+                          {vStatus !== 'Rejected' && (
+                            <button className="btn-table-action btn-action-resolve" disabled={busyId === vol.id} onClick={() => handleVerify(vol, 'Rejected')}>
+                              <X size={12} /> Reject
+                            </button>
+                          )}
+                        </div>
+                      )}
 
                       <div className="vol-dir-contact">
                         <Phone size={12} />

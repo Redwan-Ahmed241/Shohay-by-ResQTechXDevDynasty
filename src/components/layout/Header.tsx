@@ -5,7 +5,9 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import './Header.css';
 
-const navigationItems = [
+// Each role sees only what's relevant to their job — a coordinator doesn't submit
+// rescue requests, a volunteer isn't managing shelters or drones.
+const PUBLIC_NAV = [
   { label: 'Home', path: '/' },
   { label: 'Alerts', path: '/alerts' },
   { label: 'Shelters', path: '/shelters' },
@@ -13,6 +15,30 @@ const navigationItems = [
   { label: 'Campaigns', path: '/campaigns' },
   { label: 'Contacts', path: '/contacts' },
 ];
+
+const VOLUNTEER_NAV = [
+  { label: 'Home', path: '/' },
+  { label: 'My Dashboard', path: '/volunteer/dashboard' },
+  { label: 'Alerts', path: '/alerts' },
+  { label: 'Shelters', path: '/shelters' },
+  { label: 'Campaigns', path: '/campaigns' },
+  { label: 'Contacts', path: '/contacts' },
+];
+
+const ADMIN_NAV = [
+  { label: 'Command Center', path: '/admin/command-center' },
+  { label: 'Alerts', path: '/alerts' },
+  { label: 'Shelters', path: '/shelters' },
+  { label: 'Warehouse', path: '/admin/warehouse' },
+  { label: 'UAV Monitor', path: '/admin/uav' },
+  { label: 'Contacts', path: '/contacts' },
+];
+
+function getNavItems(role: 'public' | 'volunteer' | 'admin' | undefined) {
+  if (role === 'admin') return ADMIN_NAV;
+  if (role === 'volunteer') return VOLUNTEER_NAV;
+  return PUBLIC_NAV;
+}
 
 export const Header: React.FC = () => {
   const location = useLocation();
@@ -23,6 +49,7 @@ export const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
+  const navigationItems = getNavItems(isAuthenticated ? user?.role : undefined);
 
   useEffect(() => {
     const handleScroll = () => {

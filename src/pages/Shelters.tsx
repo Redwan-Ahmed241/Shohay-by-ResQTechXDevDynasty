@@ -7,15 +7,30 @@ import {
   Radio,
   Coffee,
   Heart,
-  MapPin
+  MapPin,
+  Plus,
+  X
 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '../components/layout/PageLayout';
 import { Checkbox } from '../components/ui/Checkbox';
+import { useAuth } from '../context/AuthContext';
+import { useFlash } from '../hooks/useFlash';
 import { useShelters, useShelterSummary } from '../hooks/queries';
-import { ShelterStatus } from '../types';
+import { shelterService } from '../services/shelterService';
+import { ApiError } from '../services/api';
+import { ShelterStatus, ShelterCategory } from '../types';
+import './CommandCenter.css';
 import './Shelters.css';
 
+const EMPTY_SHELTER = { name: '', address: '', upazila: '', district: 'Sunamganj', capacity: 100, category: 'Government Building' as ShelterCategory };
+
 export const Shelters: React.FC = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+  const queryClient = useQueryClient();
+  const { notice, flash } = useFlash();
+
   // Filters
   const [selectedStatus, setSelectedStatus] = useState<ShelterStatus | 'All'>('All');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('All');
@@ -28,6 +43,9 @@ export const Shelters: React.FC = () => {
     food: false,
     medicalSupport: false
   });
+  const [showCreate, setShowCreate] = useState(false);
+  const [form, setForm] = useState(EMPTY_SHELTER);
+  const [busy, setBusy] = useState(false);
 
   const { data: summaryStats } = useShelterSummary();
   const { data: shelters = [] } = useShelters({
@@ -37,6 +55,23 @@ export const Shelters: React.FC = () => {
   });
 
   const districts = ['All', 'Sunamganj', 'Sirajganj', 'Kurigram', 'Feni', 'Gaibandha'];
+  const shelterCategories: ShelterCategory[] = ['Government Building', 'Education Institution', 'Cyclone Shelter', 'Sports Facility', 'School'];
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      await shelterService.createShelter(form);
+      await queryClient.invalidateQueries({ queryKey: ['shelters'] });
+      setShowCreate(false);
+      setForm(EMPTY_SHELTER);
+      flash('ok', 'Shelter added.');
+    } catch (err) {
+      flash('error', err instanceof ApiError ? err.message : 'Could not add the shelter.');
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const toggleAmenity = (key: keyof typeof amenitiesFilter) => {
     setAmenitiesFilter((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -190,9 +225,20 @@ export const Shelters: React.FC = () => {
 
             {/* Right Main List */}
             <main className="shelters-main-list">
-              <div className="results-count-text">
-                {shelters.length} shelters shown
+              <div className="results-count-text" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{shelters.length} shelters shown</span>
+                {isAdmin && (
+                  <button className="btn-table-action btn-action-assign" onClick={() => setShowCreate(true)} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 6 }}>
+                    <Plus size={14} /> New Shelter
+                  </button>
+                )}
               </div>
+
+              {notice && (
+                <div role={notice.kind === 'error' ? 'alert' : 'status'} style={{ padding: '10px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, marginBottom: 16, background: notice.kind === 'ok' ? '#ecfdf5' : '#fef2f2', border: `1px solid ${notice.kind === 'ok' ? '#a7f3d0' : '#fecaca'}`, color: notice.kind === 'ok' ? '#065f46' : '#991b1b' }}>
+                  {notice.text}
+                </div>
+              )}
 
               <div className="shelter-cards-stack">
                 {shelters.map((shelter) => {
@@ -279,6 +325,53 @@ export const Shelters: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {showCreate && (
+        <div className="modal-backdrop" onClick={() => setShowCreate(false)}>
+          <div className="modal-box animate-scale-up" role="dialog" aria-modal="true" aria-labelledby="shelter-create-title" onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 id="shelter-create-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#0f172a' }}>Add a Shelter</h3>
+              <button onClick={() => setShowCreate(false)} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }} htmlFor="s-name">NAME</label>
+                <input id="s-name" className="form-input-field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Tahirpur College Shelter" required minLength={3} autoFocus />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }} htmlFor="s-address">ADDRESS</label>
+                <input id="s-address" className="form-input-field" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Street / landmark" required />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }} htmlFor="s-upazila">UPAZILA</label>
+                  <input id="s-upazila" className="form-input-field" value={form.upazila} onChange={(e) => setForm({ ...form, upazila: e.target.value })} required />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }} htmlFor="s-district">DISTRICT</label>
+                  <input id="s-district" className="form-input-field" value={form.district} onChange={(e) => setForm({ ...form, district: e.target.value })} required />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }} htmlFor="s-capacity">CAPACITY</label>
+                  <input id="s-capacity" type="number" min={1} max={100000} className="form-input-field" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: parseInt(e.target.value) || 0 })} required />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }} htmlFor="s-category">CATEGORY</label>
+                  <select id="s-category" className="form-input-field" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value as ShelterCategory })}>
+                    {shelterCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 6 }}>
+                <button type="button" className="btn-outline-subtle" onClick={() => setShowCreate(false)}>Cancel</button>
+                <button type="submit" className="btn-navy-primary" disabled={busy}>{busy ? 'Adding…' : 'Add Shelter'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </PageLayout>
   );
 };
