@@ -231,6 +231,27 @@ const DICTIONARY: Record<string, Record<Language, string>> = {
   ofTarget: { en: 'of', bn: 'এর মধ্যে' },
   householdsReachedText: { en: 'households reached', bn: 'টি পরিবারে সাহায্য পৌঁছেছে' },
   viewDonateBtn: { en: 'View & Donate →', bn: 'বিস্তারিত ও অনুদান →' },
+  // Contacts Page
+  contactsWarning: { en: 'Please verify all contact numbers with official sources before use in an emergency.', bn: 'জরুরি পরিস্থিতিতে ব্যবহারের পূর্বে অনুগ্রহ করে সরকারি ও প্রাতিষ্ঠানিক উৎস থেকে নম্বরগুলো যাচাই করে নিন।' },
+  nationalEmergencyNumbersHeading: { en: 'National Emergency Numbers', bn: 'জাতীয় জরুরি নম্বরসমূহ' },
+  nationalEmergencyNumbersSub: { en: 'Available 24/7. Verify numbers from primary sources.', bn: '২৪/৭ সার্বক্ষণিক সেবা চালু। প্রাথমিক উৎস থেকে নম্বর যাচাই করুন।' },
+  demoTag: { en: '(DEMO)', bn: '(ডেমো)' },
+  catNationalEmergency: { en: 'National Emergency', bn: 'জাতীয় জরুরি সেবা' },
+  catFireService: { en: 'Fire Service', bn: 'ফায়ার সার্ভিস' },
+  catMedical: { en: 'Medical', bn: 'চিকিৎসা' },
+  catDisasterManagement: { en: 'Disaster Management', bn: 'দুর্যোগ ব্যবস্থাপনা' },
+  catDistrictControlRoom: { en: 'District Control Room', bn: 'জেলা নিয়ন্ত্রণ কক্ষ' },
+  catProtection: { en: 'Protection', bn: 'নিরাপত্তা ও সুরক্ষা' },
+  catPlatformHotline: { en: 'Platform Hotline', bn: 'সহায় প্ল্যাটফর্ম হটলাইন' },
+  catRescue: { en: 'Rescue', bn: 'উদ্ধার সেবা' },
+  catHospital: { en: 'Hospital', bn: 'হাসপাতাল' },
+  allDistricts: { en: 'All Districts', bn: 'সকল জেলা' },
+  tollFree: { en: 'Toll Free', bn: 'টোল ফ্রি' },
+  verified: { en: 'Verified', bn: 'যাচাইকৃত' },
+  lastVerified: { en: 'Last verified:', bn: 'সর্বশেষ যাচাই:' },
+  callBtn: { en: 'Call', bn: 'কল করুন' },
+  copyPhoneNumber: { en: 'Copy Phone Number', bn: 'ফোন নম্বর কপি করুন' },
+  bookmark: { en: 'Bookmark', bn: 'সংরক্ষণ' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
