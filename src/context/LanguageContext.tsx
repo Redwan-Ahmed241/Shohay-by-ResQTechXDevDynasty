@@ -347,6 +347,9 @@ const DICTIONARY: Record<string, Record<Language, string>> = {
   registrationComplete: { en: 'Registration Complete!', bn: 'নিবন্ধন সফলভাবে সম্পন্ন হয়েছে!' },
   welcomeVolunteerNotice: { en: 'Welcome to the SHOHAY volunteer network. Your ID is', bn: 'সহায় স্বেচ্ছাসেবক নেটওয়ার্কে আপনাকে স্বাগতম। আপনার আইডি:' },
   goToVolunteerDashboard: { en: 'Go to Volunteer Dashboard', bn: 'স্বেচ্ছাসেবক ড্যাশবোর্ডে যান' },
+  pageNotFoundTitle: { en: '404 — Page Not Found', bn: '৪০৪ — পৃষ্ঠাটি পাওয়া যায়নি' },
+  pageNotFoundDesc: { en: 'The page or resource you requested does not exist or has been relocated in the flood relief network.', bn: 'আপনার অনুরোধ করা পৃষ্ঠা বা তথ্যটি পাওয়া যায়নি অথবা বন্যা ত্রাণ নেটওয়ার্কে স্থানান্তরিত হয়েছে।' },
+  pageNotFoundReturnHome: { en: 'Return to Homepage', bn: 'হোমপেজে ফিরে যান' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
