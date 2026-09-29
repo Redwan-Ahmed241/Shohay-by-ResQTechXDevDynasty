@@ -245,52 +245,61 @@ export const authService = {
    * Direct Sign In (without OTP, for registered users)
    */
   async directSignIn(email: string, role: UserRole): Promise<AuthApiResponse> {
+    const cleanEmail = email.trim().toLowerCase();
+
     // Check if user is registered in localStorage
     const storedUsersJson = localStorage.getItem('shohay_registered_users');
-    let registeredUsers: Record<string, AuthUser> = {};
     if (storedUsersJson) {
       try {
-        registeredUsers = JSON.parse(storedUsersJson);
+        const registeredUsers: Record<string, AuthUser> = JSON.parse(storedUsersJson);
+        if (registeredUsers[cleanEmail]) {
+          const user = registeredUsers[cleanEmail];
+          return {
+            success: true,
+            is_new_user: false,
+            user,
+            token: `token_${cleanEmail}`,
+            message: `Welcome back, ${user.name}!`
+          };
+        }
       } catch {
-        registeredUsers = {};
+        // ignore
       }
     }
 
-    const cleanEmail = email.trim().toLowerCase();
-    if (registeredUsers[cleanEmail]) {
-      const user = registeredUsers[cleanEmail];
-      return {
-        success: true,
-        is_new_user: false,
-        user,
-        token: `token_${cleanEmail}`,
-        message: `Welcome back, ${user.name}!`
-      };
-    }
+    // Call backend direct-login endpoint
+    try {
+      return await apiFetch<AuthApiResponse>('/api/auth/direct-login', {
+        method: 'POST',
+        body: JSON.stringify({ email: cleanEmail, role })
+      });
+    } catch (err: any) {
+      // Fallback: try OTP check if direct-login returned error
+      try {
+        const otpRes = await this.sendOtp(cleanEmail);
+        if (!otpRes.is_new_user) {
+          const user: AuthUser = {
+            id: `usr-${role}-${Date.now().toString().slice(-4)}`,
+            name: cleanEmail.split('@')[0],
+            first_name: cleanEmail.split('@')[0],
+            last_name: '',
+            role,
+            email: cleanEmail,
+            verification_status: 'Verified'
+          };
+          return {
+            success: true,
+            is_new_user: false,
+            user,
+            token: `token_${cleanEmail}`,
+            message: `Welcome back to Shohay!`
+          };
+        }
+      } catch {
+        // ignore
+      }
 
-    // Try backend OTP check if needed
-    const otpRes = await this.sendOtp(email);
-    if (!otpRes.is_new_user) {
-      // User exists on backend! Create direct user session
-      const user: AuthUser = {
-        id: `usr-${role}-${Date.now().toString().slice(-4)}`,
-        name: email.split('@')[0],
-        first_name: email.split('@')[0],
-        last_name: '',
-        role,
-        email: cleanEmail,
-        verification_status: 'Verified'
-      };
-      return {
-        success: true,
-        is_new_user: false,
-        user,
-        token: `token_${cleanEmail}`,
-        message: `Welcome back to Shohay!`
-      };
+      throw new Error(err.message || 'No registered account found with this email. Please create an account.');
     }
-
-    // New user trying to sign in directly
-    throw new Error('No registered account found with this email. Please create an account.');
   }
 };
