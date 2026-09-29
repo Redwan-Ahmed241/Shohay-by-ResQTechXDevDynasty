@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useFlash } from '../hooks/useFlash';
+import { useVideoOverlay } from '../hooks/useVideoOverlay';
 import { uavService } from '../services/uavService';
 import { volunteerService } from '../services/volunteerService';
 import { ApiError } from '../services/api';
@@ -22,6 +23,11 @@ function errorText(err: unknown): string {
 /** Direct video files can be embedded; RTSP/live-page URLs can't play in a plain <video> tag. */
 function isDirectVideoUrl(url?: string | null): boolean {
   return !!url && /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url);
+}
+
+function formatVideoTime(seconds: number): string {
+  const s = Math.floor(seconds);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
 function timeAgo(iso?: string | null): string {
@@ -75,6 +81,9 @@ export const UavMonitor: React.FC = () => {
   const demoFileRef = useRef<HTMLInputElement>(null);
   const feedSectionRef = useRef<HTMLDivElement>(null);
   const feedDrone = drones.find((d) => d.id === selectedFeedDroneId) || null;
+  const feedVideoRef = useRef<HTMLVideoElement>(null);
+  const feedSrc = isDirectVideoUrl(feedDrone?.streamUrl) ? feedDrone!.streamUrl! : demoVideoSrc;
+  const overlay = useVideoOverlay(feedVideoRef, feedSrc);
 
   const handleDemoFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -303,9 +312,9 @@ export const UavMonitor: React.FC = () => {
             </div>
 
             {isDirectVideoUrl(feedDrone?.streamUrl) ? (
-              <video key={feedDrone!.streamUrl} src={feedDrone!.streamUrl!} controls autoPlay style={{ width: '100%', maxHeight: 420, borderRadius: 8, background: '#000', display: 'block' }} />
+              <video ref={feedVideoRef} key={feedDrone!.streamUrl} src={feedDrone!.streamUrl!} controls autoPlay style={{ width: '100%', maxHeight: 420, borderRadius: 8, background: '#000', display: 'block' }} />
             ) : demoVideoSrc ? (
-              <video key={demoVideoSrc} src={demoVideoSrc} controls autoPlay style={{ width: '100%', maxHeight: 420, borderRadius: 8, background: '#000', display: 'block' }} />
+              <video ref={feedVideoRef} key={demoVideoSrc} src={demoVideoSrc} controls autoPlay style={{ width: '100%', maxHeight: 420, borderRadius: 8, background: '#000', display: 'block' }} />
             ) : (
               <div style={{ border: '2px dashed #cbd5e1', borderRadius: 8, padding: '32px 20px', textAlign: 'center', color: '#64748b' }}>
                 <Video size={28} style={{ margin: '0 auto 10px', display: 'block' }} />
@@ -341,8 +350,47 @@ export const UavMonitor: React.FC = () => {
                 </div>
               </div>
 
+              {feedSrc && (
+                <div className="uav-video-analysis" aria-live="polite">
+                  <div className="uav-video-analysis-head">
+                    <strong><Video size={13} /> From the live feed video</strong>
+                    <span className="uav-muted">
+                      {overlay.status === 'loading' && 'Loading text reader…'}
+                      {overlay.status === 'reading' && 'Reading overlay every second'}
+                      {overlay.status === 'error' && 'Could not read this video'}
+                      {overlay.status === 'idle' && 'Play the video to read its overlay'}
+                    </span>
+                  </div>
+                  {overlay.latest && (
+                    <div className="uav-video-stats">
+                      <div className={`uav-video-stat risk-${(overlay.latest.risk || 'unknown').toLowerCase()}`}>
+                        <span>Risk</span><b>{overlay.latest.risk ?? '—'}</b>
+                      </div>
+                      <div className="uav-video-stat"><span>Rescuers needed</span><b>{overlay.latest.rescuersNeeded ?? '—'}</b></div>
+                      <div className="uav-video-stat"><span>Already present</span><b>{overlay.latest.alreadyPresent ?? '—'}</b></div>
+                      <div className="uav-video-stat"><span>Dispatch count</span><b>{overlay.latest.dispatchCount ?? '—'}</b></div>
+                    </div>
+                  )}
+                  {overlay.history.length > 0 && (
+                    <div className="uav-feed" style={{ maxHeight: 220, marginTop: 10 }}>
+                      {overlay.history.map((r) => (
+                        <article key={r.readAt} className={`uav-det-card risk-${(r.risk || 'unknown').toLowerCase()}`}>
+                          <div className="uav-det-top">
+                            <strong>{r.risk ?? 'Unknown'} risk · {r.rescuersNeeded ?? '—'} rescuers needed</strong>
+                            <span className="uav-muted">at {formatVideoTime(r.videoTime)}</span>
+                          </div>
+                          <div className="uav-det-meta">
+                            Already present {r.alreadyPresent ?? '—'} · Dispatch count {r.dispatchCount ?? '—'}
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {shown.length === 0 ? (
-                <div className="uav-empty">
+                !feedSrc && <div className="uav-empty">
                   {detections.length === 0
                     ? 'No detections yet. They appear here within seconds of a drone sending one.'
                     : 'No detections with this status.'}

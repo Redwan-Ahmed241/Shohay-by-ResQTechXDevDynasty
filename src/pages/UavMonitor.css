@@ -187,3 +187,64 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Overlay values read from the Live Feed video */
+.uav-video-analysis {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: #f8fafc;
+}
+
+.uav-video-analysis-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.uav-video-analysis-head strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.uav-video-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+}
+
+.uav-video-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-top: 3px solid #94a3b8;
+}
+
+.uav-video-stat span {
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.uav-video-stat b {
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.uav-video-stat.risk-critical, .uav-det-card.risk-critical { border-top-color: #b91c1c; border-left-color: #b91c1c; }
+.uav-video-stat.risk-high, .uav-det-card.risk-high { border-top-color: #ea580c; border-left-color: #ea580c; }
+.uav-video-stat.risk-medium, .uav-det-card.risk-medium { border-top-color: #ca8a04; border-left-color: #ca8a04; }
+.uav-video-stat.risk-low, .uav-det-card.risk-low { border-top-color: #16a34a; border-left-color: #16a34a; }
+.uav-det-card[class*="risk-"] { border-top-color: #e2e8f0; }
