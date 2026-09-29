@@ -308,6 +308,21 @@ const DICTIONARY: Record<string, Record<Language, string>> = {
   dontHaveAccount: { en: "Don't have an account?", bn: 'অ্যাকাউন্ট নেই?' },
   createOne: { en: 'Create one', bn: 'নতুন অ্যাকাউন্ট খুলুন' },
   alreadyHaveAccount: { en: 'Already have an account?', bn: 'ইতিমধ্যে অ্যাকাউন্ট আছে?' },
+  // Volunteer Landing Page
+  volHeroTitle: { en: 'Volunteer with SHOHAY', bn: 'সহায়ের সাথে স্বেচ্ছাসেবক হিসেবে যুক্ত হোন' },
+  volHeroSub: { en: 'Join thousands of volunteers coordinating flood relief across Bangladesh.', bn: 'বাংলাদেশ জুড়ে বন্যা ত্রাণ সমন্বয়কারী হাজার হাজার স্বেচ্ছাসেবকের সাথে যোগ দিন।' },
+  activeNowLabel: { en: 'Active Now', bn: 'বর্তমানে সক্রিয়' },
+  avgResponseLabel: { en: 'Avg Response', bn: 'গড় সাড়া প্রদানের সময়' },
+  fieldRescue: { en: 'Field Rescue', bn: 'মাঠপর্যায়ে উদ্ধার' },
+  fieldRescueSub: { en: 'Boat rescue, evacuation', bn: 'নৌকায় উদ্ধার, স্থানান্তর' },
+  distributionTitle: { en: 'Distribution', bn: 'ত্রাণ বিতরণ' },
+  distributionSub: { en: 'Food, water, supplies', bn: 'খাদ্য, পানি ও প্রয়োজনীয় সামগ্রী' },
+  medicalSupportTitle: { en: 'Medical Support', bn: 'চিকিৎসা সহায়তা' },
+  medicalSupportSub: { en: 'First aid, health camps', bn: 'প্রাথমিক চিকিৎসা, স্বাস্থ্য ক্যাম্প' },
+  coordinationTitle: { en: 'Coordination', bn: 'সমন্বয় ও তথ্য' },
+  coordinationSub: { en: 'Logistics, admin, data', bn: 'লজিস্টিকস, প্রশাসনিক ও তথ্য ব্যবস্থাপনা' },
+  registerAsVolunteerBtn: { en: 'Register as Volunteer', bn: 'স্বেচ্ছাসেবক হিসেবে নিবন্ধন করুন' },
+  viewDashboardBtn: { en: 'View Dashboard', bn: 'ড্যাশবোর্ড দেখুন' },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
