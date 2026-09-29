@@ -67,7 +67,7 @@ export const Header: React.FC = () => {
   const getDashboardPath = () => {
     if (user?.role === 'admin') return '/admin/command-center';
     if (user?.role === 'volunteer') return '/volunteer/dashboard';
-    return '/get-help';
+    return '/my-requests';
   };
 
   return (

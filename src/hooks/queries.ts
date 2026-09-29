@@ -3,6 +3,7 @@ import { alertService } from '../services/alertService';
 import { shelterService, ShelterFilterParams } from '../services/shelterService';
 import { campaignService } from '../services/campaignService';
 import { contactService } from '../services/contactService';
+import { requestService } from '../services/requestService';
 import { SeverityLevel, ContactCategory } from '../types';
 
 export function useAlerts(severity: SeverityLevel | 'All', search: string) {
@@ -45,5 +46,15 @@ export function useContacts(category: ContactCategory | 'All', district: string)
   return useQuery({
     queryKey: ['contacts', category, district],
     queryFn: () => contactService.getContacts(category, district)
+  });
+}
+
+/** Only fetches once signed in — there's nothing to show for an anonymous visitor. */
+export function useMyRequests(enabled: boolean) {
+  return useQuery({
+    queryKey: ['requests', 'mine'],
+    queryFn: () => requestService.getMyRequests(),
+    enabled,
+    staleTime: 10_000
   });
 }

@@ -16,9 +16,9 @@ export const SignIn: React.FC = () => {
   const navigate = useNavigate();
   // Page the user was sent here from (see RequireRole), e.g. /admin/uav
   const returnTo = (useLocation().state as { from?: string } | null)?.from;
-  const { user, isLoading: isRestoringSession, sendCode, verifyCode, logout } = useAuth();
+  const { user, isLoading: isRestoringSession, sendCode, verifyCode } = useAuth();
 
-  const [selectedRole, setSelectedRole] = useState<UserRole>('volunteer');
+  const [selectedRole, setSelectedRole] = useState<Exclude<UserRole, 'admin'>>('volunteer');
   const [authMethod, setAuthMethod] = useState<AuthMethod>('email');
   const [step, setStep] = useState<'identify' | 'verify'>('identify');
   const [mobileNumber, setMobileNumber] = useState('');
@@ -29,7 +29,7 @@ export const SignIn: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const identifier = authMethod === 'email' ? email.trim() : mobileNumber.trim();
-  const roleLabel = selectedRole === 'admin' ? 'Coordinator' : selectedRole === 'volunteer' ? 'Volunteer' : 'Public';
+  const roleLabel = selectedRole === 'volunteer' ? 'Volunteer' : 'Public';
 
   // Already signed in (restored session, or arrived here from the emailed sign-in link)
   useEffect(() => {
@@ -51,8 +51,7 @@ export const SignIn: React.FC = () => {
   };
 
   const requestCode = async () => {
-    const metadata: SignUpMetadata =
-      selectedRole === 'volunteer' ? { requested_role: 'fieldworker' } : selectedRole === 'public' ? { requested_role: 'public' } : {};
+    const metadata: SignUpMetadata = { requested_role: selectedRole === 'volunteer' ? 'fieldworker' : 'public' };
     await sendCode(authMethod, identifier, metadata);
     setResendIn(RESEND_COOLDOWN_SECONDS);
   };
@@ -86,12 +85,6 @@ export const SignIn: React.FC = () => {
     setIsLoading(true);
     try {
       const signedIn = await verifyCode(authMethod, identifier, code);
-      if (selectedRole === 'admin' && signedIn.role !== 'admin') {
-        await logout();
-        resetToIdentify();
-        setErrorMessage('This account does not have coordinator access. Ask a district coordinator to grant it, or sign in as a field worker or public user.');
-        return;
-      }
       navigate(returnTo || dashboardPath(signedIn.role));
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to sign in. Please try again.');
@@ -169,15 +162,6 @@ export const SignIn: React.FC = () => {
                 >
                   FIELD WORKER
                 </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={selectedRole === 'admin'}
-                  className={`role-tab ${selectedRole === 'admin' ? 'active' : ''}`}
-                  onClick={() => { setSelectedRole('admin'); resetToIdentify(); }}
-                >
-                  COORDINATOR / ADMIN
-                </button>
               </div>
 
               {/* Main Auth Card Box */}
@@ -219,7 +203,7 @@ export const SignIn: React.FC = () => {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="auth-text-input"
-                          placeholder={selectedRole === 'admin' ? 'coordinator@example.org' : selectedRole === 'volunteer' ? 'volunteer@example.org' : 'citizen@example.com'}
+                          placeholder={selectedRole === 'volunteer' ? 'volunteer@example.org' : 'citizen@example.com'}
                           autoComplete="email"
                           required
                           autoFocus

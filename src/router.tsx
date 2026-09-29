@@ -10,6 +10,7 @@ import { Home } from './pages/Home';
 import { Alerts } from './pages/Alerts';
 import { Shelters } from './pages/Shelters';
 import { GetHelp } from './pages/GetHelp';
+import { MyRequests } from './pages/MyRequests';
 import { Campaigns } from './pages/Campaigns';
 import { Donate } from './pages/Donate';
 import { DonateResult } from './pages/DonateResult';
@@ -38,6 +39,7 @@ export const AppRouter: React.FC = () => {
               <Route path="/alerts" element={<Alerts />} />
               <Route path="/shelters" element={<Shelters />} />
               <Route path="/get-help" element={<GetHelp />} />
+              <Route path="/my-requests" element={<RequireRole roles={['public', 'volunteer', 'admin']}><MyRequests /></RequireRole>} />
               <Route path="/campaigns" element={<Campaigns />} />
               <Route path="/donate/:id" element={<Donate />} />
               <Route path="/donate/success" element={<DonateResult outcome="success" />} />

@@ -1,0 +1,138 @@
+.myreq-page-bg {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 120px);
+  padding: 40px 16px 80px 16px;
+  width: 100%;
+}
+
+.myreq-container {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.myreq-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.myreq-title {
+  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.myreq-subtitle {
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  max-width: 480px;
+}
+
+.myreq-new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #006a4e;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.myreq-empty {
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.myreq-empty p {
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 16px 0;
+}
+
+.myreq-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.myreq-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+.myreq-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.myreq-tracking-id {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f3460;
+}
+
+.myreq-types {
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: #334155;
+  text-transform: capitalize;
+  margin-top: 2px;
+}
+
+.myreq-status-badge {
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.myreq-meta-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.myreq-meta-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #64748b;
+}
+
+.myreq-status-text {
+  font-family: var(--font-family);
+  font-size: 12px;
+  color: #475569;
+  margin: 10px 0 0 0;
+  line-height: 1.5;
+}

@@ -34,6 +34,11 @@ export const requestService = {
     }
   },
 
+  /** Every request I submitted while signed in — no tracking ID needed. Requires sign-in. */
+  getMyRequests(): Promise<RequestTracking[]> {
+    return apiFetch<RequestTracking[]>('/api/requests/mine');
+  },
+
   /** Coordinators only. */
   getAllRequests(status?: string, district?: string): Promise<AssistanceRequestRecord[]> {
     const params = new URLSearchParams();
