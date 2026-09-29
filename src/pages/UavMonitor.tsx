@@ -66,22 +66,27 @@ export const UavMonitor: React.FC = () => {
   const [form, setForm] = useState({ name: '', registration_id: '', district: '', stream_url: '' });
   const [issuedKey, setIssuedKey] = useState<{ drone: UavDrone; apiKey: string } | null>(null);
 
-  // Feed modal: plays the drone's live stream if it's a direct video URL, otherwise lets the
-  // presenter load a locally recorded demo video (for showing detection footage before the
-  // model is hosted and a real stream exists).
-  const [feedDrone, setFeedDrone] = useState<UavDrone | null>(null);
+  // Live Feed panel: plays the selected drone's live stream if it's a direct video URL,
+  // otherwise lets the presenter load a locally recorded demo video (for showing detection
+  // footage before the model is hosted and a real stream exists). Always visible — doesn't
+  // depend on any drone being registered.
+  const [selectedFeedDroneId, setSelectedFeedDroneId] = useState('');
   const [demoVideoSrc, setDemoVideoSrc] = useState<string | null>(null);
   const demoFileRef = useRef<HTMLInputElement>(null);
+  const feedSectionRef = useRef<HTMLDivElement>(null);
+  const feedDrone = drones.find((d) => d.id === selectedFeedDroneId) || null;
 
   const handleDemoFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setDemoVideoSrc(URL.createObjectURL(file));
+    if (file) {
+      if (demoVideoSrc) URL.revokeObjectURL(demoVideoSrc);
+      setDemoVideoSrc(URL.createObjectURL(file));
+    }
   };
 
-  const closeFeed = () => {
-    setFeedDrone(null);
-    if (demoVideoSrc) URL.revokeObjectURL(demoVideoSrc);
-    setDemoVideoSrc(null);
+  const jumpToFeed = (droneId: string) => {
+    setSelectedFeedDroneId(droneId);
+    feedSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const loadAll = useCallback(async () => {
@@ -279,6 +284,49 @@ export const UavMonitor: React.FC = () => {
             </div>
           </div>
 
+          {/* Live Feed — always visible, doesn't need a drone registered to demo footage */}
+          <section className="cc-data-card uav-panel" aria-label="Live Feed" style={{ marginBottom: 20 }} ref={feedSectionRef}>
+            <div className="uav-panel-head">
+              <h3>Live Feed</h3>
+              {drones.length > 0 && (
+                <select
+                  className="form-input-field"
+                  style={{ maxWidth: 240 }}
+                  value={selectedFeedDroneId}
+                  onChange={(e) => setSelectedFeedDroneId(e.target.value)}
+                  aria-label="Choose drone feed"
+                >
+                  <option value="">Demo playback (no drone selected)</option>
+                  {drones.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+                </select>
+              )}
+            </div>
+
+            {isDirectVideoUrl(feedDrone?.streamUrl) ? (
+              <video key={feedDrone!.streamUrl} src={feedDrone!.streamUrl!} controls autoPlay style={{ width: '100%', maxHeight: 420, borderRadius: 8, background: '#000', display: 'block' }} />
+            ) : demoVideoSrc ? (
+              <video key={demoVideoSrc} src={demoVideoSrc} controls autoPlay style={{ width: '100%', maxHeight: 420, borderRadius: 8, background: '#000', display: 'block' }} />
+            ) : (
+              <div style={{ border: '2px dashed #cbd5e1', borderRadius: 8, padding: '32px 20px', textAlign: 'center', color: '#64748b' }}>
+                <Video size={28} style={{ margin: '0 auto 10px', display: 'block' }} />
+                <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+                  {feedDrone ? `No usable video URL for ${feedDrone.name} yet.` : 'No drone selected — nothing streaming yet.'}
+                </p>
+                <p style={{ margin: '0 0 14px', fontSize: 12 }}>
+                  Play a recorded detection demo instead — showing risk level and person count from a past flight.
+                </p>
+                <button type="button" className="btn-navy-primary" onClick={() => demoFileRef.current?.click()}>Choose recorded video…</button>
+                <input ref={demoFileRef} type="file" accept="video/*" onChange={handleDemoFile} style={{ display: 'none' }} />
+              </div>
+            )}
+
+            <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 12, marginBottom: 0 }}>
+              Placeholder for the live feed. Once the detection model is hosted on the drone or a base
+              station, this panel will play that drone's registered stream URL automatically instead of a
+              recorded file.
+            </p>
+          </section>
+
           <div className="uav-layout">
             {/* Detection feed */}
             <section className="cc-data-card uav-panel" aria-label="Detections">
@@ -357,7 +405,7 @@ export const UavMonitor: React.FC = () => {
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <button className="filter-chip-btn" title="View drone feed" onClick={() => setFeedDrone(dr)}>
+                      <button className="filter-chip-btn" title="View drone feed" onClick={() => jumpToFeed(dr.id)}>
                         <Video size={12} /> Feed
                       </button>
                       <button className="filter-chip-btn" title="Issue a new API key" disabled={busyId === dr.id} onClick={() => handleRotate(dr)}>
@@ -450,43 +498,6 @@ export const UavMonitor: React.FC = () => {
             </div>
           )}
 
-          {/* Drone feed modal */}
-          {feedDrone && (
-            <div className="modal-backdrop" onClick={closeFeed}>
-              <div className="modal-box animate-scale-up" style={{ maxWidth: 640 }} role="dialog" aria-modal="true" aria-labelledby="feed-title" onClick={(e) => e.stopPropagation()}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <h3 id="feed-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#0f172a' }}>
-                    {feedDrone.name} — {isDirectVideoUrl(feedDrone.streamUrl) ? 'Live Feed' : 'Detection Feed (Demo)'}
-                  </h3>
-                  <button onClick={closeFeed} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><X size={20} /></button>
-                </div>
-
-                {isDirectVideoUrl(feedDrone.streamUrl) ? (
-                  <video src={feedDrone.streamUrl!} controls autoPlay style={{ width: '100%', borderRadius: 8, background: '#000', display: 'block' }} />
-                ) : demoVideoSrc ? (
-                  <video src={demoVideoSrc} controls autoPlay style={{ width: '100%', borderRadius: 8, background: '#000', display: 'block' }} />
-                ) : (
-                  <div style={{ border: '2px dashed #cbd5e1', borderRadius: 8, padding: '40px 20px', textAlign: 'center', color: '#64748b' }}>
-                    <Video size={32} style={{ margin: '0 auto 10px', display: 'block' }} />
-                    <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: '#334155' }}>
-                      {feedDrone.streamUrl ? 'This stream URL is not a direct video file yet.' : 'No live stream configured for this drone yet.'}
-                    </p>
-                    <p style={{ margin: '0 0 14px', fontSize: 12 }}>
-                      Play a recorded detection demo instead — showing risk level and person count from a past flight.
-                    </p>
-                    <button type="button" className="btn-navy-primary" onClick={() => demoFileRef.current?.click()}>Choose recorded video…</button>
-                    <input ref={demoFileRef} type="file" accept="video/*" onChange={handleDemoFile} style={{ display: 'none' }} />
-                  </div>
-                )}
-
-                <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 12, marginBottom: 0 }}>
-                  Placeholder for the live feed. Once the detection model is hosted on the drone or a base
-                  station, this panel will play that drone's registered stream URL automatically instead of a
-                  recorded file.
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </PageLayout>
