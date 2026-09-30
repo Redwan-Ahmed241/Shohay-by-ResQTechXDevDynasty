@@ -69,9 +69,16 @@ export const VolunteerRegister: React.FC = () => {
     };
   };
 
+  const formatVolunteerCode = (id: string) => {
+    // If the ID is a UUID, convert it to a friendly volunteer badge ID like VOL-F20E4C6D
+    const clean = id.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const shortCode = clean.length >= 8 ? clean.slice(0, 8) : clean.padEnd(8, '0');
+    return `VOL-${shortCode}`;
+  };
+
   const completeRegistration = async () => {
     const registeredUser = await registerVolunteer(buildSignupData());
-    setAssignedId(registeredUser.id);
+    setAssignedId(formatVolunteerCode(registeredUser.id));
     setIsCompleted(true);
   };
 
