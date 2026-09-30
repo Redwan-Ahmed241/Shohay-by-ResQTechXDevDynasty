@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Clock, CheckCircle, Plus, X } from 'lucide-react';
+import { Clock, Plus, X } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';

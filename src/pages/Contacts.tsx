@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Copy, Bookmark, AlertCircle, Check } from 'lucide-react';
+import { Phone, Copy, Bookmark, Check } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useContacts } from '../hooks/queries';
 import { ContactCategory } from '../types';

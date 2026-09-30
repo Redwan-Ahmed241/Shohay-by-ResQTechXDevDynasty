@@ -91,7 +91,9 @@ export function useVideoOverlay(videoRef: RefObject<HTMLVideoElement | null>, sr
       try {
         if (!workerRef.current) {
           setStatus('loading');
-          workerRef.current = import('tesseract.js').then((t) => t.createWorker('eng'));
+          workerRef.current = import('tesseract.js').then((t) =>
+            t.createWorker('eng', 1, { langPath: '/', gzip: false })
+          );
         }
         const worker = await workerRef.current;
         const videoTime = video.currentTime;
