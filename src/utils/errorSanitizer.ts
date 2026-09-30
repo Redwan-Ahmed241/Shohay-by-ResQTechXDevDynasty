@@ -128,6 +128,9 @@ export function getSafeErrorText(err: unknown, defaultMessage?: string): string 
     return defaultMessage || 'An unexpected error occurred. Please try again.';
   }
 
+  // Always record full diagnostic details server-side / console
+  logErrorDetails('Unhandled Application Error', err);
+
   // Check for ApiError
   if (typeof err === 'object' && err !== null && 'status' in err && 'message' in err) {
     const apiErr = err as { status?: number; message?: string; rawMessage?: string };
