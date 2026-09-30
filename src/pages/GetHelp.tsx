@@ -30,6 +30,12 @@ import { errorText } from '../services/api';
 import { AssistanceType, AssistanceRequestPayload } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { BD_UPAZILAS } from '../data/upazilas';
+import {
+  validateWithSchema,
+  assistanceRequestSchema,
+  locationSchema,
+  contactSchema
+} from '../utils/validationSchemas';
 import './GetHelp.css';
 
 export const GetHelp: React.FC = () => {
@@ -157,7 +163,11 @@ export const GetHelp: React.FC = () => {
       }
       if (currentStep === 2) {
         if (householdSizeInput.trim() === '' || householdSize < 1) {
-          setSubmitError('Please enter the total number of people in your household.');
+          setSubmitError('Please enter the total number of people in your household (at least 1 person).');
+          return;
+        }
+        if (householdSize > 200) {
+          setSubmitError('Household size cannot exceed 200 people.');
           return;
         }
         if (vulnerableSum > householdSize) {
@@ -168,26 +178,24 @@ export const GetHelp: React.FC = () => {
         }
       }
       if (currentStep === 3) {
-        if (!location.district.trim()) {
-          setSubmitError('Please select your District from the given options.');
-          return;
-        }
-        if (!location.upazila.trim()) {
-          setSubmitError('Please select your Upazila from the given options.');
-          return;
-        }
-        if (!location.address.trim() && !location.gpsCoords) {
-          setSubmitError('Enter your village / address or share your GPS location so rescuers can find you.');
+        const locValidation = validateWithSchema(locationSchema, {
+          ...location,
+          gpsCoords: location.gpsCoords || undefined,
+          landmark: location.landmark || undefined,
+          union: location.union || undefined
+        });
+        if (!locValidation.success) {
+          setSubmitError(locValidation.error);
           return;
         }
       }
       if (currentStep === 4) {
-        if (!contact.phone.trim()) {
-          setSubmitError('Enter a mobile number so responders can call you back.');
-          return;
-        }
-        if (!contact.isAnonymous && !contact.name.trim()) {
-          setSubmitError('Enter your name, or tick "Keep my request anonymous".');
+        const contactValidation = validateWithSchema(contactSchema, {
+          ...contact,
+          altPhone: contact.altPhone || undefined
+        });
+        if (!contactValidation.success) {
+          setSubmitError(contactValidation.error);
           return;
         }
       }
@@ -199,18 +207,28 @@ export const GetHelp: React.FC = () => {
   // Returns the step to fix and why, or null when the request can be sent.
   const findMissing = (): { step: number; message: string } | null => {
     if (selectedTypes.length === 0) return { step: 1, message: 'Choose at least one kind of help you need.' };
-    if (householdSizeInput.trim() === '' || householdSize < 1) return { step: 2, message: 'Please enter the total number of people in your household.' };
+    if (householdSizeInput.trim() === '' || householdSize < 1) return { step: 2, message: 'Please enter the total number of people in your household (at least 1 person).' };
+    if (householdSize > 200) return { step: 2, message: 'Household size cannot exceed 200 people.' };
     if (vulnerableSum > householdSize) {
       return {
         step: 2,
         message: `Illogical breakdown: Total people (${householdSize}) cannot be less than the sum of vulnerable members (${vulnerableSum}: ${vulnerable.children} children, ${vulnerable.elderly} elderly, ${vulnerable.pregnant} pregnant, ${vulnerable.disabled} special care).`
       };
     }
-    if (!location.district.trim()) return { step: 3, message: 'Please select your District from the given options.' };
-    if (!location.upazila.trim()) return { step: 3, message: 'Please select your Upazila from the given options.' };
-    if (!location.address.trim() && !location.gpsCoords) return { step: 3, message: 'Enter your village / address or share your GPS location so rescuers can find you.' };
-    if (!contact.phone.trim()) return { step: 4, message: 'Enter a mobile number so responders can call you back.' };
-    if (!contact.isAnonymous && !contact.name.trim()) return { step: 4, message: 'Enter your name, or tick "Keep my request anonymous".' };
+    const locValidation = validateWithSchema(locationSchema, {
+      ...location,
+      gpsCoords: location.gpsCoords || undefined,
+      landmark: location.landmark || undefined,
+      union: location.union || undefined
+    });
+    if (!locValidation.success) return { step: 3, message: locValidation.error };
+
+    const contactValidation = validateWithSchema(contactSchema, {
+      ...contact,
+      altPhone: contact.altPhone || undefined
+    });
+    if (!contactValidation.success) return { step: 4, message: contactValidation.error };
+
     return null;
   };
 
@@ -227,20 +245,36 @@ export const GetHelp: React.FC = () => {
       types: selectedTypes,
       householdSize,
       vulnerableCount: vulnerable,
-      location: { ...location, gpsCoords: location.gpsCoords || undefined, landmark: location.landmark || undefined },
-      contact: { ...contact, name: contact.isAnonymous ? contact.name || 'Anonymous' : contact.name }
+      location: {
+        district: location.district.trim(),
+        upazila: location.upazila.trim(),
+        union: location.union.trim(),
+        address: location.address.trim(),
+        landmark: location.landmark.trim() || undefined,
+        gpsCoords: location.gpsCoords || undefined
+      },
+      contact: {
+        name: contact.isAnonymous ? (contact.name.trim() || 'Anonymous') : contact.name.trim(),
+        phone: contact.phone.trim(),
+        altPhone: contact.altPhone?.trim() || undefined,
+        isAnonymous: contact.isAnonymous
+      }
     };
+
+    const schemaResult = validateWithSchema(assistanceRequestSchema, payload);
+    if (!schemaResult.success) {
+      setSubmitError(schemaResult.error);
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      const res = await requestService.submitRequest(payload);
+      const res = await requestService.submitRequest(schemaResult.data);
       setSubmittedId(res.trackingId);
     } catch (err) {
       setSubmitError(
         `Your request was NOT sent: ${errorText(err, 'Unable to submit your request at this time. Please try again.')}`
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

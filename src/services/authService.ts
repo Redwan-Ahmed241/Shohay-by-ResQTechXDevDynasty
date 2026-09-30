@@ -7,6 +7,13 @@ import { apiFetch } from './api';
 import { supabase } from './supabaseClient';
 import { AuthUser, UserRole } from '../types';
 import { logErrorDetails, sanitizeErrorMessage } from '../utils/errorSanitizer';
+import {
+  emailSchema,
+  bdPhoneSchema,
+  otpCodeSchema,
+  volunteerSignupSchema,
+  assertValid
+} from '../utils/validationSchemas';
 
 export type AuthMethod = 'email' | 'mobile';
 
@@ -102,29 +109,40 @@ function client(): SupabaseClient {
 export const authService = {
   /**
    * Sends a one-time code by email (the email also carries a sign-in link) or SMS.
-   * Creates the Supabase user on first use.
+   * Strictly validates identifier format against schema.
    */
   async sendCode(method: AuthMethod, identifier: string, metadata: SignUpMetadata = {}): Promise<void> {
+    const validIdentifier =
+      method === 'email'
+        ? assertValid(emailSchema, identifier).toLowerCase()
+        : assertValid(bdPhoneSchema, identifier);
+
     const { error } =
       method === 'email'
         ? await client().auth.signInWithOtp({
-          email: identifier.trim().toLowerCase(),
+          email: validIdentifier,
           options: { data: metadata, emailRedirectTo: `${window.location.origin}/sign-in` }
         })
         : await client().auth.signInWithOtp({
-          phone: toE164(identifier),
+          phone: toE164(validIdentifier),
           options: { data: metadata }
         });
     if (error) throw friendlyError(error);
   },
 
-  /** Exchanges the one-time code for a Supabase session. */
+  /** Exchanges the one-time code for a Supabase session after validating code schema. */
   async verifyCode(method: AuthMethod, identifier: string, code: string): Promise<void> {
-    const token = code.replace(/\s/g, '');
+    const validCode = assertValid(otpCodeSchema, code);
+    const validIdentifier =
+      method === 'email'
+        ? assertValid(emailSchema, identifier).toLowerCase()
+        : assertValid(bdPhoneSchema, identifier);
+
+    const token = validCode.replace(/\s/g, '');
     const { error } =
       method === 'email'
-        ? await client().auth.verifyOtp({ email: identifier.trim().toLowerCase(), token, type: 'email' })
-        : await client().auth.verifyOtp({ phone: toE164(identifier), token, type: 'sms' });
+        ? await client().auth.verifyOtp({ email: validIdentifier, token, type: 'email' })
+        : await client().auth.verifyOtp({ phone: toE164(validIdentifier), token, type: 'sms' });
     if (error) throw friendlyError(error);
   },
 
@@ -134,17 +152,18 @@ export const authService = {
     return transformBackendUser(u);
   },
 
-  /** Saves volunteer details for the signed-in user and makes them a field worker. */
+  /** Saves volunteer details for the signed-in user after validating volunteerSignupSchema. */
   async registerVolunteer(data: VolunteerSignupData): Promise<AuthUser> {
+    const validData = assertValid(volunteerSignupSchema, data);
     const u = await apiFetch<BackendUser>('/api/auth/register/volunteer', {
       method: 'POST',
       body: JSON.stringify({
-        first_name: data.firstName,
-        last_name: data.lastName,
-        phone_number: data.mobile || null,
-        district: data.district || null,
-        skills: data.skills,
-        equipment: data.equipment
+        first_name: validData.firstName,
+        last_name: validData.lastName,
+        phone_number: validData.mobile || null,
+        district: validData.district || null,
+        skills: validData.skills,
+        equipment: validData.equipment
       })
     });
     return transformBackendUser(u);

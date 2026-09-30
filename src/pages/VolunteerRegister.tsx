@@ -10,6 +10,15 @@ import { VolunteerSignupData } from '../services/authService';
 import { errorText } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import { BD_UPAZILAS } from '../data/upazilas';
+import {
+  validateWithSchema,
+  personNameSchema,
+  bdPhoneSchema,
+  emailSchema,
+  otpCodeSchema,
+  districtSchema,
+  volunteerSignupSchema
+} from '../utils/validationSchemas';
 import './VolunteerRegister.css';
 
 export const VolunteerRegister: React.FC = () => {
@@ -72,7 +81,13 @@ export const VolunteerRegister: React.FC = () => {
   };
 
   const completeRegistration = async () => {
-    const registeredUser = await registerVolunteer(buildSignupData());
+    const data = buildSignupData();
+    const val = validateWithSchema(volunteerSignupSchema, data);
+    if (!val.success) {
+      setErrorMessage(val.error);
+      return;
+    }
+    const registeredUser = await registerVolunteer(val.data);
     setAssignedId(registeredUser.id);
     setIsCompleted(true);
   };
@@ -81,17 +96,43 @@ export const VolunteerRegister: React.FC = () => {
   const handleNextStep = () => {
     setErrorMessage(null);
     if (currentStep === 1) {
-      if (!formData.firstName.trim() || !formData.lastName.trim()) {
-        setErrorMessage('Please enter both your first name and last name.');
+      const fnVal = validateWithSchema(personNameSchema, formData.firstName);
+      if (!fnVal.success) {
+        setErrorMessage(`First name: ${fnVal.error}`);
         return;
       }
-      if (!isAuthenticated && !formData.email.trim()) {
-        setErrorMessage('Please enter your email address.');
+      const lnVal = validateWithSchema(personNameSchema, formData.lastName);
+      if (!lnVal.success) {
+        setErrorMessage(`Last name: ${lnVal.error}`);
         return;
       }
-      if (!isAuthenticated && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-        setErrorMessage('Please enter a valid email address.');
+      if (formData.mobile.trim()) {
+        const phoneVal = validateWithSchema(bdPhoneSchema, formData.mobile);
+        if (!phoneVal.success) {
+          setErrorMessage(phoneVal.error);
+          return;
+        }
+      }
+      if (!isAuthenticated) {
+        const emailVal = validateWithSchema(emailSchema, formData.email);
+        if (!emailVal.success) {
+          setErrorMessage(emailVal.error);
+          return;
+        }
+      }
+    } else if (currentStep === 2) {
+      const anySkill = Object.values(formData.skills).some(Boolean);
+      if (!anySkill) {
+        setErrorMessage('Please select at least one skill.');
         return;
+      }
+    } else if (currentStep === 3) {
+      if (formData.district.trim()) {
+        const distVal = validateWithSchema(districtSchema, formData.district);
+        if (!distVal.success) {
+          setErrorMessage(distVal.error);
+          return;
+        }
       }
     }
     setCurrentStep((prev) => Math.min(prev + 1, 3));
@@ -101,11 +142,21 @@ export const VolunteerRegister: React.FC = () => {
     e.preventDefault();
     setErrorMessage(null);
 
-    const email = formData.email.trim();
-    if (!formData.firstName.trim() || !formData.lastName.trim() || (!isAuthenticated && !email)) {
-      setErrorMessage('Please enter your first name, last name and email address.');
-      setCurrentStep(1);
+    const signupData = buildSignupData();
+    const valResult = validateWithSchema(volunteerSignupSchema, signupData);
+    if (!valResult.success) {
+      setErrorMessage(valResult.error);
       return;
+    }
+
+    const email = formData.email.trim();
+    if (!isAuthenticated) {
+      const emailVal = validateWithSchema(emailSchema, email);
+      if (!emailVal.success) {
+        setErrorMessage(emailVal.error);
+        setCurrentStep(1);
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -131,9 +182,16 @@ export const VolunteerRegister: React.FC = () => {
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    const codeVal = validateWithSchema(otpCodeSchema, code);
+    if (!codeVal.success) {
+      setErrorMessage(codeVal.error);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await verifyCode('email', formData.email.trim(), code);
+      await verifyCode('email', formData.email.trim(), codeVal.data);
       await completeRegistration();
     } catch (err: any) {
       setErrorMessage(errorText(err, 'Verification failed. Please try again.'));

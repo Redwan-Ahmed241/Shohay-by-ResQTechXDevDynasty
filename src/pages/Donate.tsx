@@ -6,6 +6,7 @@ import { useCampaigns } from '../hooks/queries';
 import { donationService } from '../services/donationService';
 import { errorText } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import { validateWithSchema, donationPayloadSchema } from '../utils/validationSchemas';
 import './Donate.css';
 
 const PRESET_AMOUNTS = [500, 1000, 2500, 5000];
@@ -27,15 +28,22 @@ export const Donate: React.FC = () => {
     e.preventDefault();
     if (!id) return;
     setError(null);
+
+    const validation = validateWithSchema(donationPayloadSchema, {
+      campaignId: id,
+      amount,
+      donorName: donorName.trim(),
+      donorEmail: donorEmail.trim(),
+      donorPhone: donorPhone.trim()
+    });
+    if (!validation.success) {
+      setError(validation.error);
+      return;
+    }
+
     setBusy(true);
     try {
-      const { gatewayUrl } = await donationService.initDonation({
-        campaignId: id,
-        amount,
-        donorName,
-        donorEmail,
-        donorPhone
-      });
+      const { gatewayUrl } = await donationService.initDonation(validation.data);
       // Full browser redirect — this leaves the app for SSLCommerz's real hosted checkout.
       window.location.href = gatewayUrl;
     } catch (err) {

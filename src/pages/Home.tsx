@@ -32,6 +32,7 @@ import { BD_UPAZILAS } from '../data/upazilas';
 import { TRACK_STATUS_TEXT } from '../utils/requestStatus';
 import { RequestTracking } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { validateWithSchema, trackingIdSchema } from '../utils/validationSchemas';
 import './Home.css';
 
 // Local image assets from public/
@@ -86,13 +87,14 @@ export const Home: React.FC = () => {
     setTrackingError('');
     setTrackingResult(null);
 
-    if (!trackingId.trim()) {
-      setTrackingError(t('homeTrackErrorEmpty'));
+    const validation = validateWithSchema(trackingIdSchema, trackingId.trim());
+    if (!validation.success) {
+      setTrackingError(validation.error);
       return;
     }
 
     try {
-      const res = await requestService.trackRequest(trackingId);
+      const res = await requestService.trackRequest(validation.data);
       if (res) {
         setTrackingResult(res);
       } else {

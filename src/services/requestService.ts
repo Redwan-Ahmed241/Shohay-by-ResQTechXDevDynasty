@@ -1,5 +1,6 @@
 import { AssistanceRequestPayload, AssistanceRequestRecord, RequestStatus, RequestTracking } from '../types';
 import { ApiError, apiFetch } from './api';
+import { assistanceRequestSchema, trackingIdSchema, assertValid } from '../utils/validationSchemas';
 
 export interface DispatchTaskInput {
   title: string;
@@ -15,17 +16,19 @@ export interface DispatchTaskInput {
  * server must never look submitted, so errors are passed on to the page.
  */
 export const requestService = {
-  /** Public, no account needed. */
+  /** Public, no account needed. Strictly validated against schema before submission. */
   submitRequest(payload: AssistanceRequestPayload): Promise<AssistanceRequestRecord> {
+    const validated = assertValid(assistanceRequestSchema, payload);
     return apiFetch<AssistanceRequestRecord>('/api/requests', {
       method: 'POST',
-      body: JSON.stringify(payload)
+      body: JSON.stringify(validated)
     });
   },
 
   /** Public progress view. Returns undefined when the tracking ID does not exist. */
   async trackRequest(trackingId: string): Promise<RequestTracking | undefined> {
-    const cleanId = trackingId.trim().toUpperCase();
+    const validatedId = assertValid(trackingIdSchema, trackingId);
+    const cleanId = validatedId.toUpperCase();
     try {
       return await apiFetch<RequestTracking>(`/api/requests/track/${encodeURIComponent(cleanId)}`);
     } catch (err) {
