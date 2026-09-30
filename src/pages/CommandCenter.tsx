@@ -510,7 +510,7 @@ export const CommandCenter: React.FC = () => {
                             <tr key={req.id}>
                               <td>
                                 <strong style={{ fontFamily: 'monospace', color: '#0f3460', fontSize: '13px' }}>{req.trackingId}</strong>
-                                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>{req.createdAt?.slice(0, 16) || 'Recent'}</div>
+                                <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>{req.createdAt?.slice(0, 16) || 'Recent'}</div>
                               </td>
 
                               <td>
@@ -519,7 +519,7 @@ export const CommandCenter: React.FC = () => {
                                     <span key={t} className="req-badge-type">{t.replace(/_/g, ' ').toUpperCase()}</span>
                                   ))}
                                 </div>
-                                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
+                                <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
                                   Household: <strong>{req.householdSize}</strong>
                                   {req.vulnerableCount && (req.vulnerableCount.elderly > 0 || req.vulnerableCount.children > 0 || req.vulnerableCount.pregnant > 0 || req.vulnerableCount.disabled > 0) && (
                                     <span style={{ color: '#dc2626', marginLeft: '6px' }}>
@@ -544,19 +544,19 @@ export const CommandCenter: React.FC = () => {
 
                               <td>
                                 <div style={{ fontWeight: 500 }}>{[req.location.district, req.location.upazila].filter(Boolean).join(', ')}</div>
-                                <div style={{ fontSize: '11px', color: '#64748b' }}>{req.location.address || req.location.union}</div>
+                                <div style={{ fontSize: '12px', color: '#64748b' }}>{req.location.address || req.location.union}</div>
                                 {req.location.gpsCoords && (
-                                  <a href={`https://www.google.com/maps?q=${req.location.gpsCoords}`} target="_blank" rel="noreferrer" style={{ fontSize: '11px' }}>
+                                  <a href={`https://www.google.com/maps?q=${req.location.gpsCoords}`} target="_blank" rel="noreferrer" style={{ fontSize: '12px' }}>
                                     <MapPin size={11} /> Open map
                                   </a>
                                 )}
-                                {req.notes && <div style={{ fontSize: '11px', color: '#0284c7', fontStyle: 'italic', marginTop: '2px' }}>"{req.notes}"</div>}
+                                {req.notes && <div style={{ fontSize: '12px', color: '#0284c7', fontStyle: 'italic', marginTop: '2px' }}>"{req.notes}"</div>}
                               </td>
 
                               <td>
                                 <span className={`req-status-pill req-status-${req.status.toLowerCase().replace(' ', '-')}`}>{req.status}</span>
                                 {req.task && (
-                                  <div style={{ fontSize: '11px', color: '#475569', marginTop: '4px' }}>
+                                  <div style={{ fontSize: '12px', color: '#475569', marginTop: '4px' }}>
                                     Task: {req.task.status}
                                     {req.task.assignedVolunteerName && <> · {req.task.assignedVolunteerName}</>}
                                   </div>
@@ -621,7 +621,7 @@ export const CommandCenter: React.FC = () => {
                             <tr key={t.id}>
                               <td>
                                 <div style={{ fontWeight: 600, color: '#0f172a' }}>{t.title}</div>
-                                {request && <div style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>{request.trackingId}</div>}
+                                {request && <div style={{ fontSize: '12px', color: '#64748b', fontFamily: 'monospace' }}>{request.trackingId}</div>}
                               </td>
                               <td>{t.location}, {t.district}</td>
                               <td><span className="req-badge-type">{t.priority.toUpperCase()}</span></td>
@@ -682,10 +682,10 @@ export const CommandCenter: React.FC = () => {
                           </div>
                           <div>
                             <h4 className="vol-dir-name">{volName}</h4>
-                            <span style={{ fontSize: '11px', color: vColors.fg, fontWeight: 600, background: vColors.bg, padding: '2px 8px', borderRadius: '12px' }}>
+                            <span style={{ fontSize: '12px', color: vColors.fg, fontWeight: 600, background: vColors.bg, padding: '2px 8px', borderRadius: '12px' }}>
                               {vStatus}
                             </span>
-                            <span style={{ fontSize: '11px', color: dutyColor, fontWeight: 600, marginLeft: 6 }}>● {vol.dutyStatus}</span>
+                            <span style={{ fontSize: '12px', color: dutyColor, fontWeight: 600, marginLeft: 6 }}>● {vol.dutyStatus}</span>
                           </div>
                         </div>
                       </div>
@@ -719,7 +719,7 @@ export const CommandCenter: React.FC = () => {
                         {vol.skills.map((s) => <span key={s} className="vol-skill-tag">{s}</span>)}
                       </div>
                       {vol.equipment.length > 0 && (
-                        <div style={{ marginTop: '8px', fontSize: '11px', color: '#64748b' }}>🧰 {vol.equipment.join(', ')}</div>
+                        <div style={{ marginTop: '8px', fontSize: '12px', color: '#64748b' }}>🧰 {vol.equipment.join(', ')}</div>
                       )}
                     </div>
                   );

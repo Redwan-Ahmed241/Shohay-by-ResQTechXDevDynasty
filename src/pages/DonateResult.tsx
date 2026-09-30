@@ -3,31 +3,15 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, XCircle, Ban, Loader2 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { donationService, DonationStatus } from '../services/donationService';
+import { useLanguage } from '../context/LanguageContext';
 import './Donate.css';
 
 interface Props {
   outcome: 'success' | 'fail' | 'cancel';
 }
 
-const COPY = {
-  success: {
-    icon: <CheckCircle2 size={40} color="#059669" />,
-    title: 'Thank you for your support',
-    fallback: 'Your donation was received.'
-  },
-  fail: {
-    icon: <XCircle size={40} color="#dc2626" />,
-    title: 'Payment did not go through',
-    fallback: 'SSLCommerz reported this payment as failed. No amount was charged.'
-  },
-  cancel: {
-    icon: <Ban size={40} color="#d97706" />,
-    title: 'Payment cancelled',
-    fallback: 'You cancelled the payment before it completed. No amount was charged.'
-  }
-};
-
 export const DonateResult: React.FC<Props> = ({ outcome }) => {
+  const { t } = useLanguage();
   const [params] = useSearchParams();
   const tranId = params.get('tran_id') || '';
   const [status, setStatus] = useState<DonationStatus | null>(null);
@@ -38,7 +22,23 @@ export const DonateResult: React.FC<Props> = ({ outcome }) => {
     donationService.getStatus(tranId).then(setStatus).catch(() => undefined).finally(() => setLoading(false));
   }, [tranId]);
 
-  const copy = COPY[outcome];
+  const copy = {
+    success: {
+      icon: <CheckCircle2 size={40} color="#059669" />,
+      title: t('donateSuccessTitle'),
+      fallback: 'Your donation was received.'
+    },
+    fail: {
+      icon: <XCircle size={40} color="#dc2626" />,
+      title: t('donateFailTitle'),
+      fallback: 'SSLCommerz reported this payment as failed. No amount was charged.'
+    },
+    cancel: {
+      icon: <Ban size={40} color="#d97706" />,
+      title: t('donateCancelTitle'),
+      fallback: 'You cancelled the payment before it completed. No amount was charged.'
+    }
+  }[outcome];
 
   return (
     <PageLayout showAlertBanner={false}>
@@ -50,11 +50,11 @@ export const DonateResult: React.FC<Props> = ({ outcome }) => {
             {status
               ? `৳${status.amount.toLocaleString()} — ${status.status === 'Success' ? 'confirmed by SSLCommerz.' : `status: ${status.status}.`}`
               : copy.fallback}
-            {tranId && <><br /><span style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}>Ref: {tranId}</span></>}
+            {tranId && <><br /><span style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}>Ref: {tranId}</span></>}
           </p>
           <div className="donate-result-actions">
-            <Link to="/campaigns" className="donate-btn-primary">Back to Campaigns</Link>
-            {outcome !== 'success' && <Link to="/campaigns" className="donate-btn-outline">Try Again</Link>}
+            <Link to="/campaigns" className="donate-btn-primary">{t('donateBackToCampaigns')}</Link>
+            {outcome !== 'success' && <Link to="/campaigns" className="donate-btn-outline">{t('donateTryAgain')}</Link>}
           </div>
         </div>
       </div>

@@ -101,13 +101,13 @@ export const authService = {
     const { error } =
       method === 'email'
         ? await client().auth.signInWithOtp({
-            email: identifier.trim().toLowerCase(),
-            options: { data: metadata, emailRedirectTo: `${window.location.origin}/sign-in` }
-          })
+          email: identifier.trim().toLowerCase(),
+          options: { data: metadata, emailRedirectTo: `${window.location.origin}/sign-in` }
+        })
         : await client().auth.signInWithOtp({
-            phone: toE164(identifier),
-            options: { data: metadata }
-          });
+          phone: toE164(identifier),
+          options: { data: metadata }
+        });
     if (error) throw friendlyError(error);
   },
 

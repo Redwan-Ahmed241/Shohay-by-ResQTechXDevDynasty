@@ -92,8 +92,9 @@
 
 .nat-card-label {
   font-family: var(--font-family);
-  font-size: 11px;
-  color: #94a3b8;
+  font-size: var(--font-size-xs, 12px);
+  color: #cbd5e1;
+  line-height: 1.45;
 }
 
 /* Category Filters */
@@ -105,15 +106,16 @@
 }
 
 .cat-filter-btn {
-  padding: 5px 12px;
+  padding: 6px 12px;
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 500;
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
   color: #475569;
   cursor: pointer;
+  line-height: 1.45;
   transition: all var(--transition-fast);
 }
 
@@ -137,15 +139,16 @@
 }
 
 .district-chip-btn {
-  padding: 4px 12px;
+  padding: 5px 12px;
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 500;
   background-color: #f1f5f9;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   color: #475569;
   cursor: pointer;
+  line-height: 1.45;
   transition: all var(--transition-fast);
 }
 
@@ -195,14 +198,16 @@
   font-weight: 700;
   color: #0f172a;
   margin: 0;
+  line-height: 1.4;
 }
 
 .tag-pill {
   font-family: var(--font-family);
-  font-size: 10px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 3px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  line-height: 1.45;
 }
 
 .tag-tollfree {
@@ -223,6 +228,7 @@
   font-weight: 700;
   color: #0f172a;
   margin: 10px 0 6px 0;
+  line-height: 1.2;
 }
 
 .contact-demo-note {
@@ -230,18 +236,20 @@
   border: 1px solid #fef08a;
   color: #854d0e;
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   padding: 4px 8px;
-  border-radius: 3px;
+  border-radius: 4px;
   display: inline-block;
   align-self: flex-start;
   margin-bottom: 8px;
+  line-height: 1.45;
 }
 
 .contact-verified-date {
   font-family: var(--font-family);
-  font-size: 11px;
-  color: #94a3b8;
+  font-size: var(--font-size-xs, 12px);
+  color: #64748b;
+  line-height: 1.45;
 }
 
 .contact-right-actions {
@@ -253,14 +261,16 @@
 
 .availability-label {
   font-family: var(--font-family);
-  font-size: 11px;
-  color: #94a3b8;
+  font-size: var(--font-size-xs, 12px);
+  color: #64748b;
+  line-height: 1.45;
 }
 
 .district-label {
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   color: #64748b;
+  line-height: 1.45;
 }
 
 .action-buttons-row {

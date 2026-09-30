@@ -79,8 +79,8 @@ export const Header: React.FC = () => {
     <header className={`header${scrolled ? ' header-scrolled' : ''}`}>
       <div className="container header-container">
         <Link to="/" className="header-brand" onClick={() => setMobileMenuOpen(false)}>
-          <div className="brand-icon">
-            <Radio size={18} />
+          <div className="brand-icon" aria-hidden="true">
+            <Radio size={20} />
           </div>
           <div className="brand-text">
             <span className="brand-title">SHOHAY</span>

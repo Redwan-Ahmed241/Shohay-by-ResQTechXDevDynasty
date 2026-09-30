@@ -3,10 +3,12 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Clock } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { MOCK_NEWS } from '../data/news';
+import { useLanguage } from '../context/LanguageContext';
 import './News.css';
 
 export const NewsArticle: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { t } = useLanguage();
   const article = MOCK_NEWS.find((a) => a.id === id);
 
   if (!article) {
@@ -14,9 +16,9 @@ export const NewsArticle: React.FC = () => {
       <PageLayout showAlertBanner={false}>
         <div className="news-page-bg">
           <div className="news-page-container" style={{ textAlign: 'center', padding: '48px 16px' }}>
-            <h1 className="news-page-title">Story not found</h1>
+            <h1 className="news-page-title">{t('newsStoryNotFound')}</h1>
             <Link to="/news" className="news-page-card-link" style={{ justifyContent: 'center' }}>
-              <ArrowLeft size={12} /> Back to News and Stories
+              <ArrowLeft size={12} /> {t('newsBackToNews')}
             </Link>
           </div>
         </div>
@@ -29,7 +31,7 @@ export const NewsArticle: React.FC = () => {
       <div className="news-page-bg">
         <div className="news-article-container">
           <Link to="/news" className="news-article-back">
-            <ArrowLeft size={14} /> Back to News and Stories
+            <ArrowLeft size={14} /> {t('newsBackToNews')}
           </Link>
 
           <span className="news-page-card-tag news-article-tag">{article.category}</span>

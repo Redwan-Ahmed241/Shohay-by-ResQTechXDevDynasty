@@ -10,8 +10,9 @@
 }
 
 .tag-sm {
-  padding: 0.15rem 0.5rem;
-  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
 }
 
 .tag-md {
