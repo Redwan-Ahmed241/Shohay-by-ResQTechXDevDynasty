@@ -24,7 +24,7 @@
   font-weight: 700;
   color: #0f172a;
   margin: 0 0 6px 0;
-  line-height: 1.2;
+  line-height: 1.4;
 }
 
 .get-help-subtitle {
@@ -32,6 +32,7 @@
   font-size: 14px;
   color: #64748b;
   margin: 0;
+  line-height: 1.45;
 }
 
 .get-help-card {
@@ -59,6 +60,11 @@
 }
 
 .type-card {
+  /* <button>: reset browser defaults so it looks like the original card */
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
@@ -71,13 +77,18 @@
   cursor: pointer;
   position: relative;
   transition: all var(--transition-fast);
-  height: 88px;
+  min-height: 88px;
   box-sizing: border-box;
 }
 
 .type-card:hover {
   border-color: #cbd5e1;
   background-color: #f8fafc;
+}
+
+.type-card:focus-visible {
+  outline: 2px solid #0f3460;
+  outline-offset: 2px;
 }
 
 .type-card.selected {
@@ -103,15 +114,16 @@
   font-size: 12px;
   font-weight: 600;
   color: #1e293b;
-  line-height: 1.2;
+  line-height: 1.4;
 }
 
 .priority-text {
   font-family: var(--font-family);
-  font-size: 10px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 700;
   color: #dc2626;
   margin-top: 2px;
+  line-height: 1.4;
 }
 
 .wizard-actions {
@@ -213,10 +225,11 @@
 
 .id-label {
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 700;
   color: #64748b;
   letter-spacing: 1px;
+  line-height: 1.45;
 }
 
 .id-code {

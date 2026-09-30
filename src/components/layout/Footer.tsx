@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Radio } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 import './Footer.css';
 
 export const Footer: React.FC = () => {
+  const { t } = useLanguage();
+
   return (
     <footer className="footer">
       <div className="container">
@@ -16,43 +19,43 @@ export const Footer: React.FC = () => {
               </div>
               <div className="logo-text-wrapper">
                 <div className="logo-title">SHOHAY / সহায়</div>
-                <div className="logo-sub">Bangladesh Flood Relief Platform</div>
+                <div className="logo-sub">{t('subTitle')}</div>
               </div>
             </div>
             <p className="footer-desc">
-              Coordinating immediate rescue, shelter, and relief operations for flood-affected communities.
+              {t('footerDesc')}
             </p>
           </div>
 
           {/* Col 2: Public Services */}
           <div className="footer-links-col">
-            <h4 className="footer-heading">Public Services</h4>
+            <h4 className="footer-heading">{t('publicServices')}</h4>
             <ul className="footer-links">
-              <li><Link to="/alerts">Flood Alerts</Link></li>
-              <li><Link to="/shelters">Find Shelter</Link></li>
-              <li><Link to="/get-help">Request Assistance</Link></li>
-              <li><Link to="/alerts">Report Hazard</Link></li>
-              <li><Link to="/contacts">Emergency Contacts</Link></li>
+              <li><Link to="/alerts">{t('floodAlerts')}</Link></li>
+              <li><Link to="/shelters">{t('findShelter')}</Link></li>
+              <li><Link to="/get-help">{t('requestAssistance')}</Link></li>
+              <li><Link to="/alerts">{t('reportHazard')}</Link></li>
+              <li><Link to="/contacts">{t('emergencyContacts')}</Link></li>
             </ul>
           </div>
 
           {/* Col 3: Platform */}
           <div className="footer-links-col">
-            <h4 className="footer-heading">Platform</h4>
+            <h4 className="footer-heading">{t('platformHeading')}</h4>
             <ul className="footer-links">
-              <li><Link to="/">Track Request</Link></li>
-              <li><Link to="/campaigns">Campaigns & Donations</Link></li>
-              <li><Link to="/volunteer">Volunteer</Link></li>
-              <li><Link to="/contacts">Feedback</Link></li>
-              <li><Link to="/sign-in">Staff Login</Link></li>
+              <li><Link to="/">{t('trackRequest')}</Link></li>
+              <li><Link to="/campaigns">{t('campaignsDonations')}</Link></li>
+              <li><Link to="/volunteer">{t('volunteer')}</Link></li>
+              <li><Link to="/contacts">{t('feedback')}</Link></li>
+              <li><Link to="/sign-in">{t('staffLogin')}</Link></li>
             </ul>
           </div>
         </div>
 
         {/* Footer Bottom Disclaimer */}
         <div className="footer-bottom">
-          <span>SHOHAY / সহায় — Prototype Platform for Bangladesh Flood Relief Coordination</span>
-          <span>All data shown is placeholder content for demonstration purposes</span>
+          <span>{t('footerDisclaimer1')}</span>
+          <span>{t('footerDisclaimer2')}</span>
         </div>
       </div>
     </footer>

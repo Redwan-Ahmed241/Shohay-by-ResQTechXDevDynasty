@@ -1,191 +1,312 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Radio, Phone, Mail, ArrowRight } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Phone, Mail, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import { AuthMethod, SignUpMetadata } from '../services/authService';
 import { UserRole } from '../types';
 import './SignIn.css';
 
-const SIGNIN_BG_IMAGE = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1200&q=80';
+const RESEND_COOLDOWN_SECONDS = 60;
+
+const dashboardPath = (role: UserRole) =>
+  role === 'admin' ? '/admin/command-center' : role === 'volunteer' ? '/volunteer/dashboard' : '/';
 
 export const SignIn: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  // Page the user was sent here from (see RequireRole), e.g. /admin/uav
+  const returnTo = (useLocation().state as { from?: string } | null)?.from;
+  const { user, isLoading: isRestoringSession, sendCode, verifyCode } = useAuth();
+  const { t } = useLanguage();
 
-  const [selectedRole, setSelectedRole] = useState<UserRole>('volunteer');
-  const [authMethod, setAuthMethod] = useState<'otp' | 'email'>('otp');
+  const [selectedRole, setSelectedRole] = useState<Exclude<UserRole, 'admin'>>('volunteer');
+  const [authMethod, setAuthMethod] = useState<AuthMethod>('email');
+  const [step, setStep] = useState<'identify' | 'verify'>('identify');
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
+  const [code, setCode] = useState('');
+  const [resendIn, setResendIn] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSendOtp = (e: React.FormEvent) => {
-    e.preventDefault();
-    setOtpSent(true);
+  const identifier = authMethod === 'email' ? email.trim() : mobileNumber.trim();
+  const roleLabel = selectedRole === 'volunteer' ? 'Volunteer' : 'Public';
+
+  // Already signed in (restored session, or arrived here from the emailed sign-in link)
+  useEffect(() => {
+    if (!isRestoringSession && user && step === 'identify') {
+      navigate(returnTo || dashboardPath(user.role));
+    }
+  }, [isRestoringSession, user, step, navigate, returnTo]);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = setTimeout(() => setResendIn((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendIn]);
+
+  const resetToIdentify = () => {
+    setStep('identify');
+    setCode('');
+    setErrorMessage(null);
   };
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
-    e.preventDefault();
-    login(selectedRole, mobileNumber);
+  const requestCode = async () => {
+    const metadata: SignUpMetadata = { requested_role: selectedRole === 'volunteer' ? 'fieldworker' : 'public' };
+    await sendCode(authMethod, identifier, metadata);
+    setResendIn(RESEND_COOLDOWN_SECONDS);
+  };
 
-    if (selectedRole === 'admin') {
-      navigate('/admin/command-center');
-    } else if (selectedRole === 'volunteer') {
-      navigate('/volunteer/dashboard');
-    } else {
-      navigate('/');
+  const handleSendCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setIsLoading(true);
+    try {
+      await requestCode();
+      setStep('verify');
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Could not send the code. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setErrorMessage(null);
+    try {
+      await requestCode();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Could not resend the code. Please try again.');
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setIsLoading(true);
+    try {
+      const signedIn = await verifyCode(authMethod, identifier, code);
+      navigate(returnTo || dashboardPath(signedIn.role));
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to sign in. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <PageLayout showAlertBanner={false}>
-      <div className="signin-page-bg">
-        <div className="signin-container-card">
-          {/* Left Visual Image Panel */}
-          <div className="signin-visual-panel">
-            <img src={SIGNIN_BG_IMAGE} alt="Coordinating relief" className="visual-bg-img" />
-            <div className="visual-gradient-overlay" />
+    <PageLayout showAlertBanner={false} showFooter={false}>
+      <div className="signin-page-viewport">
+        <div className="signin-modal-container">
+          {/* Left Visual Panel: Frosted Glass with Hadith Quote & Stats */}
+          <div className="signin-glass-panel">
+            <div className="quote-container">
+              <blockquote className="hadith-quote">
+                {t('hadithQuote')}
+              </blockquote>
+              <cite className="hadith-citation">{t('hadithCitation')}</cite>
+            </div>
 
-            <div className="visual-panel-content">
-              <div className="brand-header">
-                <div className="brand-icon-box">
-                  <Radio size={16} />
-                </div>
-                <div className="brand-title">SHOHOY</div>
+            <div className="signin-stats-grid">
+              <div className="signin-stat-card">
+                <div className="signin-stat-number">1.2M+</div>
+                <div className="signin-stat-label">{t('peopleHelped')}</div>
               </div>
-
-              <h2 className="visual-heading">Coordinating relief where it matters most.</h2>
-              <p className="visual-subtext">
-                Sign in to manage shelters, track inventory, coordinate volunteers, and oversee district relief operations.
-              </p>
-
-              <div className="visual-stats-grid">
-                <div className="v-stat-box">
-                  <div className="v-stat-num">1.2M+</div>
-                  <div className="v-stat-lbl">People served</div>
-                </div>
-                <div className="v-stat-box">
-                  <div className="v-stat-num">847</div>
-                  <div className="v-stat-lbl">Open shelters</div>
-                </div>
-                <div className="v-stat-box">
-                  <div className="v-stat-num">38</div>
-                  <div className="v-stat-lbl">Partner orgs</div>
-                </div>
-                <div className="v-stat-box">
-                  <div className="v-stat-num">98%</div>
-                  <div className="v-stat-lbl">Special ops</div>
-                </div>
+              <div className="signin-stat-card">
+                <div className="signin-stat-number">847</div>
+                <div className="signin-stat-label">{t('specialShelters')}</div>
               </div>
+              <div className="signin-stat-card">
+                <div className="signin-stat-number">38</div>
+                <div className="signin-stat-label">{t('partnerOrgs')}</div>
+              </div>
+              <div className="signin-stat-card">
+                <div className="signin-stat-number">98%</div>
+                <div className="signin-stat-label">{t('specialOps')}</div>
+              </div>
+            </div>
+
+            <div className="panel-footer-meta">
+              <span className="platform-tag">SHOHAY PORTAL</span>
+              <span className="dot-divider">•</span>
+              <span className="platform-tag">SECURE ACCESS</span>
             </div>
           </div>
 
           {/* Right Form Panel */}
           <div className="signin-form-panel">
             <div className="signin-form-box">
-              <h1 className="signin-title">Sign In</h1>
-              <p className="signin-subtitle">Bangladesh Flood Relief Coordination Platform</p>
+              <div className="signin-header-block">
+                <h1 className="signin-title">{t('signIn')}</h1>
+                <p className="signin-subtitle">
+                  Choose your role and we'll send a one-time sign-in code to your email or phone. No password needed.
+                </p>
+              </div>
 
-              {/* Role Selection Tabs */}
-              <div className="role-selector-tabs">
+              {/* Role Selection Tabs: Public Access vs Field Worker */}
+              <div className="role-selector-tabs" role="tablist">
                 <button
+                  type="button"
+                  role="tab"
+                  aria-selected={selectedRole === 'public'}
                   className={`role-tab ${selectedRole === 'public' ? 'active' : ''}`}
-                  onClick={() => setSelectedRole('public')}
+                  onClick={() => { setSelectedRole('public'); resetToIdentify(); }}
                 >
-                  PUBLIC ACCESS
+                  {t('publicAccessTab')}
                 </button>
                 <button
+                  type="button"
+                  role="tab"
+                  aria-selected={selectedRole === 'volunteer'}
                   className={`role-tab ${selectedRole === 'volunteer' ? 'active' : ''}`}
-                  onClick={() => setSelectedRole('volunteer')}
+                  onClick={() => { setSelectedRole('volunteer'); resetToIdentify(); }}
                 >
-                  FIELD WORKER
-                </button>
-                <button
-                  className={`role-tab ${selectedRole === 'admin' ? 'active' : ''}`}
-                  onClick={() => setSelectedRole('admin')}
-                >
-                  COORDINATOR / ADMIN
+                  {t('fieldWorkerTab')}
                 </button>
               </div>
 
-              {/* White Form Card Box matching Figma */}
+              {/* Main Auth Card Box */}
               <div className="auth-card-box">
                 {/* Auth Method Toggle */}
-                <div className="auth-method-toggle">
+                <div className="auth-method-toggle" role="tablist">
                   <button
-                    className={`method-btn ${authMethod === 'otp' ? 'active' : ''}`}
-                    onClick={() => setAuthMethod('otp')}
+                    type="button"
+                    className={`method-btn ${authMethod === 'email' ? 'active' : ''}`}
+                    onClick={() => { setAuthMethod('email'); resetToIdentify(); }}
                   >
-                    <Phone size={14} /> Mobile OTP
+                    <Mail size={14} />
+                    <span>Email Address</span>
                   </button>
                   <button
-                    className={`method-btn ${authMethod === 'email' ? 'active' : ''}`}
-                    onClick={() => setAuthMethod('email')}
+                    type="button"
+                    className={`method-btn ${authMethod === 'mobile' ? 'active' : ''}`}
+                    onClick={() => { setAuthMethod('mobile'); resetToIdentify(); }}
                   >
-                    <Mail size={14} /> Email
+                    <Phone size={14} />
+                    <span>Mobile Number</span>
                   </button>
                 </div>
 
-                {!otpSent ? (
-                  <form onSubmit={handleSendOtp} className="auth-form-stack">
-                    {authMethod === 'otp' ? (
+                {errorMessage && (
+                  <div role="alert" style={{ padding: '8px 12px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', color: '#991b1b', fontSize: '12px', marginBottom: '12px' }}>
+                    {errorMessage}
+                  </div>
+                )}
+
+                {step === 'identify' ? (
+                  <form onSubmit={handleSendCode} className="auth-form-stack">
+                    {authMethod === 'email' ? (
                       <div className="field-group">
-                        <label className="field-label">MOBILE NUMBER</label>
+                        <label className="field-label" htmlFor="email-input">EMAIL ADDRESS</label>
+                        <input
+                          id="email-input"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="auth-text-input"
+                          placeholder={selectedRole === 'volunteer' ? 'volunteer@example.org' : 'citizen@example.com'}
+                          autoComplete="email"
+                          required
+                          autoFocus
+                        />
+                      </div>
+                    ) : (
+                      <div className="field-group">
+                        <label className="field-label" htmlFor="phone-input">MOBILE NUMBER</label>
                         <div className="phone-prefix-group">
                           <span className="phone-prefix">+880</span>
                           <input
-                            type="text"
+                            id="phone-input"
+                            type="tel"
                             value={mobileNumber}
                             onChange={(e) => setMobileNumber(e.target.value)}
                             className="phone-input"
                             placeholder="01XXXXXXXXX"
+                            autoComplete="tel-national"
                             required
+                            autoFocus
                           />
                         </div>
                       </div>
-                    ) : (
-                      <div className="field-group">
-                        <label className="field-label">EMAIL ADDRESS</label>
-                        <input
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="email-input"
-                          placeholder="admin@shohay.gov.bd"
-                          required
-                        />
-                      </div>
                     )}
 
-                    <button type="submit" className="submit-btn-navy">
-                      Send OTP <ArrowRight size={14} />
+                    <button type="submit" className="submit-btn-navy" disabled={isLoading}>
+                      {isLoading ? (
+                        <>
+                          <Loader2 size={15} className="animate-spin" />
+                          <span>Sending code...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Send Sign-In Code</span>
+                          <ArrowRight size={15} />
+                        </>
+                      )}
                     </button>
-                    <span className="otp-disclaimer">A one-time code will be sent to your number.</span>
+                    <p className="otp-disclaimer">
+                      {authMethod === 'email'
+                        ? "We'll email you a one-time code and a sign-in link."
+                        : "We'll text you a one-time code."}
+                    </p>
                   </form>
                 ) : (
-                  <form onSubmit={handleVerifyOtp} className="auth-form-stack">
+                  <form onSubmit={handleVerify} className="auth-form-stack">
                     <div className="field-group">
-                      <label className="field-label">ENTER 6-DIGIT OTP CODE</label>
+                      <div className="otp-header-row">
+                        <label className="field-label" htmlFor="code-input">ENTER CODE</label>
+                        <button type="button" className="change-auth-btn" onClick={resetToIdentify}>
+                          <ArrowLeft size={12} />
+                          {authMethod === 'email' ? 'Change email' : 'Change number'}
+                        </button>
+                      </div>
                       <input
+                        id="code-input"
                         type="text"
-                        value={otpCode}
-                        onChange={(e) => setOtpCode(e.target.value)}
-                        className="email-input"
-                        placeholder="123456"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        pattern="[0-9]{6,10}"
+                        maxLength={10}
+                        value={code}
+                        onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                        className="auth-text-input otp-code-input"
+                        placeholder="••••••"
                         required
+                        autoFocus
                       />
+                      <p className="otp-disclaimer" style={{ textAlign: 'left' }}>
+                        Sent to <strong>{authMethod === 'mobile' ? `+880 ${identifier.replace(/^0/, '')}` : identifier}</strong>.
+                        {authMethod === 'email' && ' You can also tap the sign-in link in the email.'}
+                      </p>
                     </div>
-                    <button type="submit" className="submit-btn-success">
-                      Verify &amp; Enter System
+
+                    <button type="submit" className="submit-btn-navy" disabled={isLoading || code.length < 6}>
+                      {isLoading ? (
+                        <>
+                          <Loader2 size={15} className="animate-spin" />
+                          <span>Verifying...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Verify &amp; Sign In as {roleLabel}</span>
+                          <ArrowRight size={15} />
+                        </>
+                      )}
                     </button>
+                    <p className="otp-disclaimer">
+                      Didn't get it?{' '}
+                      <button type="button" className="change-auth-btn" onClick={handleResend} disabled={resendIn > 0}>
+                        {resendIn > 0 ? `Resend code in ${resendIn}s` : 'Resend code'}
+                      </button>
+                    </p>
                   </form>
                 )}
               </div>
 
               <div className="signin-footer-row">
-                <span>Don't have an account? </span>
+                <span>{t('dontHaveAccount')} </span>
                 <Link to="/volunteer/register" className="create-link">
-                  Create one
+                  {t('createOne')}
                 </Link>
               </div>
             </div>

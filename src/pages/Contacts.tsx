@@ -1,24 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Phone, Copy, Bookmark, AlertCircle, Check } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
-import { contactService } from '../services/contactService';
-import { EmergencyContact, ContactCategory } from '../types';
+import { useContacts } from '../hooks/queries';
+import { ContactCategory } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 import './Contacts.css';
 
 export const Contacts: React.FC = () => {
-  const [contacts, setContacts] = useState<EmergencyContact[]>([]);
+  const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<ContactCategory | 'All'>('All');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('All Districts');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchContacts();
-  }, [selectedCategory, selectedDistrict]);
-
-  const fetchContacts = async () => {
-    const list = await contactService.getContacts(selectedCategory, selectedDistrict);
-    setContacts(list);
-  };
+  const { data: contacts = [] } = useContacts(selectedCategory, selectedDistrict);
 
   const handleCopy = (id: string, phone: string) => {
     navigator.clipboard.writeText(phone);
@@ -26,17 +20,17 @@ export const Contacts: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const categories: Array<ContactCategory | 'All'> = [
-    'All',
-    'National Emergency',
-    'Fire Service',
-    'Medical',
-    'Disaster Management',
-    'District Control Room',
-    'Protection',
-    'Platform Hotline',
-    'Rescue',
-    'Hospital'
+  const categories: Array<{ id: ContactCategory | 'All'; labelKey: string }> = [
+    { id: 'All', labelKey: 'filterAll' },
+    { id: 'National Emergency', labelKey: 'catNationalEmergency' },
+    { id: 'Fire Service', labelKey: 'catFireService' },
+    { id: 'Medical', labelKey: 'catMedical' },
+    { id: 'Disaster Management', labelKey: 'catDisasterManagement' },
+    { id: 'District Control Room', labelKey: 'catDistrictControlRoom' },
+    { id: 'Protection', labelKey: 'catProtection' },
+    { id: 'Platform Hotline', labelKey: 'catPlatformHotline' },
+    { id: 'Rescue', labelKey: 'catRescue' },
+    { id: 'Hospital', labelKey: 'catHospital' }
   ];
 
   const districts = ['All Districts', 'Sunamganj', 'Sirajganj', 'Kurigram', 'Feni'];
@@ -46,11 +40,11 @@ export const Contacts: React.FC = () => {
       <div className="contacts-page-bg">
         <div className="contacts-container">
           {/* Header Title */}
-          <h1 className="contacts-title">Emergency Contacts</h1>
+          <h1 className="contacts-title">{t('emergencyContacts')}</h1>
 
           {/* Yellow Warning Banner matching Figma */}
           <div className="contacts-warning-banner">
-            Please verify all contact numbers with official sources before use in an emergency.
+            {t('contactsWarning')}
           </div>
 
           {/* Dark Navy Hero Box - National Emergency Numbers */}
@@ -58,23 +52,23 @@ export const Contacts: React.FC = () => {
             <div className="hero-box-header">
               <Phone size={18} className="hero-phone-icon" />
               <div>
-                <h3 className="hero-box-title">National Emergency Numbers</h3>
-                <p className="hero-box-sub">Available 24/7. Verify numbers from primary sources.</p>
+                <h3 className="hero-box-title">{t('nationalEmergencyNumbersHeading')}</h3>
+                <p className="hero-box-sub">{t('nationalEmergencyNumbersSub')}</p>
               </div>
             </div>
 
             <div className="national-numbers-grid">
               <div className="nat-card">
-                <div className="nat-card-number">999 (DEMO)</div>
-                <div className="nat-card-label">National Emergency</div>
+                <div className="nat-card-number">999 {t('demoTag')}</div>
+                <div className="nat-card-label">{t('catNationalEmergency')}</div>
               </div>
               <div className="nat-card">
-                <div className="nat-card-number">102 (DEMO)</div>
-                <div className="nat-card-label">Fire Service &amp; Civil Defence</div>
+                <div className="nat-card-number">102 {t('demoTag')}</div>
+                <div className="nat-card-label">{t('catFireService')} &amp; Civil Defence</div>
               </div>
               <div className="nat-card">
-                <div className="nat-card-number">199 (DEMO)</div>
-                <div className="nat-card-label">Ambulance Service</div>
+                <div className="nat-card-number">199 {t('demoTag')}</div>
+                <div className="nat-card-label">{t('homeAmbulanceService')}</div>
               </div>
             </div>
           </div>
@@ -83,11 +77,11 @@ export const Contacts: React.FC = () => {
           <div className="contact-category-filters">
             {categories.map((cat) => (
               <button
-                key={cat}
-                className={`cat-filter-btn ${selectedCategory === cat ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(cat)}
+                key={cat.id}
+                className={`cat-filter-btn ${selectedCategory === cat.id ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(cat.id)}
               >
-                {cat}
+                {t(cat.labelKey)}
               </button>
             ))}
           </div>
@@ -100,7 +94,7 @@ export const Contacts: React.FC = () => {
                 className={`district-chip-btn ${selectedDistrict === d ? 'active' : ''}`}
                 onClick={() => setSelectedDistrict(d)}
               >
-                {d}
+                {d === 'All Districts' ? t('allDistricts') : d}
               </button>
             ))}
           </div>
@@ -113,15 +107,15 @@ export const Contacts: React.FC = () => {
                   <div className="contact-left-info">
                     <div className="contact-name-row">
                       <h3 className="contact-name">{contact.title}</h3>
-                      {contact.isTollFree && <span className="tag-pill tag-tollfree">Toll Free</span>}
-                      {contact.isVerified && <span className="tag-pill tag-verified">Verified</span>}
+                      {contact.isTollFree && <span className="tag-pill tag-tollfree">{t('tollFree')}</span>}
+                      {contact.isVerified && <span className="tag-pill tag-verified">{t('verified')}</span>}
                     </div>
 
                     <div className="contact-phone-code">{contact.phone}</div>
 
                     {contact.notes && <div className="contact-demo-note">{contact.notes}</div>}
 
-                    <div className="contact-verified-date">Last verified: {contact.lastVerified}</div>
+                    <div className="contact-verified-date">{t('lastVerified')} {contact.lastVerified}</div>
                   </div>
 
                   <div className="contact-right-actions">
@@ -130,16 +124,16 @@ export const Contacts: React.FC = () => {
 
                     <div className="action-buttons-row">
                       <button className="btn-call" onClick={() => window.open(`tel:${contact.phone}`)}>
-                        <Phone size={14} /> Call
+                        <Phone size={14} /> {t('callBtn')}
                       </button>
                       <button
                         className="btn-icon-action"
                         onClick={() => handleCopy(contact.id, contact.phone)}
-                        title="Copy Phone Number"
+                        title={t('copyPhoneNumber')}
                       >
                         {copiedId === contact.id ? <Check size={14} style={{ color: '#006a4e' }} /> : <Copy size={14} />}
                       </button>
-                      <button className="btn-icon-action" title="Bookmark">
+                      <button className="btn-icon-action" title={t('bookmark')}>
                         <Bookmark size={14} />
                       </button>
                     </div>

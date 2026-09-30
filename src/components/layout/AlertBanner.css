@@ -23,11 +23,12 @@
   background-color: #7f1d1d;
   color: #fca5a5;
   font-weight: var(--font-weight-extrabold);
-  padding: 0.15rem 0.4rem;
+  padding: 0.2rem 0.5rem;
   border-radius: var(--radius-sm);
-  font-size: 0.65rem;
+  font-size: var(--font-size-xs, 0.75rem);
   letter-spacing: 0.05em;
   white-space: nowrap;
+  line-height: 1.45;
 }
 
 .banner-icon {
@@ -39,6 +40,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.45;
 }
 
 .banner-actions {
@@ -49,13 +51,14 @@
 }
 
 .banner-btn-secondary {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.7rem;
+  padding: 0.3rem 0.75rem;
+  font-size: var(--font-size-xs, 0.75rem);
   font-weight: var(--font-weight-semibold);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radius-sm);
   text-decoration: none;
+  line-height: 1.45;
 }
 
 .banner-btn-secondary:hover {
@@ -67,13 +70,14 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.25rem 0.6rem;
-  font-size: 0.7rem;
+  padding: 0.3rem 0.75rem;
+  font-size: var(--font-size-xs, 0.75rem);
   font-weight: var(--font-weight-bold);
   background-color: #ffffff;
   color: #b91c1c;
   border-radius: var(--radius-sm);
   text-decoration: none;
+  line-height: 1.45;
 }
 
 .banner-btn-primary:hover {

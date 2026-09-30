@@ -1,49 +1,66 @@
-import { AssistanceRequestPayload, AssistanceRequestRecord } from '../types';
-import { mockFetch } from './api';
+import { AssistanceRequestPayload, AssistanceRequestRecord, RequestStatus, RequestTracking } from '../types';
+import { ApiError, apiFetch } from './api';
 
-const MOCK_REQUESTS_DB: Record<string, AssistanceRequestRecord> = {
-  'SHY-2024-89211': {
-    id: 'req-1',
-    trackingId: 'SHY-2024-89211',
-    types: ['rescue', 'water'],
-    householdSize: 5,
-    vulnerableCount: { children: 2, elderly: 1, pregnant: 0, disabled: 0 },
-    location: {
-      district: 'Sunamganj',
-      upazila: 'Sunamganj Sadar',
-      union: 'Jahangirnagar',
-      address: 'Village Nabinagar, Ward 3'
-    },
-    contact: {
-      name: 'Rahim Uddin',
-      phone: '01712345678',
-      isAnonymous: false
-    },
-    status: 'In Progress',
-    createdAt: '2024-07-15 08:30'
-  }
-};
+export interface DispatchTaskInput {
+  title: string;
+  location: string;
+  district: string;
+  durationHours: number;
+  teamSize: number;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+}
 
+/**
+ * Citizen requests. Nothing here falls back to fake data: a request that did not reach the
+ * server must never look submitted, so errors are passed on to the page.
+ */
 export const requestService = {
-  async submitRequest(payload: AssistanceRequestPayload): Promise<AssistanceRequestRecord> {
-    const randomNum = Math.floor(10000 + Math.random() * 90000);
-    const trackingId = `SHY-2024-${randomNum}`;
-
-    const newRecord: AssistanceRequestRecord = {
-      ...payload,
-      id: `req-${Date.now()}`,
-      trackingId,
-      status: 'Pending',
-      createdAt: new Date().toISOString()
-    };
-
-    MOCK_REQUESTS_DB[trackingId] = newRecord;
-    return mockFetch(newRecord);
+  /** Public, no account needed. */
+  submitRequest(payload: AssistanceRequestPayload): Promise<AssistanceRequestRecord> {
+    return apiFetch<AssistanceRequestRecord>('/api/requests', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
   },
 
-  async trackRequest(trackingId: string): Promise<AssistanceRequestRecord | undefined> {
+  /** Public progress view. Returns undefined when the tracking ID does not exist. */
+  async trackRequest(trackingId: string): Promise<RequestTracking | undefined> {
     const cleanId = trackingId.trim().toUpperCase();
-    const result = MOCK_REQUESTS_DB[cleanId];
-    return mockFetch(result);
+    try {
+      return await apiFetch<RequestTracking>(`/api/requests/track/${encodeURIComponent(cleanId)}`);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) return undefined;
+      throw err;
+    }
+  },
+
+  /** Every request I submitted while signed in — no tracking ID needed. Requires sign-in. */
+  getMyRequests(): Promise<RequestTracking[]> {
+    return apiFetch<RequestTracking[]>('/api/requests/mine');
+  },
+
+  /** Coordinators only. */
+  getAllRequests(status?: string, district?: string): Promise<AssistanceRequestRecord[]> {
+    const params = new URLSearchParams();
+    if (status && status !== 'All') params.append('status', status);
+    if (district && district !== 'All') params.append('district', district);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return apiFetch<AssistanceRequestRecord[]>(`/api/requests${queryString}`);
+  },
+
+  /** Coordinators only. */
+  updateRequestStatus(requestId: string, newStatus: RequestStatus, notes?: string): Promise<AssistanceRequestRecord> {
+    return apiFetch<AssistanceRequestRecord>(`/api/requests/${encodeURIComponent(requestId)}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: newStatus, notes })
+    });
+  },
+
+  /** Coordinators only: creates a volunteer task for the request and marks it Assigned. */
+  dispatchRequest(requestId: string, task: DispatchTaskInput): Promise<AssistanceRequestRecord> {
+    return apiFetch<AssistanceRequestRecord>(`/api/requests/${encodeURIComponent(requestId)}/dispatch`, {
+      method: 'POST',
+      body: JSON.stringify(task)
+    });
   }
 };

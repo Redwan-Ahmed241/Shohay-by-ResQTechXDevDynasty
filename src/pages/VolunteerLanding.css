@@ -77,9 +77,10 @@
 
 .v-stat-label-sub {
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   color: #cbd5e1;
   margin-top: 4px;
+  line-height: 1.45;
 }
 
 /* White Help Card */
