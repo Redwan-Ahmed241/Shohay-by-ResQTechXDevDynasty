@@ -10,6 +10,7 @@ import { uavService } from '../services/uavService';
 import { volunteerService } from '../services/volunteerService';
 import { ApiError } from '../services/api';
 import { UavDetection, UavDrone, UavLogEntry, UavRescuerAssignment, VolunteerDirectoryEntry } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 import './CommandCenter.css';
 import './UavMonitor.css';
 
@@ -52,6 +53,7 @@ function usePolling(fn: () => void, ms: number) {
 
 export const UavMonitor: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [drones, setDrones] = useState<UavDrone[]>([]);
   const [detections, setDetections] = useState<UavDetection[]>([]);
   const [assignments, setAssignments] = useState<UavRescuerAssignment[]>([]);
@@ -211,21 +213,29 @@ export const UavMonitor: React.FC = () => {
   const count = (status: string) => detections.filter((d) => d.status === status).length;
   const shown = detections.filter((d) => statusFilter === 'All' || d.status === statusFilter);
 
+  const statusFilters = [
+    { id: 'All', key: 'uavStatusAll' },
+    { id: 'New', key: 'uavStatusNew' },
+    { id: 'Acknowledged', key: 'uavStatusAcknowledged' },
+    { id: 'Rescue Requested', key: 'uavStatusRescueRequested' },
+    { id: 'Dismissed', key: 'uavStatusDismissed' }
+  ];
+
   return (
     <PageLayout showAlertBanner={false}>
       <div className="cc-page-bg">
         <div className="cc-container">
           <div className="cc-header-row">
             <div>
-              <h1 className="cc-title">UAV Monitor</h1>
+              <h1 className="cc-title">{t('uavTitle')}</h1>
               <p className="cc-subtitle">
-                Drone patrols and on-board detections of stranded people · <span className="uav-live-dot" /> live, updated {lastSync ? timeAgo(lastSync.toISOString()) : '…'}
+                {t('uavSubtitle')} · <span className="uav-live-dot" /> {t('uavLiveBadge')} {lastSync ? timeAgo(lastSync.toISOString()) : '…'}
               </p>
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button className="filter-chip-btn" onClick={() => navigate('/admin/command-center')}>← Command Center</button>
+              <button className="filter-chip-btn" onClick={() => navigate('/admin/command-center')}>{t('uavBackToCommandCenter')}</button>
               <button className="btn-table-action btn-action-assign" onClick={() => setShowRegister(true)} style={{ padding: '8px 16px', fontSize: '13px', borderRadius: '6px' }}>
-                <Plus size={15} /> Register Drone
+                <Plus size={15} /> {t('uavRegisterDroneBtn')}
               </button>
             </div>
           </div>
@@ -261,33 +271,33 @@ export const UavMonitor: React.FC = () => {
           <div className="cc-top-stats-grid">
             <div className="cc-stat-card card-blue">
               <div className="cc-stat-info">
-                <span className="cc-stat-label label-blue">DRONES ONLINE</span>
+                <span className="cc-stat-label label-blue">{t('uavDronesOnlineStat')}</span>
                 <div className="cc-stat-value text-blue">{online}/{drones.length}</div>
-                <div className="cc-stat-sub text-blue">Offline after 2 min without heartbeat</div>
+                <div className="cc-stat-sub text-blue">{t('uavDronesOfflineSub')}</div>
               </div>
               <Radar size={24} className="icon-blue" />
             </div>
             <div className="cc-stat-card card-red" onClick={() => setStatusFilter('New')} style={{ cursor: 'pointer' }}>
               <div className="cc-stat-info">
-                <span className="cc-stat-label label-red">NEW DETECTIONS</span>
+                <span className="cc-stat-label label-red">{t('uavNewDetectionsStat')}</span>
                 <div className="cc-stat-value text-red">{count('New')}</div>
-                <div className="cc-stat-sub text-red">Waiting for review</div>
+                <div className="cc-stat-sub text-red">{t('uavWaitingReviewSub')}</div>
               </div>
               <AlertTriangle size={24} className="icon-red" />
             </div>
             <div className="cc-stat-card card-green" onClick={() => setStatusFilter('Rescue Requested')} style={{ cursor: 'pointer' }}>
               <div className="cc-stat-info">
-                <span className="cc-stat-label label-green">RESCUE REQUESTS</span>
+                <span className="cc-stat-label label-green">{t('uavRescueRequestsStat')}</span>
                 <div className="cc-stat-value text-green">{count('Rescue Requested')}</div>
-                <div className="cc-stat-sub text-green">Sent to the request queue</div>
+                <div className="cc-stat-sub text-green">{t('uavSentToQueueSub')}</div>
               </div>
               <LifeBuoy size={24} className="icon-green" />
             </div>
             <div className="cc-stat-card card-purple">
               <div className="cc-stat-info">
-                <span className="cc-stat-label label-purple">RESCUERS LINKED</span>
+                <span className="cc-stat-label label-purple">{t('uavRescuersLinkedStat')}</span>
                 <div className="cc-stat-value text-purple">{assignments.length}</div>
-                <div className="cc-stat-sub text-purple">Volunteers receiving drone alerts</div>
+                <div className="cc-stat-sub text-purple">{t('uavVolunteersAlertedSub')}</div>
               </div>
               <CheckCircle2 size={24} className="icon-purple" />
             </div>
@@ -296,7 +306,7 @@ export const UavMonitor: React.FC = () => {
           {/* Live Feed — always visible, doesn't need a drone registered to demo footage */}
           <section className="cc-data-card uav-panel" aria-label="Live Feed" style={{ marginBottom: 20 }} ref={feedSectionRef}>
             <div className="uav-panel-head">
-              <h3>Live Feed</h3>
+              <h3>{t('uavLiveFeedTitle')}</h3>
               {drones.length > 0 && (
                 <select
                   className="form-input-field"
@@ -305,7 +315,7 @@ export const UavMonitor: React.FC = () => {
                   onChange={(e) => setSelectedFeedDroneId(e.target.value)}
                   aria-label="Choose drone feed"
                 >
-                  <option value="">Demo playback (no drone selected)</option>
+                  <option value="">{t('uavDemoPlaybackOption')}</option>
                   {drones.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                 </select>
               )}
@@ -324,12 +334,12 @@ export const UavMonitor: React.FC = () => {
                 <p style={{ margin: '0 0 14px', fontSize: 12 }}>
                   Play a recorded detection demo instead — showing risk level and person count from a past flight.
                 </p>
-                <button type="button" className="btn-navy-primary" onClick={() => demoFileRef.current?.click()}>Choose recorded video…</button>
+                <button type="button" className="btn-navy-primary" onClick={() => demoFileRef.current?.click()}>{t('uavChooseRecordedVideo')}</button>
                 <input ref={demoFileRef} type="file" accept="video/*" onChange={handleDemoFile} style={{ display: 'none' }} />
               </div>
             )}
 
-            <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 12, marginBottom: 0 }}>
+            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 12, marginBottom: 0, lineHeight: 1.45 }}>
               Placeholder for the live feed. Once the detection model is hosted on the drone or a base
               station, this panel will play that drone's registered stream URL automatically instead of a
               recorded file.
@@ -340,11 +350,11 @@ export const UavMonitor: React.FC = () => {
             {/* Detection feed */}
             <section className="cc-data-card uav-panel" aria-label="Detections">
               <div className="uav-panel-head">
-                <h3>Detections</h3>
+                <h3>{t('uavDetectionsTitle')}</h3>
                 <div className="filter-chips-group">
-                  {['All', 'New', 'Acknowledged', 'Rescue Requested', 'Dismissed'].map((s) => (
-                    <button key={s} className={`filter-chip-btn ${statusFilter === s ? 'active' : ''}`} onClick={() => setStatusFilter(s)}>
-                      {s}
+                  {statusFilters.map((s) => (
+                    <button key={s.id} className={`filter-chip-btn ${statusFilter === s.id ? 'active' : ''}`} onClick={() => setStatusFilter(s.id)}>
+                      {t(s.key)}
                     </button>
                   ))}
                 </div>
@@ -364,11 +374,11 @@ export const UavMonitor: React.FC = () => {
                   {overlay.latest && (
                     <div className="uav-video-stats">
                       <div className={`uav-video-stat risk-${(overlay.latest.risk || 'unknown').toLowerCase()}`}>
-                        <span>Risk</span><b>{overlay.latest.risk ?? '—'}</b>
+                        <span>{t('uavRiskLabel')}</span><b>{overlay.latest.risk ?? '—'}</b>
                       </div>
-                      <div className="uav-video-stat"><span>Rescuers needed</span><b>{overlay.latest.rescuersNeeded ?? '—'}</b></div>
-                      <div className="uav-video-stat"><span>Already present</span><b>{overlay.latest.alreadyPresent ?? '—'}</b></div>
-                      <div className="uav-video-stat"><span>Dispatch count</span><b>{overlay.latest.dispatchCount ?? '—'}</b></div>
+                      <div className="uav-video-stat"><span>{t('uavRescuersNeededLabel')}</span><b>{overlay.latest.rescuersNeeded ?? '—'}</b></div>
+                      <div className="uav-video-stat"><span>{t('uavAlreadyPresentLabel')}</span><b>{overlay.latest.alreadyPresent ?? '—'}</b></div>
+                      <div className="uav-video-stat"><span>{t('uavDispatchCountLabel')}</span><b>{overlay.latest.dispatchCount ?? '—'}</b></div>
                     </div>
                   )}
                   {overlay.history.length > 0 && (
@@ -400,7 +410,7 @@ export const UavMonitor: React.FC = () => {
                   {shown.map((d) => (
                     <article key={d.id} className={`uav-det-card status-${d.status.toLowerCase().replace(' ', '-')}`}>
                       <div className="uav-det-top">
-                        <strong>{d.detectionType === 'human' ? '🧍 Person' : '🐄 Animal'} · {Math.round(d.confidence * 100)}% confidence</strong>
+                        <strong>{d.detectionType === 'human' ? `🧍 ${t('uavPersonLabel')}` : `🐄 ${t('uavAnimalLabel')}`} · {Math.round(d.confidence * 100)}% {t('uavConfidenceLabel')}</strong>
                         <span className="req-status-pill req-status-pending">{d.status}</span>
                       </div>
                       <div className="uav-det-meta">
@@ -414,18 +424,18 @@ export const UavMonitor: React.FC = () => {
                         <div className="action-btns-group" style={{ marginTop: 8 }}>
                           {d.detectionType === 'human' && (
                             <button className="btn-table-action btn-action-assign" disabled={busyId === d.id} onClick={() => handleRescue(d)}>
-                              <LifeBuoy size={12} /> Create rescue request
+                              <LifeBuoy size={12} /> {t('uavCreateRescueReqBtn')}
                             </button>
                           )}
                           {d.status === 'New' && (
                             <button className="btn-table-action btn-action-verify" disabled={busyId === d.id}
                               onClick={() => act(d.id, async () => replaceDetection(await uavService.acknowledge(d.id)))}>
-                              <CheckCircle2 size={12} /> Acknowledge
+                              <CheckCircle2 size={12} /> {t('uavAcknowledgeBtn')}
                             </button>
                           )}
                           <button className="btn-table-action btn-action-resolve" disabled={busyId === d.id}
                             onClick={() => act(d.id, async () => replaceDetection(await uavService.dismiss(d.id)))}>
-                            <Ban size={12} /> False alarm
+                            <Ban size={12} /> {t('uavFalseAlarmBtn')}
                           </button>
                         </div>
                       )}
@@ -438,7 +448,7 @@ export const UavMonitor: React.FC = () => {
             <div className="uav-side">
               {/* Drones */}
               <section className="cc-data-card uav-panel" aria-label="Drones">
-                <div className="uav-panel-head"><h3>Drones</h3></div>
+                <div className="uav-panel-head"><h3>{t('uavDronesPanelTitle')}</h3></div>
                 {drones.length === 0 && <div className="uav-empty">No drones registered yet.</div>}
                 {drones.map((dr) => (
                   <div key={dr.id} className="uav-drone-row">
@@ -466,7 +476,7 @@ export const UavMonitor: React.FC = () => {
 
               {/* Rescuer assignments */}
               <section className="cc-data-card uav-panel" aria-label="Rescuer assignments">
-                <div className="uav-panel-head"><h3>Who gets each drone's alerts</h3></div>
+                <div className="uav-panel-head"><h3>{t('uavRescuerAssignmentsTitle')}</h3></div>
                 <form onSubmit={handleAssign} className="uav-assign-form">
                   <select className="form-input-field" value={assignUser} onChange={(e) => setAssignUser(e.target.value)} required aria-label="Volunteer">
                     <option value="">Volunteer…</option>
@@ -478,7 +488,7 @@ export const UavMonitor: React.FC = () => {
                     <option value="">Drone…</option>
                     {drones.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                   </select>
-                  <button className="btn-navy-primary" type="submit" disabled={busyId === 'assign'}>Assign</button>
+                  <button className="btn-navy-primary" type="submit" disabled={busyId === 'assign'}>{t('uavAssignBtn')}</button>
                 </form>
                 {assignments.length === 0 && <div className="uav-empty">No volunteers linked to drones yet.</div>}
                 {assignments.map((a) => (
@@ -495,7 +505,7 @@ export const UavMonitor: React.FC = () => {
 
           {/* Audit log */}
           <section className="cc-data-card" style={{ marginTop: 20 }} aria-label="Audit log">
-            <div className="uav-panel-head" style={{ padding: '14px 16px 0' }}><h3>Audit log</h3></div>
+            <div className="uav-panel-head" style={{ padding: '14px 16px 0' }}><h3>{t('uavAuditLogTitle')}</h3></div>
             <div className="cc-table-wrapper">
               <table className="cc-interactive-table">
                 <thead>
@@ -520,26 +530,26 @@ export const UavMonitor: React.FC = () => {
             <div className="modal-backdrop" onClick={() => setShowRegister(false)}>
               <div className="modal-box animate-scale-up" role="dialog" aria-modal="true" aria-labelledby="register-title" onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <h3 id="register-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#0f172a' }}>Register a Drone</h3>
+                  <h3 id="register-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#0f172a' }}>{t('uavRegisterModalTitle')}</h3>
                   <button onClick={() => setShowRegister(false)} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><X size={20} /></button>
                 </div>
                 <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <label className="uav-label">Name
+                  <label className="uav-label">{t('uavNameLabel')}
                     <input className="form-input-field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Tahirpur Scout 2" required autoFocus />
                   </label>
-                  <label className="uav-label">Registration ID (printed on the drone)
+                  <label className="uav-label">{t('uavRegIdLabel')}
                     <input className="form-input-field" value={form.registration_id} onChange={(e) => setForm({ ...form, registration_id: e.target.value })}
                       placeholder="e.g. SUN-UAV-02" pattern="[A-Za-z0-9_-]{3,100}" title="3+ letters, numbers, - or _" required />
                   </label>
-                  <label className="uav-label">District
+                  <label className="uav-label">{t('uavDistrictLabel')}
                     <input className="form-input-field" value={form.district} onChange={(e) => setForm({ ...form, district: e.target.value })} placeholder="e.g. Sunamganj" />
                   </label>
-                  <label className="uav-label">Live video URL (optional)
+                  <label className="uav-label">{t('uavLiveUrlLabel')}
                     <input className="form-input-field" value={form.stream_url} onChange={(e) => setForm({ ...form, stream_url: e.target.value })} placeholder="https://… or rtsp://…" />
                   </label>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 6 }}>
-                    <button type="button" className="btn-outline-subtle" onClick={() => setShowRegister(false)}>Cancel</button>
-                    <button type="submit" className="btn-navy-primary" disabled={busyId === 'register'}>{busyId === 'register' ? 'Registering…' : 'Register'}</button>
+                    <button type="button" className="btn-outline-subtle" onClick={() => setShowRegister(false)}>{t('uavCancelBtn')}</button>
+                    <button type="submit" className="btn-navy-primary" disabled={busyId === 'register'}>{busyId === 'register' ? '...' : t('uavRegisterSubmitBtn')}</button>
                   </div>
                 </form>
               </div>

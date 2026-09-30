@@ -272,7 +272,7 @@ export const Warehouse: React.FC = () => {
                       <td style={{ color: '#64748b', fontSize: '13px' }}>{m.date}</td>
                       <td>
                         <span style={{
-                          padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700,
+                          padding: '3px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 700,
                           background: m.type === 'INBOUND' ? '#ecfdf5' : '#eff6ff',
                           color: m.type === 'INBOUND' ? '#059669' : '#2563eb'
                         }}>

@@ -5,12 +5,14 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { useCampaigns } from '../hooks/queries';
 import { donationService } from '../services/donationService';
 import { ApiError } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import './Donate.css';
 
 const PRESET_AMOUNTS = [500, 1000, 2500, 5000];
 
 export const Donate: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { t } = useLanguage();
   const { data: campaigns = [] } = useCampaigns();
   const campaign = campaigns.find((c) => c.id === id);
 
@@ -47,19 +49,19 @@ export const Donate: React.FC = () => {
       <div className="donate-page-bg">
         <div className="donate-container">
           <Link to="/campaigns" className="donate-back-link">
-            <ArrowLeft size={14} /> Back to Campaigns
+            <ArrowLeft size={14} /> {t('donateBackToCampaigns')}
           </Link>
 
           <div className="donate-grid">
             {/* Order summary */}
             <div className="donate-summary-card">
               <div className="donate-gateway-badge">
-                <ShieldCheck size={14} /> Secured by SSLCommerz (Sandbox)
+                <ShieldCheck size={14} /> {t('donateSecuredBy')}
               </div>
-              <h3>{campaign ? campaign.title : 'Relief Campaign'}</h3>
+              <h3>{campaign ? campaign.title : t('donateReliefCampaign')}</h3>
               {campaign && <p className="donate-summary-org">{campaign.organization} • {campaign.district}</p>}
               <div className="donate-summary-row">
-                <span>Donation amount</span>
+                <span>{t('donateAmountLabel')}</span>
                 <strong>৳{amount.toLocaleString()}</strong>
               </div>
               <p className="donate-summary-note">
@@ -78,7 +80,7 @@ export const Donate: React.FC = () => {
                 </div>
               )}
 
-              <h3 className="donate-form-title">Choose Amount (BDT)</h3>
+              <h3 className="donate-form-title">{t('donateChooseAmountTitle')}</h3>
               <div className="donate-amount-grid">
                 {PRESET_AMOUNTS.map((a) => (
                   <button
@@ -98,16 +100,16 @@ export const Donate: React.FC = () => {
                 className="donate-amount-input"
                 value={amount}
                 onChange={(e) => setAmount(Math.max(0, parseInt(e.target.value) || 0))}
-                placeholder="Custom amount"
+                placeholder={t('donateCustomAmountPlaceholder')}
                 required
               />
 
-              <h3 className="donate-form-title" style={{ marginTop: 20 }}>Your Details</h3>
+              <h3 className="donate-form-title" style={{ marginTop: 20 }}>{t('donateYourDetailsTitle')}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <input
                   type="text"
                   className="donate-text-input"
-                  placeholder="Full name"
+                  placeholder={t('donateFullNamePlaceholder')}
                   value={donorName}
                   onChange={(e) => setDonorName(e.target.value)}
                   required
@@ -116,7 +118,7 @@ export const Donate: React.FC = () => {
                 <input
                   type="email"
                   className="donate-text-input"
-                  placeholder="Email address"
+                  placeholder={t('donateEmailPlaceholder')}
                   value={donorEmail}
                   onChange={(e) => setDonorEmail(e.target.value)}
                   required
@@ -124,7 +126,7 @@ export const Donate: React.FC = () => {
                 <input
                   type="tel"
                   className="donate-text-input"
-                  placeholder="Mobile number"
+                  placeholder={t('donateMobilePlaceholder')}
                   value={donorPhone}
                   onChange={(e) => setDonorPhone(e.target.value)}
                   required
@@ -133,7 +135,7 @@ export const Donate: React.FC = () => {
               </div>
 
               <button type="submit" className="donate-btn-primary" disabled={busy || amount < 10 || !campaign} style={{ width: '100%', marginTop: 18 }}>
-                {busy ? <Loader2 size={16} className="animate-spin" /> : `Continue to Payment — ৳${amount.toLocaleString()}`}
+                {busy ? <Loader2 size={16} className="animate-spin" /> : `${t('donateContinueToPayment')} — ৳${amount.toLocaleString()}`}
               </button>
               <p className="donate-disclaimer">You'll leave Shohay to complete payment on SSLCommerz's secure sandbox page.</p>
             </form>

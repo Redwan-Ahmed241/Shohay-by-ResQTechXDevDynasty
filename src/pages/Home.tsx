@@ -107,147 +107,163 @@ export const Home: React.FC = () => {
     <PageLayout showAlertBanner={false}>
       <div className="home-page">
         {/* ═══════════════════════════════════════
+        {/* ═══════════════════════════════════════
            1. ALERT BANNER (Red)
            ═══════════════════════════════════════ */}
-
-      <div className="alert-banner-home">
-        <div className="alert-banner-icon">
-          <AlertTriangle />
-        </div>
-        <div className="alert-banner-content">
-          <div className="alert-banner-label">
-            {t('homeAlertLabel')}
+        <div className="alert-banner-home" role="alert" aria-live="assertive">
+          <div className="alert-banner-icon" aria-hidden="true">
+            <AlertTriangle size={20} />
           </div>
-          <div className="alert-banner-title">
-            {t('homeAlertTitle')}
+          <div className="alert-banner-content">
+            <span className="alert-banner-label">
+              {t('homeAlertLabel')}
+            </span>
+            <h2 className="alert-banner-title">
+              {t('homeAlertTitle')}
+            </h2>
+            <p className="alert-banner-areas">
+              {t('homeAlertAreas')}
+            </p>
           </div>
-          <div className="alert-banner-areas">
-            {t('homeAlertAreas')}
-          </div>
-        </div>
-        <div className="alert-banner-actions">
-          <button className="alert-btn-outline" onClick={() => navigate('/alerts')}>
-            {t('homeViewAlert')}
-          </button>
-          <button className="alert-btn-solid" onClick={() => navigate('/get-help')}>
-            {t('homeGetHelpNow')}
-          </button>
-        </div>
-      </div>
-
-      {/* ═══════════════════════════════════════
-         2. LOCATION ROW
-         ═══════════════════════════════════════ */}
-      {!locationDismissed && (
-        <div className="location-row">
-          <div className="location-row-inner">
-            <div className="location-label">
-              <MapPin />
-              <span>{locationDisplay}</span>
-            </div>
-            <button className="location-gps-btn" onClick={shareGps} disabled={gpsBusy} type="button">
-              <Navigation />
-              <span>{gpsBusy ? 'Locating…' : t('homeGps')}</span>
+          <div className="alert-banner-actions">
+            <button className="alert-btn-outline" onClick={() => navigate('/alerts')}>
+              {t('homeViewAlert')}
             </button>
-            <select
-              className="location-dropdown"
-              value={selectedUpazila}
-              onChange={(e) => {
-                setSelectedUpazila(e.target.value);
-                setGpsStatus(null);
-              }}
-            >
-              <option value="">{t('homeSelectUpazila')}</option>
-              {BD_UPAZILAS.map((d) => (
-                <optgroup key={d.district} label={d.district}>
-                  {d.upazilas.map((u) => (
-                    <option key={`${d.district}-${u}`} value={u}>{u}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-            <span className="location-separator">|</span>
-            <button className="location-skip" onClick={() => setLocationDismissed(true)} type="button">{t('homeSkip')}</button>
+            <button className="alert-btn-solid" onClick={() => navigate('/get-help')}>
+              {t('homeGetHelpNow')}
+            </button>
           </div>
         </div>
-      )}
 
-      {/* ═══════════════════════════════════════
-         3. QUICK STATS BAR
-         ═══════════════════════════════════════ */}
-      <div className="quick-stats-bar">
-        <div className="quick-stats-inner">
-          <div className="stat-chips">
-            <div className="stat-chip">
-              <Users size={14} />
-              <span className="stat-chip-value">1.2M+</span>
-              <span className="stat-chip-label">{t('homeStatReached')}</span>
-            </div>
-            <div className="stat-chip">
-              <HomeIcon size={14} />
-              <span className="stat-chip-value">847</span>
-              <span className="stat-chip-label">{t('homeStatShelters')}</span>
-            </div>
-            <div className="stat-chip">
-              <Package size={14} />
-              <span className="stat-chip-value">50K+</span>
-              <span className="stat-chip-label">{t('homeStatPackages')}</span>
-            </div>
-            <div className="stat-chip">
-              <Anchor size={14} />
-              <span className="stat-chip-value">340</span>
-              <span className="stat-chip-label">{t('homeStatRescues')}</span>
+        {/* ═══════════════════════════════════════
+           2. LOCATION ROW
+           ═══════════════════════════════════════ */}
+        {!locationDismissed && (
+          <div className="location-row" role="region" aria-label="Location selector">
+            <div className="location-row-inner">
+              <div className="location-label">
+                <MapPin size={14} aria-hidden="true" />
+                <span>{locationDisplay}</span>
+              </div>
+              <button
+                className="location-gps-btn"
+                onClick={shareGps}
+                disabled={gpsBusy}
+                type="button"
+                aria-label="Use GPS location"
+              >
+                <Navigation size={13} aria-hidden="true" />
+                <span>{gpsBusy ? 'Locating…' : t('homeGps')}</span>
+              </button>
+              <select
+                className="location-dropdown"
+                value={selectedUpazila}
+                onChange={(e) => {
+                  setSelectedUpazila(e.target.value);
+                  setGpsStatus(null);
+                }}
+                aria-label="Select upazila"
+              >
+                <option value="">{t('homeSelectUpazila')}</option>
+                {BD_UPAZILAS.map((d) => (
+                  <optgroup key={d.district} label={d.district}>
+                    {d.upazilas.map((u) => (
+                      <option key={`${d.district}-${u}`} value={u}>{u}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+              <span className="location-separator" aria-hidden="true">|</span>
+              <button
+                className="location-skip"
+                onClick={() => setLocationDismissed(true)}
+                type="button"
+                aria-label="Skip location selection"
+              >
+                {t('homeSkip')}
+              </button>
             </div>
           </div>
+        )}
 
-          <div className="stats-divider" />
+        {/* ═══════════════════════════════════════
+           3. QUICK STATS BAR
+           ═══════════════════════════════════════ */}
+        <div className="quick-stats-bar" role="region" aria-label="Key statistics and water risk">
+          <div className="quick-stats-inner">
+            <div className="stat-chips">
+              <div className="stat-chip">
+                <Users size={15} aria-hidden="true" />
+                <span className="stat-chip-value">1.2M+</span>
+                <span className="stat-chip-label">{t('homeStatReached')}</span>
+              </div>
+              <div className="stat-chip">
+                <HomeIcon size={15} aria-hidden="true" />
+                <span className="stat-chip-value">847</span>
+                <span className="stat-chip-label">{t('homeStatShelters')}</span>
+              </div>
+              <div className="stat-chip">
+                <Package size={15} aria-hidden="true" />
+                <span className="stat-chip-value">50K+</span>
+                <span className="stat-chip-label">{t('homeStatPackages')}</span>
+              </div>
+              <div className="stat-chip">
+                <Anchor size={15} aria-hidden="true" />
+                <span className="stat-chip-value">340</span>
+                <span className="stat-chip-label">{t('homeStatRescues')}</span>
+              </div>
+            </div>
 
-          <div className="water-risk-section">
-            <div className="water-risk-label">
-              <Droplets />
-              <span>{t('homeWaterRisk')}</span>
-            </div>
-            <div className="water-risk-item">
-              <span className="water-risk-name">Sunamganj</span>
-              <div className="water-risk-bar">
-                <div className="water-risk-fill risk-fill-extreme" style={{ width: '92%' }} />
+            <div className="stats-divider" aria-hidden="true" />
+
+            <div className="water-risk-section">
+              <div className="water-risk-label">
+                <Droplets size={13} aria-hidden="true" />
+                <span>{t('homeWaterRisk')}</span>
               </div>
-              <span className="water-risk-pct">92%</span>
-            </div>
-            <div className="water-risk-item">
-              <span className="water-risk-name">Sylhet</span>
-              <div className="water-risk-bar">
-                <div className="water-risk-fill risk-fill-high" style={{ width: '78%' }} />
+              <div className="water-risk-item">
+                <span className="water-risk-name">Sunamganj</span>
+                <div className="water-risk-bar">
+                  <div className="water-risk-fill risk-fill-extreme" style={{ width: '92%' }} />
+                </div>
+                <span className="water-risk-pct">92%</span>
               </div>
-              <span className="water-risk-pct">78%</span>
-            </div>
-            <div className="water-risk-item">
-              <span className="water-risk-name">Netrokona</span>
-              <div className="water-risk-bar">
-                <div className="water-risk-fill risk-fill-medium" style={{ width: '61%' }} />
+              <div className="water-risk-item">
+                <span className="water-risk-name">Sylhet</span>
+                <div className="water-risk-bar">
+                  <div className="water-risk-fill risk-fill-high" style={{ width: '78%' }} />
+                </div>
+                <span className="water-risk-pct">78%</span>
               </div>
-              <span className="water-risk-pct">61%</span>
-            </div>
-            <div className="water-risk-item">
-              <span className="water-risk-name">Sirajganj</span>
-              <div className="water-risk-bar">
-                <div className="water-risk-fill risk-fill-low" style={{ width: '44%' }} />
+              <div className="water-risk-item">
+                <span className="water-risk-name">Netrokona</span>
+                <div className="water-risk-bar">
+                  <div className="water-risk-fill risk-fill-medium" style={{ width: '61%' }} />
+                </div>
+                <span className="water-risk-pct">61%</span>
               </div>
-              <span className="water-risk-pct">44%</span>
+              <div className="water-risk-item">
+                <span className="water-risk-name">Sirajganj</span>
+                <div className="water-risk-bar">
+                  <div className="water-risk-fill risk-fill-low" style={{ width: '44%' }} />
+                </div>
+                <span className="water-risk-pct">44%</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ═══════════════════════════════════════
-         4. LIVE TICKER
-         ═══════════════════════════════════════ */}
-      <div className="live-ticker">
-        <span className="live-ticker-text">
-          {t('homeLiveTicker')} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          {t('homeLiveTicker')}
-        </span>
-      </div>
+        {/* ═══════════════════════════════════════
+           4. LIVE TICKER
+           ═══════════════════════════════════════ */}
+        <div className="live-ticker" role="region" aria-label="Live updates">
+          <div className="live-ticker-track">
+            <span className="live-ticker-text">
+              {t('homeLiveTicker')} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              {t('homeLiveTicker')}
+            </span>
+          </div>
+        </div>
 
       {/* ═══════════════════════════════════════
          5. HERO SECTION

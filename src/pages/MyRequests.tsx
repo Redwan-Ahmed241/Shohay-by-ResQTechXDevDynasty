@@ -5,6 +5,7 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
 import { useMyRequests } from '../hooks/queries';
 import { TRACK_STATUS_TEXT } from '../utils/requestStatus';
+import { useLanguage } from '../context/LanguageContext';
 import './MyRequests.css';
 
 const STATUS_COLOR: Record<string, string> = {
@@ -24,6 +25,7 @@ const STATUS_BG: Record<string, string> = {
 
 export const MyRequests: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
+  const { t } = useLanguage();
   const { data: requests = [], isLoading } = useMyRequests(isAuthenticated);
 
   return (
@@ -32,18 +34,18 @@ export const MyRequests: React.FC = () => {
         <div className="myreq-container">
           <div className="myreq-header-row">
             <div>
-              <h1 className="myreq-title">My Requests</h1>
-              <p className="myreq-subtitle">Every assistance request you've submitted while signed in — no tracking ID needed.</p>
+              <h1 className="myreq-title">{t('myReqTitle')}</h1>
+              <p className="myreq-subtitle">{t('myReqSubtitle')}</p>
             </div>
-            <Link to="/get-help" className="myreq-new-btn"><Hand size={14} /> New Request</Link>
+            <Link to="/get-help" className="myreq-new-btn"><Hand size={14} /> {t('myReqNewBtn')}</Link>
           </div>
 
           {isLoading ? (
             <div className="skeleton-loading h-40" />
           ) : requests.length === 0 ? (
             <div className="myreq-empty">
-              <p>You haven't submitted any requests yet{user?.name ? `, ${user.name.split(' ')[0]}` : ''}.</p>
-              <Link to="/get-help" className="myreq-new-btn">Request Assistance</Link>
+              <p>{t('myReqEmpty')}{user?.name ? `, ${user.name.split(' ')[0]}` : ''}.</p>
+              <Link to="/get-help" className="myreq-new-btn">{t('myReqRequestAssistance')}</Link>
             </div>
           ) : (
             <div className="myreq-cards-stack">

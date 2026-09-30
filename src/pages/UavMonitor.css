@@ -232,10 +232,11 @@
 }
 
 .uav-video-stat span {
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  line-height: 1.4;
 }
 
 .uav-video-stat b {

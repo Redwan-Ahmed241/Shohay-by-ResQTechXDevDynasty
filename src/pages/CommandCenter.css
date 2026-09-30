@@ -81,9 +81,10 @@
 
 .cc-stat-label {
   font-family: var(--font-family);
-  font-size: 10px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 700;
   letter-spacing: 0.5px;
+  line-height: 1.4;
 }
 
 .cc-stat-value {
@@ -96,8 +97,10 @@
 
 .cc-stat-sub {
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   margin-top: 4px;
+  line-height: 1.45;
+  color: #475569;
 }
 
 /* 4 Secondary Stat Cards Row */
@@ -124,9 +127,10 @@
 
 .sec-stat-lbl {
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   color: #64748b;
   margin-top: 4px;
+  line-height: 1.45;
 }
 
 .text-amber { color: #d97706; }
@@ -186,9 +190,10 @@
   justify-content: center;
   gap: 16px;
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   color: #64748b;
   margin-top: 12px;
+  line-height: 1.45;
 }
 
 .legend-item {
@@ -226,6 +231,7 @@
   font-weight: 700;
   color: #0f172a;
   margin: 0 0 12px 0;
+  line-height: 1.4;
 }
 
 .cc-bullet-list {
@@ -238,12 +244,13 @@
   font-family: var(--font-family);
   font-size: 13px;
   color: #475569;
+  line-height: 1.45;
 }
 
 .cc-bullet-list li::before {
   content: '■ ';
   color: #cbd5e1;
-  font-size: 10px;
+  font-size: var(--font-size-xs, 12px);
 }
 
 @media (max-width: 900px) {
@@ -286,6 +293,7 @@
   background: #ffffff;
   color: #475569;
   cursor: pointer;
+  line-height: 1.45;
   transition: all 0.15s ease;
 }
 
@@ -318,12 +326,13 @@
 .cc-interactive-table th {
   background: #f8fafc;
   padding: 12px 16px;
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 700;
   text-transform: uppercase;
   color: #64748b;
   letter-spacing: 0.05em;
   border-bottom: 1px solid #e2e8f0;
+  line-height: 1.45;
 }
 
 .cc-interactive-table td {
@@ -331,6 +340,7 @@
   border-bottom: 1px solid #f1f5f9;
   color: #1e293b;
   vertical-align: middle;
+  line-height: 1.45;
 }
 
 .cc-interactive-table tr:hover {
@@ -339,22 +349,24 @@
 
 .req-badge-type {
   display: inline-block;
-  padding: 2px 8px;
-  font-size: 11px;
+  padding: 3px 8px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 600;
   border-radius: 4px;
   background: #eff6ff;
   color: #1e40af;
   margin-right: 4px;
   margin-bottom: 2px;
+  line-height: 1.45;
 }
 
 .req-status-pill {
   display: inline-block;
   padding: 4px 10px;
-  font-size: 11px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 700;
   border-radius: 20px;
+  line-height: 1.45;
 }
 
 .req-status-pending { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
@@ -370,8 +382,8 @@
 }
 
 .btn-table-action {
-  padding: 5px 10px;
-  font-size: 11px;
+  padding: 6px 12px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 600;
   border-radius: 4px;
   cursor: pointer;
@@ -379,6 +391,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  line-height: 1.45;
 }
 
 .btn-action-verify { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
@@ -417,6 +430,7 @@
   font-weight: 700;
   color: #0f172a;
   margin: 0 0 2px 0;
+  line-height: 1.4;
 }
 
 .vol-dir-contact {
@@ -426,6 +440,7 @@
   align-items: center;
   gap: 6px;
   margin-top: 4px;
+  line-height: 1.4;
 }
 
 .vol-skills-wrap {
@@ -438,10 +453,11 @@
 .vol-skill-tag {
   background: #f1f5f9;
   color: #334155;
-  font-size: 10px;
+  font-size: var(--font-size-xs, 12px);
   font-weight: 600;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 4px;
+  line-height: 1.45;
 }
 
 /* Modal */
