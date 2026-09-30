@@ -157,6 +157,50 @@
   gap: 8px;
 }
 
+.amenities-checkboxes .checkbox-container {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.amenities-checkboxes .checkbox-container:hover {
+  background-color: #f1f5f9;
+}
+
+.amenities-checkboxes .checkbox-container .checkbox-label {
+  color: #475569;
+}
+
+.amenities-checkboxes .checkbox-container:hover .checkbox-label {
+  color: #0f172a !important;
+}
+
+.amenities-checkboxes .checkbox-container .checkbox-icon {
+  color: #64748b;
+}
+
+.amenities-checkboxes .checkbox-container:hover .checkbox-icon {
+  color: #006a4e !important;
+}
+
+.amenities-checkboxes .checkbox-box {
+  background-color: #ffffff;
+  border: 1.5px solid #cbd5e1;
+}
+
+.amenities-checkboxes .checkbox-container:hover .checkbox-box {
+  border-color: #006a4e;
+}
+
+.amenities-checkboxes .checkbox-input:checked + .checkbox-box {
+  background-color: #006a4e;
+  border-color: #006a4e;
+  color: #ffffff;
+}
+
 /* Right Main List */
 .shelters-main-list {
   display: flex;
