@@ -40,12 +40,12 @@ export const GetHelp: React.FC = () => {
 
   // Form State
   const [selectedTypes, setSelectedTypes] = useState<AssistanceType[]>([]);
-  const [householdSize, setHouseholdSize] = useState<number>(4);
-  const [vulnerable, setVulnerable] = useState({
-    children: 0,
-    elderly: 0,
-    pregnant: 0,
-    disabled: 0
+  const [householdSizeInput, setHouseholdSizeInput] = useState<string>('');
+  const [vulnerableInput, setVulnerableInput] = useState({
+    children: '',
+    elderly: '',
+    pregnant: '',
+    disabled: ''
   });
   const [location, setLocation] = useState({
     district: '',
@@ -133,13 +133,18 @@ export const GetHelp: React.FC = () => {
     }));
   };
 
-  const vulnerableSum =
-    (vulnerable.children || 0) +
-    (vulnerable.elderly || 0) +
-    (vulnerable.pregnant || 0) +
-    (vulnerable.disabled || 0);
+  const householdSize = householdSizeInput.trim() === '' ? 0 : parseInt(householdSizeInput, 10) || 0;
+  const vulnerable = {
+    children: vulnerableInput.children.trim() === '' ? 0 : parseInt(vulnerableInput.children, 10) || 0,
+    elderly: vulnerableInput.elderly.trim() === '' ? 0 : parseInt(vulnerableInput.elderly, 10) || 0,
+    pregnant: vulnerableInput.pregnant.trim() === '' ? 0 : parseInt(vulnerableInput.pregnant, 10) || 0,
+    disabled: vulnerableInput.disabled.trim() === '' ? 0 : parseInt(vulnerableInput.disabled, 10) || 0
+  };
 
-  const isHouseholdIllogical = vulnerableSum > householdSize;
+  const vulnerableSum =
+    vulnerable.children + vulnerable.elderly + vulnerable.pregnant + vulnerable.disabled;
+
+  const isHouseholdIllogical = householdSize > 0 && vulnerableSum > householdSize;
 
   const handleNextStep = (targetStep?: number) => {
     setSubmitError(null);
@@ -151,8 +156,8 @@ export const GetHelp: React.FC = () => {
         return;
       }
       if (currentStep === 2) {
-        if (householdSize < 1) {
-          setSubmitError('Household size must be at least 1 person.');
+        if (householdSizeInput.trim() === '' || householdSize < 1) {
+          setSubmitError('Please enter the total number of people in your household.');
           return;
         }
         if (vulnerableSum > householdSize) {
@@ -194,7 +199,7 @@ export const GetHelp: React.FC = () => {
   // Returns the step to fix and why, or null when the request can be sent.
   const findMissing = (): { step: number; message: string } | null => {
     if (selectedTypes.length === 0) return { step: 1, message: 'Choose at least one kind of help you need.' };
-    if (householdSize < 1) return { step: 2, message: 'Household size must be at least 1 person.' };
+    if (householdSizeInput.trim() === '' || householdSize < 1) return { step: 2, message: 'Please enter the total number of people in your household.' };
     if (vulnerableSum > householdSize) {
       return {
         step: 2,
@@ -312,44 +317,62 @@ export const GetHelp: React.FC = () => {
 
                     <Input
                       label={t('totalPeopleHousehold')}
-                      type="number"
-                      min={1}
-                      value={householdSize}
-                      onChange={(e) => setHouseholdSize(Math.max(1, parseInt(e.target.value) || 1))}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      placeholder="Enter total people in household (e.g. 4)"
+                      value={householdSizeInput}
+                      onChange={(e) => setHouseholdSizeInput(e.target.value.replace(/\D/g, ''))}
                       className={isHouseholdIllogical ? 'has-error' : ''}
                     />
 
                     <div className="vulnerable-counters-grid grid-2 gap-4 mt-2">
                       <Input
                         label={t('childrenUnder12')}
-                        type="number"
-                        min={0}
-                        value={vulnerable.children}
-                        onChange={(e) => setVulnerable({ ...vulnerable, children: Math.max(0, parseInt(e.target.value) || 0) })}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        placeholder="0"
+                        value={vulnerableInput.children}
+                        onChange={(e) =>
+                          setVulnerableInput({ ...vulnerableInput, children: e.target.value.replace(/\D/g, '') })
+                        }
                         className={isHouseholdIllogical ? 'has-error' : ''}
                       />
                       <Input
                         label={t('elderly60')}
-                        type="number"
-                        min={0}
-                        value={vulnerable.elderly}
-                        onChange={(e) => setVulnerable({ ...vulnerable, elderly: Math.max(0, parseInt(e.target.value) || 0) })}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        placeholder="0"
+                        value={vulnerableInput.elderly}
+                        onChange={(e) =>
+                          setVulnerableInput({ ...vulnerableInput, elderly: e.target.value.replace(/\D/g, '') })
+                        }
                         className={isHouseholdIllogical ? 'has-error' : ''}
                       />
                       <Input
                         label={t('pregnantWomen')}
-                        type="number"
-                        min={0}
-                        value={vulnerable.pregnant}
-                        onChange={(e) => setVulnerable({ ...vulnerable, pregnant: Math.max(0, parseInt(e.target.value) || 0) })}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        placeholder="0"
+                        value={vulnerableInput.pregnant}
+                        onChange={(e) =>
+                          setVulnerableInput({ ...vulnerableInput, pregnant: e.target.value.replace(/\D/g, '') })
+                        }
                         className={isHouseholdIllogical ? 'has-error' : ''}
                       />
                       <Input
                         label={t('disabledSpecialCare')}
-                        type="number"
-                        min={0}
-                        value={vulnerable.disabled}
-                        onChange={(e) => setVulnerable({ ...vulnerable, disabled: Math.max(0, parseInt(e.target.value) || 0) })}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        placeholder="0"
+                        value={vulnerableInput.disabled}
+                        onChange={(e) =>
+                          setVulnerableInput({ ...vulnerableInput, disabled: e.target.value.replace(/\D/g, '') })
+                        }
                         className={isHouseholdIllogical ? 'has-error' : ''}
                       />
                     </div>
@@ -390,7 +413,7 @@ export const GetHelp: React.FC = () => {
                             cursor: 'pointer'
                           }}
                           onClick={() => {
-                            setHouseholdSize(vulnerableSum);
+                            setHouseholdSizeInput(String(vulnerableSum));
                             setSubmitError(null);
                           }}
                         >
