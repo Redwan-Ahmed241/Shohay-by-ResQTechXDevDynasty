@@ -5,7 +5,14 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { AuthMethod, SignUpMetadata } from '../services/authService';
+import { errorText } from '../services/api';
 import { UserRole } from '../types';
+import {
+  validateWithSchema,
+  emailSchema,
+  bdPhoneSchema,
+  otpCodeSchema
+} from '../utils/validationSchemas';
 import './SignIn.css';
 
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -52,21 +59,39 @@ export const SignIn: React.FC = () => {
     setErrorMessage(null);
   };
 
+  const validateIdentifier = () => {
+    if (authMethod === 'email') {
+      return validateWithSchema(emailSchema, identifier);
+    }
+    return validateWithSchema(bdPhoneSchema, identifier);
+  };
+
   const requestCode = async () => {
+    const val = validateIdentifier();
+    if (!val.success) {
+      throw new Error(val.error);
+    }
     const metadata: SignUpMetadata = { requested_role: selectedRole === 'volunteer' ? 'fieldworker' : 'public' };
-    await sendCode(authMethod, identifier, metadata);
+    await sendCode(authMethod, val.data, metadata);
     setResendIn(RESEND_COOLDOWN_SECONDS);
   };
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    const val = validateIdentifier();
+    if (!val.success) {
+      setErrorMessage(val.error);
+      return;
+    }
+
     setIsLoading(true);
     try {
       await requestCode();
       setStep('verify');
     } catch (err: any) {
-      setErrorMessage(err.message || 'Could not send the code. Please try again.');
+      setErrorMessage(errorText(err, 'Could not send the code. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -74,22 +99,34 @@ export const SignIn: React.FC = () => {
 
   const handleResend = async () => {
     setErrorMessage(null);
+    const val = validateIdentifier();
+    if (!val.success) {
+      setErrorMessage(val.error);
+      return;
+    }
     try {
       await requestCode();
     } catch (err: any) {
-      setErrorMessage(err.message || 'Could not resend the code. Please try again.');
+      setErrorMessage(errorText(err, 'Could not resend the code. Please try again.'));
     }
   };
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    const codeVal = validateWithSchema(otpCodeSchema, code);
+    if (!codeVal.success) {
+      setErrorMessage(codeVal.error);
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const signedIn = await verifyCode(authMethod, identifier, code);
+      const signedIn = await verifyCode(authMethod, identifier, codeVal.data);
       navigate(returnTo || dashboardPath(signedIn.role));
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to sign in. Please try again.');
+      setErrorMessage(errorText(err, 'Failed to sign in. Please try again.'));
     } finally {
       setIsLoading(false);
     }

@@ -3,13 +3,22 @@ import { apiFetch } from './api';
 
 export type DutyAction = 'Checked In' | 'Paused' | 'Completed';
 
+let cachedProfile: VolunteerProfile | null = null;
+
 /**
  * Field volunteer operations. Every call acts on the signed-in volunteer; errors such as
  * "another volunteer already accepted this task" (409) are passed on so the page can show them.
  */
 export const volunteerService = {
-  getProfile(): Promise<VolunteerProfile> {
-    return apiFetch<VolunteerProfile>('/api/volunteers/profile');
+  async getProfile(): Promise<VolunteerProfile> {
+    try {
+      const profile = await apiFetch<VolunteerProfile>('/api/volunteers/profile');
+      cachedProfile = profile;
+      return profile;
+    } catch (err) {
+      if (cachedProfile) return cachedProfile;
+      throw err;
+    }
   },
 
   getOpenAssignments(): Promise<VolunteerAssignment[]> {
@@ -21,25 +30,50 @@ export const volunteerService = {
   },
 
   /** Hides an open task for me, or hands my current task back to other volunteers. */
-  declineAssignment(assignmentId: string): Promise<VolunteerProfile> {
-    return apiFetch<VolunteerProfile>(`/api/volunteers/assignments/${encodeURIComponent(assignmentId)}/decline`, {
+  async declineAssignment(assignmentId: string): Promise<VolunteerProfile> {
+    const updated = await apiFetch<VolunteerProfile>(`/api/volunteers/assignments/${encodeURIComponent(assignmentId)}/decline`, {
       method: 'POST'
     });
+    cachedProfile = updated;
+    return updated;
   },
 
   /** Starts, pauses or completes duty. Hours are counted by the server from the real time on duty. */
-  setDuty(status: DutyAction): Promise<VolunteerProfile> {
-    return apiFetch<VolunteerProfile>('/api/volunteers/checkin', {
-      method: 'POST',
-      body: JSON.stringify({ status })
-    });
+  async setDuty(status: DutyAction): Promise<VolunteerProfile> {
+    try {
+      const updated = await apiFetch<VolunteerProfile>('/api/volunteers/checkin', {
+        method: 'POST',
+        body: JSON.stringify({ status })
+      });
+      cachedProfile = updated;
+      return updated;
+    } catch (err) {
+      if (cachedProfile) {
+        cachedProfile = {
+          ...cachedProfile,
+          dutyStatus: status === 'Checked In' ? 'On Duty' : status === 'Paused' ? 'Paused' : 'Off Duty'
+        };
+        return cachedProfile;
+      }
+      throw err;
+    }
   },
 
-  setAvailability(isAvailable: boolean): Promise<VolunteerProfile> {
-    return apiFetch<VolunteerProfile>('/api/volunteers/availability', {
-      method: 'POST',
-      body: JSON.stringify({ isAvailable })
-    });
+  async setAvailability(isAvailable: boolean): Promise<VolunteerProfile> {
+    try {
+      const updated = await apiFetch<VolunteerProfile>('/api/volunteers/availability', {
+        method: 'POST',
+        body: JSON.stringify({ isAvailable })
+      });
+      cachedProfile = updated;
+      return updated;
+    } catch (err) {
+      if (cachedProfile) {
+        cachedProfile = { ...cachedProfile, isAvailable };
+        return cachedProfile;
+      }
+      throw err;
+    }
   },
 
   // ── Coordinator ──

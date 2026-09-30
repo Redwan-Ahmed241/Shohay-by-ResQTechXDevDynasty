@@ -4,8 +4,9 @@ import { ArrowLeft, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useCampaigns } from '../hooks/queries';
 import { donationService } from '../services/donationService';
-import { ApiError } from '../services/api';
+import { errorText } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import { validateWithSchema, donationPayloadSchema } from '../utils/validationSchemas';
 import './Donate.css';
 
 const PRESET_AMOUNTS = [500, 1000, 2500, 5000];
@@ -27,20 +28,27 @@ export const Donate: React.FC = () => {
     e.preventDefault();
     if (!id) return;
     setError(null);
+
+    const validation = validateWithSchema(donationPayloadSchema, {
+      campaignId: id,
+      amount,
+      donorName: donorName.trim(),
+      donorEmail: donorEmail.trim(),
+      donorPhone: donorPhone.trim()
+    });
+    if (!validation.success) {
+      setError(validation.error);
+      return;
+    }
+
     setBusy(true);
     try {
-      const { gatewayUrl } = await donationService.initDonation({
-        campaignId: id,
-        amount,
-        donorName,
-        donorEmail,
-        donorPhone
-      });
+      const { gatewayUrl } = await donationService.initDonation(validation.data);
       // Full browser redirect — this leaves the app for SSLCommerz's real hosted checkout.
       window.location.href = gatewayUrl;
     } catch (err) {
       setBusy(false);
-      setError(err instanceof ApiError ? err.message : 'Could not start the payment. Check your connection and try again.');
+      setError(errorText(err, 'Could not start the payment. Check your connection and try again.'));
     }
   };
 

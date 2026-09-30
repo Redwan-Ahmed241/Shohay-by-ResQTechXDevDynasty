@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Clock, CheckCircle, Plus, X } from 'lucide-react';
+import { Clock, Plus, X } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
 import { useFlash } from '../hooks/useFlash';
 import { useAlerts } from '../hooks/queries';
 import { alertService } from '../services/alertService';
-import { ApiError } from '../services/api';
+import { errorText } from '../services/api';
 import { SeverityLevel } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import './CommandCenter.css';
@@ -62,7 +62,7 @@ export const Alerts: React.FC = () => {
       setForm(EMPTY_ALERT);
       flash('ok', 'Alert published.');
     } catch (err) {
-      flash('error', err instanceof ApiError ? err.message : 'Could not publish the alert.');
+      flash('error', errorText(err, 'Could not publish the alert. Please try again.'));
     } finally {
       setBusy(false);
     }

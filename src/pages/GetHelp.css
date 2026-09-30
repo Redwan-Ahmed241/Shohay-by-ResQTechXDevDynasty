@@ -278,3 +278,32 @@
     padding: 20px 12px 60px 12px;
   }
 }
+
+/* High-visibility input styling inside get-help-card */
+.get-help-card .input-group .input-label {
+  color: #334155 !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+.get-help-card .input-field,
+.get-help-card select.select-field {
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  font-size: 14px !important;
+  border-radius: 6px !important;
+}
+
+.get-help-card .input-field:focus,
+.get-help-card select.select-field:focus {
+  border-color: #006a4e !important;
+  box-shadow: 0 0 0 3px rgba(0, 106, 78, 0.15) !important;
+  outline: none !important;
+}
+
+.get-help-card .input-field.has-error {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2 !important;
+}
+

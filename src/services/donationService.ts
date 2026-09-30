@@ -1,4 +1,5 @@
 import { apiFetch } from './api';
+import { donationPayloadSchema, assertValid } from '../utils/validationSchemas';
 
 export interface DonationInitInput {
   campaignId: string;
@@ -25,16 +26,17 @@ export interface DonationStatus {
 }
 
 export const donationService = {
-  /** Opens a real SSLCommerz payment session and returns its hosted checkout URL. */
+  /** Opens a real SSLCommerz payment session after strict schema validation. */
   async initDonation(input: DonationInitInput): Promise<DonationInitResult> {
+    const validated = assertValid(donationPayloadSchema, input);
     return apiFetch<DonationInitResult>('/api/donations/init', {
       method: 'POST',
       body: JSON.stringify({
-        campaignId: input.campaignId,
-        amount: input.amount,
-        donorName: input.donorName,
-        donorEmail: input.donorEmail,
-        donorPhone: input.donorPhone,
+        campaignId: validated.campaignId,
+        amount: validated.amount,
+        donorName: validated.donorName,
+        donorEmail: validated.donorEmail,
+        donorPhone: validated.donorPhone,
         returnOrigin: window.location.origin
       })
     });

@@ -8,7 +8,7 @@ import { useFlash } from '../hooks/useFlash';
 import { useVideoOverlay } from '../hooks/useVideoOverlay';
 import { uavService } from '../services/uavService';
 import { volunteerService } from '../services/volunteerService';
-import { ApiError } from '../services/api';
+import { errorText } from '../services/api';
 import { UavDetection, UavDrone, UavLogEntry, UavRescuerAssignment, VolunteerDirectoryEntry } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import './CommandCenter.css';
@@ -16,10 +16,6 @@ import './UavMonitor.css';
 
 const DETECTION_POLL_MS = 5_000;
 const DRONE_POLL_MS = 15_000;
-
-function errorText(err: unknown): string {
-  return err instanceof ApiError ? err.message : 'Could not reach the Shohay server.';
-}
 
 /** Direct video files can be embedded; RTSP/live-page URLs can't play in a plain <video> tag. */
 function isDirectVideoUrl(url?: string | null): boolean {

@@ -18,7 +18,7 @@ import { useAuth } from '../context/AuthContext';
 import { useFlash } from '../hooks/useFlash';
 import { useShelters, useShelterSummary } from '../hooks/queries';
 import { shelterService } from '../services/shelterService';
-import { ApiError } from '../services/api';
+import { errorText } from '../services/api';
 import { ShelterStatus, ShelterCategory } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import './CommandCenter.css';
@@ -69,7 +69,7 @@ export const Shelters: React.FC = () => {
       setForm(EMPTY_SHELTER);
       flash('ok', 'Shelter added.');
     } catch (err) {
-      flash('error', err instanceof ApiError ? err.message : 'Could not add the shelter.');
+      flash('error', errorText(err, 'Could not add the shelter. Please try again.'));
     } finally {
       setBusy(false);
     }

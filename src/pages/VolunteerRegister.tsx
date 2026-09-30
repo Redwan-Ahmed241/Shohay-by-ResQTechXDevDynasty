@@ -3,10 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { CheckCircle, ArrowLeft } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { Checkbox } from '../components/ui/Checkbox';
+import { Select } from '../components/ui/Select';
 import { StepIndicator } from '../components/ui/StepIndicator';
 import { useAuth } from '../context/AuthContext';
 import { VolunteerSignupData } from '../services/authService';
+import { errorText } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import { BD_UPAZILAS } from '../data/upazilas';
+import {
+  validateWithSchema,
+  personNameSchema,
+  bdPhoneSchema,
+  emailSchema,
+  otpCodeSchema,
+  districtSchema,
+  volunteerSignupSchema
+} from '../utils/validationSchemas';
 import './VolunteerRegister.css';
 
 export const VolunteerRegister: React.FC = () => {
@@ -69,21 +81,82 @@ export const VolunteerRegister: React.FC = () => {
   };
 
   const completeRegistration = async () => {
-    const registeredUser = await registerVolunteer(buildSignupData());
+    const data = buildSignupData();
+    const val = validateWithSchema(volunteerSignupSchema, data);
+    if (!val.success) {
+      setErrorMessage(val.error);
+      return;
+    }
+    const registeredUser = await registerVolunteer(val.data);
     setAssignedId(registeredUser.id);
     setIsCompleted(true);
   };
 
   // Signed-in users register straight away; everyone else first verifies their email with a code.
+  const handleNextStep = () => {
+    setErrorMessage(null);
+    if (currentStep === 1) {
+      const fnVal = validateWithSchema(personNameSchema, formData.firstName);
+      if (!fnVal.success) {
+        setErrorMessage(`First name: ${fnVal.error}`);
+        return;
+      }
+      const lnVal = validateWithSchema(personNameSchema, formData.lastName);
+      if (!lnVal.success) {
+        setErrorMessage(`Last name: ${lnVal.error}`);
+        return;
+      }
+      if (formData.mobile.trim()) {
+        const phoneVal = validateWithSchema(bdPhoneSchema, formData.mobile);
+        if (!phoneVal.success) {
+          setErrorMessage(phoneVal.error);
+          return;
+        }
+      }
+      if (!isAuthenticated) {
+        const emailVal = validateWithSchema(emailSchema, formData.email);
+        if (!emailVal.success) {
+          setErrorMessage(emailVal.error);
+          return;
+        }
+      }
+    } else if (currentStep === 2) {
+      const anySkill = Object.values(formData.skills).some(Boolean);
+      if (!anySkill) {
+        setErrorMessage('Please select at least one skill.');
+        return;
+      }
+    } else if (currentStep === 3) {
+      if (formData.district.trim()) {
+        const distVal = validateWithSchema(districtSchema, formData.district);
+        if (!distVal.success) {
+          setErrorMessage(distVal.error);
+          return;
+        }
+      }
+    }
+    setCurrentStep((prev) => Math.min(prev + 1, 3));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    const email = formData.email.trim();
-    if (!formData.firstName.trim() || !formData.lastName.trim() || (!isAuthenticated && !email)) {
-      setErrorMessage('Please enter your first name, last name and email address.');
-      setCurrentStep(1);
+    const signupData = buildSignupData();
+    const valResult = validateWithSchema(volunteerSignupSchema, signupData);
+    if (!valResult.success) {
+      setErrorMessage(valResult.error);
       return;
+    }
+
+    const email = formData.email.trim();
+    if (!isAuthenticated) {
+      const emailVal = validateWithSchema(emailSchema, email);
+      if (!emailVal.success) {
+        setErrorMessage(emailVal.error);
+        setCurrentStep(1);
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -100,7 +173,7 @@ export const VolunteerRegister: React.FC = () => {
         setAwaitingCode(true);
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Registration failed. Please try again.');
+      setErrorMessage(errorText(err, 'Registration failed. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -109,12 +182,19 @@ export const VolunteerRegister: React.FC = () => {
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    const codeVal = validateWithSchema(otpCodeSchema, code);
+    if (!codeVal.success) {
+      setErrorMessage(codeVal.error);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await verifyCode('email', formData.email.trim(), code);
+      await verifyCode('email', formData.email.trim(), codeVal.data);
       await completeRegistration();
     } catch (err: any) {
-      setErrorMessage(err.message || 'Verification failed. Please try again.');
+      setErrorMessage(errorText(err, 'Verification failed. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -131,13 +211,40 @@ export const VolunteerRegister: React.FC = () => {
 
           {/* Stepper Bar */}
           <div className="register-stepper-box">
-            <StepIndicator steps={steps} currentStep={currentStep} onStepClick={(s) => setCurrentStep(s)} />
+            <StepIndicator
+              steps={steps}
+              currentStep={currentStep}
+              onStepClick={(s) => {
+                if (s > currentStep) {
+                  handleNextStep();
+                } else {
+                  setCurrentStep(s);
+                }
+              }}
+            />
           </div>
 
           {/* Card Box */}
           <div className="vol-register-card">
             {errorMessage && !isCompleted && (
-              <div className="register-error-box" role="alert">{errorMessage}</div>
+              <div className="register-error-box" role="alert">
+                <div>{errorMessage}</div>
+                {errorMessage.toLowerCase().includes('too many codes') && !awaitingCode && (
+                  <div style={{ marginTop: '8px' }}>
+                    <button
+                      type="button"
+                      className="btn-outline-subtle"
+                      style={{ fontSize: '12px', padding: '4px 10px', background: '#fff' }}
+                      onClick={() => {
+                        setErrorMessage(null);
+                        setAwaitingCode(true);
+                      }}
+                    >
+                      Already received a code in your email? Enter it here
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
 
             {isCompleted ? (
@@ -185,7 +292,17 @@ export const VolunteerRegister: React.FC = () => {
                 </div>
               </form>
             ) : (
-              <form onSubmit={handleSubmit}>
+              <form
+                onSubmit={handleSubmit}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    if (currentStep < 3) {
+                      e.preventDefault();
+                      handleNextStep();
+                    }
+                  }
+                }}
+              >
                 {/* Step 1: Basic Information */}
                 {currentStep === 1 && (
                   <div className="step-content-stack">
@@ -307,12 +424,16 @@ export const VolunteerRegister: React.FC = () => {
                     <h2 className="step-card-title">{t('availabilityDistrictTitle')}</h2>
 
                     <div className="field-group-item">
-                      <label className="field-label-text">{t('primaryOperatingDistrict')}</label>
-                      <input
-                        type="text"
-                        className="form-input-field"
+                      <Select
+                        label={t('primaryOperatingDistrict')}
                         value={formData.district}
                         onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                        options={[
+                          { label: '-- Select Operating District --', value: '' },
+                          ...BD_UPAZILAS.map((d) => d.district)
+                            .sort((a, b) => a.localeCompare(b))
+                            .map((dist) => ({ label: dist, value: dist }))
+                        ]}
                         required
                       />
                     </div>
@@ -344,14 +465,34 @@ export const VolunteerRegister: React.FC = () => {
                     <button
                       type="button"
                       className="btn-navy-primary"
-                      onClick={() => setCurrentStep(currentStep + 1)}
+                      onClick={handleNextStep}
                     >
                       {t('nextBtn')}
                     </button>
                   ) : (
-                    <button type="submit" className="btn-green-submit" disabled={isSubmitting}>
-                      {isSubmitting ? 'Sending code...' : t('completeRegistrationBtn')}
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      {!isAuthenticated && (
+                        <button
+                          type="button"
+                          className="btn-outline-subtle"
+                          style={{ fontSize: '12px', padding: '8px 14px' }}
+                          onClick={() => {
+                            if (!formData.email.trim()) {
+                              setErrorMessage('Please enter your email first in step 1.');
+                              setCurrentStep(1);
+                              return;
+                            }
+                            setErrorMessage(null);
+                            setAwaitingCode(true);
+                          }}
+                        >
+                          Already have a code?
+                        </button>
+                      )}
+                      <button type="submit" className="btn-green-submit" disabled={isSubmitting}>
+                        {isSubmitting ? 'Sending code...' : t('completeRegistrationBtn')}
+                      </button>
+                    </div>
                   )}
                 </div>
               </form>
