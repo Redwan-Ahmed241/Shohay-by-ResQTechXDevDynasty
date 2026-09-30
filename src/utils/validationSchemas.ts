@@ -84,7 +84,7 @@ export const locationSchema = z
   .object({
     district: districtSchema,
     upazila: upazilaSchema,
-    union: z.string().max(100, 'Union/Ward cannot exceed 100 characters').default(''),
+    union: z.string().max(100, 'Union/Ward cannot exceed 100 characters'),
     address: z.string().max(300, 'Address cannot exceed 300 characters'),
     landmark: z.string().max(150, 'Landmark cannot exceed 150 characters').optional(),
     gpsCoords: z
@@ -112,7 +112,7 @@ export const contactSchema = z
         (val) => !val || val.trim() === '' || bdPhoneSchema.safeParse(val).success,
         { message: 'Alternative phone must be a valid Bangladeshi mobile number' }
       ),
-    isAnonymous: z.boolean().default(false)
+    isAnonymous: z.boolean()
   })
   .refine(
     (c) => c.isAnonymous || (c.name && c.name.trim().length >= 2),
@@ -194,7 +194,7 @@ export const volunteerSignupSchema = z.object({
     }),
   district: districtSchema.optional(),
   skills: z.array(z.string().min(1)).min(1, 'Please select at least one skill'),
-  equipment: z.array(z.string()).default([])
+  equipment: z.array(z.string())
 });
 
 export const donationPayloadSchema = z.object({
