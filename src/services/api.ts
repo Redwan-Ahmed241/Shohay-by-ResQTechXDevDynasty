@@ -96,11 +96,15 @@ export async function apiFetch<T>(endpoint: string, options?: RequestInit): Prom
 
   const send = async (baseUrl: string): Promise<T> => {
     const url = `${baseUrl}${cleanEndpoint}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
     try {
-      const response = await fetch(url, { ...options, headers });
+      const response = await fetch(url, { ...options, headers, signal: controller.signal });
+      clearTimeout(timeoutId);
       if (!response.ok) throw await toApiError(response, cleanEndpoint);
       return (response.status === 204 ? undefined : await response.json()) as T;
     } catch (error) {
+      clearTimeout(timeoutId);
       if (isNetworkError(error)) {
         logErrorDetails(`Network fetch failed for ${url}`, error);
       }

@@ -104,11 +104,26 @@ export const VolunteerDashboard: React.FC = () => {
       flash('ok', 'Task handed back to other volunteers.');
     });
 
-  const handleAvailability = () =>
-    profile &&
+  const handleAvailability = () => {
+    if (!profile) return;
+    const previousState = profile.isAvailable;
+    const nextState = !previousState;
+
+    // 1. Instant optimistic update (0ms latency UI response)
+    setProfile((prev) => (prev ? { ...prev, isAvailable: nextState } : prev));
+
+    // 2. Background sync
     run('availability', async () => {
-      setProfile(await volunteerService.setAvailability(!profile.isAvailable));
+      try {
+        const updated = await volunteerService.setAvailability(nextState);
+        setProfile(updated);
+      } catch (err) {
+        // Revert on failure
+        setProfile((prev) => (prev ? { ...prev, isAvailable: previousState } : prev));
+        throw err;
+      }
     });
+  };
 
   const handleAcknowledge = (det: UavDetection) =>
     run(`ack-${det.id}`, async () => {
@@ -180,11 +195,22 @@ export const VolunteerDashboard: React.FC = () => {
                 type="button"
                 className="profile-status-right"
                 onClick={handleAvailability}
-                disabled={busy === 'availability'}
-                style={{ cursor: 'pointer', background: 'none', border: 'none' }}
                 aria-label="Toggle availability for new tasks"
+                style={{ cursor: 'pointer', background: 'none', border: 'none' }}
               >
-                <span className={profile.isAvailable ? 'badge-available' : 'badge-in-progress'} style={{ background: profile.isAvailable ? '#ecfdf5' : '#fef3c7', color: profile.isAvailable ? '#065f46' : '#92400e', border: profile.isAvailable ? '1px solid #10b981' : '1px solid #f59e0b' }}>
+                <span
+                  className={profile.isAvailable ? 'badge-available' : 'badge-in-progress'}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: profile.isAvailable ? '#ecfdf5' : '#fef3c7',
+                    color: profile.isAvailable ? '#065f46' : '#92400e',
+                    border: profile.isAvailable ? '1px solid #10b981' : '1px solid #f59e0b',
+                    transition: 'all 0.15s ease-in-out'
+                  }}
+                >
+                  {busy === 'availability' && <Loader2 size={12} className="animate-spin" />}
                   {profile.isAvailable ? '● Available' : '○ On Break'}
                 </span>
                 <span className="toggle-hint">{t('volTapToToggle')}</span>
