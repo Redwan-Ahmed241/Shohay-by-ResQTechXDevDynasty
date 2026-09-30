@@ -55,21 +55,6 @@ export const GetHelp: React.FC = () => {
     landmark: '',
     gpsCoords: ''
   });
-
-  // District & Upazila options extracted from BD_UPAZILAS dataset
-  const districtList = BD_UPAZILAS.map((d) => d.district).sort((a, b) => a.localeCompare(b));
-  const selectedDistrictData = BD_UPAZILAS.find((d) => d.district.toLowerCase() === location.district.toLowerCase());
-  const upazilaList = selectedDistrictData
-    ? selectedDistrictData.upazilas.slice().sort((a, b) => a.localeCompare(b))
-    : [];
-
-  const handleDistrictSelect = (districtName: string) => {
-    setLocation((prev) => ({
-      ...prev,
-      district: districtName,
-      upazila: '' // Reset upazila when district changes
-    }));
-  };
   const [contact, setContact] = useState({
     name: '',
     phone: '',
@@ -133,10 +118,89 @@ export const GetHelp: React.FC = () => {
     );
   };
 
+  // District & Upazila options extracted from BD_UPAZILAS dataset
+  const districtList = BD_UPAZILAS.map((d) => d.district).sort((a, b) => a.localeCompare(b));
+  const selectedDistrictData = BD_UPAZILAS.find((d) => d.district.toLowerCase() === location.district.toLowerCase());
+  const upazilaList = selectedDistrictData
+    ? selectedDistrictData.upazilas.slice().sort((a, b) => a.localeCompare(b))
+    : [];
+
+  const handleDistrictSelect = (districtName: string) => {
+    setLocation((prev) => ({
+      ...prev,
+      district: districtName,
+      upazila: '' // Reset upazila when district changes
+    }));
+  };
+
+  const vulnerableSum =
+    (vulnerable.children || 0) +
+    (vulnerable.elderly || 0) +
+    (vulnerable.pregnant || 0) +
+    (vulnerable.disabled || 0);
+
+  const isHouseholdIllogical = vulnerableSum > householdSize;
+
+  const handleNextStep = (targetStep?: number) => {
+    setSubmitError(null);
+    const next = targetStep !== undefined ? targetStep : currentStep + 1;
+
+    if (next > currentStep) {
+      if (currentStep === 1 && selectedTypes.length === 0) {
+        setSubmitError('Choose at least one kind of help you need.');
+        return;
+      }
+      if (currentStep === 2) {
+        if (householdSize < 1) {
+          setSubmitError('Household size must be at least 1 person.');
+          return;
+        }
+        if (vulnerableSum > householdSize) {
+          setSubmitError(
+            `Illogical breakdown: Total people (${householdSize}) cannot be less than the sum of vulnerable members (${vulnerableSum}: ${vulnerable.children} children, ${vulnerable.elderly} elderly, ${vulnerable.pregnant} pregnant, ${vulnerable.disabled} special care).`
+          );
+          return;
+        }
+      }
+      if (currentStep === 3) {
+        if (!location.district.trim()) {
+          setSubmitError('Please select your District from the given options.');
+          return;
+        }
+        if (!location.upazila.trim()) {
+          setSubmitError('Please select your Upazila from the given options.');
+          return;
+        }
+        if (!location.address.trim() && !location.gpsCoords) {
+          setSubmitError('Enter your village / address or share your GPS location so rescuers can find you.');
+          return;
+        }
+      }
+      if (currentStep === 4) {
+        if (!contact.phone.trim()) {
+          setSubmitError('Enter a mobile number so responders can call you back.');
+          return;
+        }
+        if (!contact.isAnonymous && !contact.name.trim()) {
+          setSubmitError('Enter your name, or tick "Keep my request anonymous".');
+          return;
+        }
+      }
+    }
+
+    setCurrentStep(next);
+  };
+
   // Returns the step to fix and why, or null when the request can be sent.
   const findMissing = (): { step: number; message: string } | null => {
     if (selectedTypes.length === 0) return { step: 1, message: 'Choose at least one kind of help you need.' };
-    if (householdSize < 1) return { step: 2, message: 'Household size must be at least 1.' };
+    if (householdSize < 1) return { step: 2, message: 'Household size must be at least 1 person.' };
+    if (vulnerableSum > householdSize) {
+      return {
+        step: 2,
+        message: `Illogical breakdown: Total people (${householdSize}) cannot be less than the sum of vulnerable members (${vulnerableSum}: ${vulnerable.children} children, ${vulnerable.elderly} elderly, ${vulnerable.pregnant} pregnant, ${vulnerable.disabled} special care).`
+      };
+    }
     if (!location.district.trim()) return { step: 3, message: 'Please select your District from the given options.' };
     if (!location.upazila.trim()) return { step: 3, message: 'Please select your Upazila from the given options.' };
     if (!location.address.trim() && !location.gpsCoords) return { step: 3, message: 'Enter your village / address or share your GPS location so rescuers can find you.' };
@@ -190,7 +254,7 @@ export const GetHelp: React.FC = () => {
           </div>
 
           <div className="get-help-card">
-            <StepIndicator steps={steps} currentStep={currentStep} onStepClick={(s) => setCurrentStep(s)} />
+            <StepIndicator steps={steps} currentStep={currentStep} onStepClick={(s) => handleNextStep(s)} />
 
             {submittedId ? (
               /* Success Screen */
@@ -249,36 +313,91 @@ export const GetHelp: React.FC = () => {
                     <Input
                       label={t('totalPeopleHousehold')}
                       type="number"
+                      min={1}
                       value={householdSize}
-                      onChange={(e) => setHouseholdSize(parseInt(e.target.value) || 1)}
+                      onChange={(e) => setHouseholdSize(Math.max(1, parseInt(e.target.value) || 1))}
+                      className={isHouseholdIllogical ? 'has-error' : ''}
                     />
 
                     <div className="vulnerable-counters-grid grid-2 gap-4 mt-2">
                       <Input
                         label={t('childrenUnder12')}
                         type="number"
+                        min={0}
                         value={vulnerable.children}
-                        onChange={(e) => setVulnerable({ ...vulnerable, children: parseInt(e.target.value) || 0 })}
+                        onChange={(e) => setVulnerable({ ...vulnerable, children: Math.max(0, parseInt(e.target.value) || 0) })}
+                        className={isHouseholdIllogical ? 'has-error' : ''}
                       />
                       <Input
                         label={t('elderly60')}
                         type="number"
+                        min={0}
                         value={vulnerable.elderly}
-                        onChange={(e) => setVulnerable({ ...vulnerable, elderly: parseInt(e.target.value) || 0 })}
+                        onChange={(e) => setVulnerable({ ...vulnerable, elderly: Math.max(0, parseInt(e.target.value) || 0) })}
+                        className={isHouseholdIllogical ? 'has-error' : ''}
                       />
                       <Input
                         label={t('pregnantWomen')}
                         type="number"
+                        min={0}
                         value={vulnerable.pregnant}
-                        onChange={(e) => setVulnerable({ ...vulnerable, pregnant: parseInt(e.target.value) || 0 })}
+                        onChange={(e) => setVulnerable({ ...vulnerable, pregnant: Math.max(0, parseInt(e.target.value) || 0) })}
+                        className={isHouseholdIllogical ? 'has-error' : ''}
                       />
                       <Input
                         label={t('disabledSpecialCare')}
                         type="number"
+                        min={0}
                         value={vulnerable.disabled}
-                        onChange={(e) => setVulnerable({ ...vulnerable, disabled: parseInt(e.target.value) || 0 })}
+                        onChange={(e) => setVulnerable({ ...vulnerable, disabled: Math.max(0, parseInt(e.target.value) || 0) })}
+                        className={isHouseholdIllogical ? 'has-error' : ''}
                       />
                     </div>
+
+                    {isHouseholdIllogical && (
+                      <div
+                        role="alert"
+                        style={{
+                          padding: '12px 14px',
+                          background: '#fef2f2',
+                          border: '1px solid #fecaca',
+                          borderRadius: '6px',
+                          color: '#991b1b',
+                          fontSize: '13px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px',
+                          marginTop: '4px'
+                        }}
+                      >
+                        <div style={{ fontWeight: 700 }}>
+                          ⚠️ Illogical Household Breakdown
+                        </div>
+                        <div>
+                          Total household members is set to <strong>{householdSize}</strong>, but the sum of vulnerable members (children: {vulnerable.children}, elderly: {vulnerable.elderly}, pregnant: {vulnerable.pregnant}, special care: {vulnerable.disabled}) is <strong>{vulnerableSum}</strong>. The sum of breakdown members cannot exceed total household members.
+                        </div>
+                        <button
+                          type="button"
+                          className="get-help-btn-outline"
+                          style={{
+                            alignSelf: 'flex-start',
+                            fontSize: '12px',
+                            padding: '4px 10px',
+                            background: '#ffffff',
+                            color: '#991b1b',
+                            borderColor: '#fecaca',
+                            marginTop: '2px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => {
+                            setHouseholdSize(vulnerableSum);
+                            setSubmitError(null);
+                          }}
+                        >
+                          Auto-adjust Total Household Members to {vulnerableSum}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -416,7 +535,7 @@ export const GetHelp: React.FC = () => {
                   )}
 
                   {currentStep < 5 ? (
-                    <button className="get-help-btn-primary" onClick={() => setCurrentStep(currentStep + 1)}>
+                    <button className="get-help-btn-primary" onClick={() => handleNextStep()}>
                       {t('nextBtn')} <ChevronRight size={16} />
                     </button>
                   ) : (
