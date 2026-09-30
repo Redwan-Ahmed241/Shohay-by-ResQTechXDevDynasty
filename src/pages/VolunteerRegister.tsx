@@ -76,6 +76,25 @@ export const VolunteerRegister: React.FC = () => {
   };
 
   // Signed-in users register straight away; everyone else first verifies their email with a code.
+  const handleNextStep = () => {
+    setErrorMessage(null);
+    if (currentStep === 1) {
+      if (!formData.firstName.trim() || !formData.lastName.trim()) {
+        setErrorMessage('Please enter both your first name and last name.');
+        return;
+      }
+      if (!isAuthenticated && !formData.email.trim()) {
+        setErrorMessage('Please enter your email address.');
+        return;
+      }
+      if (!isAuthenticated && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+        setErrorMessage('Please enter a valid email address.');
+        return;
+      }
+    }
+    setCurrentStep((prev) => Math.min(prev + 1, 3));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -132,13 +151,40 @@ export const VolunteerRegister: React.FC = () => {
 
           {/* Stepper Bar */}
           <div className="register-stepper-box">
-            <StepIndicator steps={steps} currentStep={currentStep} onStepClick={(s) => setCurrentStep(s)} />
+            <StepIndicator
+              steps={steps}
+              currentStep={currentStep}
+              onStepClick={(s) => {
+                if (s > currentStep) {
+                  handleNextStep();
+                } else {
+                  setCurrentStep(s);
+                }
+              }}
+            />
           </div>
 
           {/* Card Box */}
           <div className="vol-register-card">
             {errorMessage && !isCompleted && (
-              <div className="register-error-box" role="alert">{errorMessage}</div>
+              <div className="register-error-box" role="alert">
+                <div>{errorMessage}</div>
+                {errorMessage.toLowerCase().includes('too many codes') && !awaitingCode && (
+                  <div style={{ marginTop: '8px' }}>
+                    <button
+                      type="button"
+                      className="btn-outline-subtle"
+                      style={{ fontSize: '12px', padding: '4px 10px', background: '#fff' }}
+                      onClick={() => {
+                        setErrorMessage(null);
+                        setAwaitingCode(true);
+                      }}
+                    >
+                      Already received a code in your email? Enter it here
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
 
             {isCompleted ? (
@@ -186,7 +232,17 @@ export const VolunteerRegister: React.FC = () => {
                 </div>
               </form>
             ) : (
-              <form onSubmit={handleSubmit}>
+              <form
+                onSubmit={handleSubmit}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    if (currentStep < 3) {
+                      e.preventDefault();
+                      handleNextStep();
+                    }
+                  }
+                }}
+              >
                 {/* Step 1: Basic Information */}
                 {currentStep === 1 && (
                   <div className="step-content-stack">
@@ -345,14 +401,34 @@ export const VolunteerRegister: React.FC = () => {
                     <button
                       type="button"
                       className="btn-navy-primary"
-                      onClick={() => setCurrentStep(currentStep + 1)}
+                      onClick={handleNextStep}
                     >
                       {t('nextBtn')}
                     </button>
                   ) : (
-                    <button type="submit" className="btn-green-submit" disabled={isSubmitting}>
-                      {isSubmitting ? 'Sending code...' : t('completeRegistrationBtn')}
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      {!isAuthenticated && (
+                        <button
+                          type="button"
+                          className="btn-outline-subtle"
+                          style={{ fontSize: '12px', padding: '8px 14px' }}
+                          onClick={() => {
+                            if (!formData.email.trim()) {
+                              setErrorMessage('Please enter your email first in step 1.');
+                              setCurrentStep(1);
+                              return;
+                            }
+                            setErrorMessage(null);
+                            setAwaitingCode(true);
+                          }}
+                        >
+                          Already have a code?
+                        </button>
+                      )}
+                      <button type="submit" className="btn-green-submit" disabled={isSubmitting}>
+                        {isSubmitting ? 'Sending code...' : t('completeRegistrationBtn')}
+                      </button>
+                    </div>
                   )}
                 </div>
               </form>
