@@ -6,6 +6,7 @@ import { Checkbox } from '../components/ui/Checkbox';
 import { StepIndicator } from '../components/ui/StepIndicator';
 import { useAuth } from '../context/AuthContext';
 import { VolunteerSignupData } from '../services/authService';
+import { errorText } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import './VolunteerRegister.css';
 
@@ -100,7 +101,7 @@ export const VolunteerRegister: React.FC = () => {
         setAwaitingCode(true);
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Registration failed. Please try again.');
+      setErrorMessage(errorText(err, 'Registration failed. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -114,7 +115,7 @@ export const VolunteerRegister: React.FC = () => {
       await verifyCode('email', formData.email.trim(), code);
       await completeRegistration();
     } catch (err: any) {
-      setErrorMessage(err.message || 'Verification failed. Please try again.');
+      setErrorMessage(errorText(err, 'Verification failed. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }

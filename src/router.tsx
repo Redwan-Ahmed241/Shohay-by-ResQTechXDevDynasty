@@ -5,6 +5,7 @@ import { queryClient } from './lib/queryClient';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { PageLoader } from './components/layout/PageLoader';
+import { ErrorBoundary } from './components/layout/ErrorBoundary';
 import { RequireRole } from './components/auth/RequireRole';
 
 // Route-level code-splitting for balanced chunk sizes
@@ -41,8 +42,9 @@ export const AppRouter: React.FC = () => {
       <BrowserRouter>
         <AuthProvider>
           <LanguageProvider>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
+            <ErrorBoundary>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/alerts" element={<Alerts />} />
                 <Route path="/shelters" element={<Shelters />} />
@@ -107,7 +109,8 @@ export const AppRouter: React.FC = () => {
                 {/* Fallback 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </Suspense>
+              </Suspense>
+            </ErrorBoundary>
           </LanguageProvider>
         </AuthProvider>
       </BrowserRouter>

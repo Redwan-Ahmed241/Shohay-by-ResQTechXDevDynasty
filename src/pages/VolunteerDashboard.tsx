@@ -4,7 +4,7 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { useFlash } from '../hooks/useFlash';
 import { volunteerService, DutyAction } from '../services/volunteerService';
 import { uavService } from '../services/uavService';
-import { ApiError } from '../services/api';
+import { ApiError, errorText } from '../services/api';
 import { VolunteerProfile, VolunteerAssignment, UavDetection, UavDrone } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -14,11 +14,6 @@ const DRONE_POLL_MS = 10_000;
 
 function minutesSince(iso?: string | null): number {
   return iso ? Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000)) : 0;
-}
-
-function errorText(err: unknown): string {
-  if (err instanceof ApiError) return err.message;
-  return 'Could not reach the Shohay server. Check your connection and try again.';
 }
 
 export const VolunteerDashboard: React.FC = () => {

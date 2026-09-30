@@ -25,7 +25,7 @@ import { Input } from '../components/ui/Input';
 import { Checkbox } from '../components/ui/Checkbox';
 import { StepIndicator } from '../components/ui/StepIndicator';
 import { requestService } from '../services/requestService';
-import { ApiError } from '../services/api';
+import { errorText } from '../services/api';
 import { AssistanceType, AssistanceRequestPayload } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import './GetHelp.css';
@@ -150,9 +150,7 @@ export const GetHelp: React.FC = () => {
       setSubmittedId(res.trackingId);
     } catch (err) {
       setSubmitError(
-        err instanceof ApiError
-          ? `Your request was NOT sent: ${err.message}`
-          : 'Your request was NOT sent — there is no connection to the Shohay server. Please try again.'
+        `Your request was NOT sent: ${errorText(err, 'Unable to submit your request at this time. Please try again.')}`
       );
     } finally {
       setIsSubmitting(false);

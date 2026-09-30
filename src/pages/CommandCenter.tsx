@@ -35,7 +35,7 @@ import { campaignService } from '../services/campaignService';
 import { alertService } from '../services/alertService';
 import { warehouseService } from '../services/warehouseService';
 import { uavService } from '../services/uavService';
-import { ApiError } from '../services/api';
+import { errorText } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import {
   AssistanceRequestRecord,
@@ -77,10 +77,6 @@ function suggestTask(req: AssistanceRequestRecord): DispatchTaskInput {
     teamSize: Math.min(10, Math.max(2, Math.ceil(req.householdSize / 3))),
     priority: urgent ? 'critical' : vulnerable > 0 ? 'high' : 'medium'
   };
-}
-
-function errorText(err: unknown): string {
-  return err instanceof ApiError ? err.message : 'Could not reach the Shohay server.';
 }
 
 /** Requests per day for the last 7 days (createdAt is "YYYY-MM-DD HH:MM"). */

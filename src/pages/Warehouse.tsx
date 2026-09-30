@@ -3,7 +3,7 @@ import { AlertTriangle, Clock, Plus, Truck } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useFlash } from '../hooks/useFlash';
 import { warehouseService } from '../services/warehouseService';
-import { ApiError } from '../services/api';
+import { errorText } from '../services/api';
 import { WarehouseItem, InventoryCategory, StockMovement } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import './Warehouse.css';
@@ -16,10 +16,6 @@ function expiresSoon(item: WarehouseItem): boolean {
   if (!item.expiryDate) return false;
   const days = (new Date(item.expiryDate).getTime() - Date.now()) / 86_400_000;
   return days <= EXPIRY_WINDOW_DAYS;
-}
-
-function errorText(err: unknown): string {
-  return err instanceof ApiError ? err.message : 'Could not reach the Shohay server.';
 }
 
 const fieldStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', background: '#fff' };

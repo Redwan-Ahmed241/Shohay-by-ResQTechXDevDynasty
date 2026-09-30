@@ -5,6 +5,7 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { AuthMethod, SignUpMetadata } from '../services/authService';
+import { errorText } from '../services/api';
 import { UserRole } from '../types';
 import './SignIn.css';
 
@@ -66,7 +67,7 @@ export const SignIn: React.FC = () => {
       await requestCode();
       setStep('verify');
     } catch (err: any) {
-      setErrorMessage(err.message || 'Could not send the code. Please try again.');
+      setErrorMessage(errorText(err, 'Could not send the code. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +78,7 @@ export const SignIn: React.FC = () => {
     try {
       await requestCode();
     } catch (err: any) {
-      setErrorMessage(err.message || 'Could not resend the code. Please try again.');
+      setErrorMessage(errorText(err, 'Could not resend the code. Please try again.'));
     }
   };
 
@@ -89,7 +90,7 @@ export const SignIn: React.FC = () => {
       const signedIn = await verifyCode(authMethod, identifier, code);
       navigate(returnTo || dashboardPath(signedIn.role));
     } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to sign in. Please try again.');
+      setErrorMessage(errorText(err, 'Failed to sign in. Please try again.'));
     } finally {
       setIsLoading(false);
     }

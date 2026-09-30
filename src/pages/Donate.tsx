@@ -4,7 +4,7 @@ import { ArrowLeft, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useCampaigns } from '../hooks/queries';
 import { donationService } from '../services/donationService';
-import { ApiError } from '../services/api';
+import { errorText } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import './Donate.css';
 
@@ -40,7 +40,7 @@ export const Donate: React.FC = () => {
       window.location.href = gatewayUrl;
     } catch (err) {
       setBusy(false);
-      setError(err instanceof ApiError ? err.message : 'Could not start the payment. Check your connection and try again.');
+      setError(errorText(err, 'Could not start the payment. Check your connection and try again.'));
     }
   };
 

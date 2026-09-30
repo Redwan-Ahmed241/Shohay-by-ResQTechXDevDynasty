@@ -6,6 +6,7 @@ import type { AuthError, SupabaseClient } from '@supabase/supabase-js';
 import { apiFetch } from './api';
 import { supabase } from './supabaseClient';
 import { AuthUser, UserRole } from '../types';
+import { logErrorDetails, sanitizeErrorMessage } from '../utils/errorSanitizer';
 
 export type AuthMethod = 'email' | 'mobile';
 
@@ -82,12 +83,18 @@ const FRIENDLY_ERRORS: Record<string, string> = {
 };
 
 function friendlyError(error: AuthError): Error {
-  return new Error((error.code && FRIENDLY_ERRORS[error.code]) || error.message);
+  logErrorDetails('Supabase Auth Error', error, { code: error.code, status: error.status });
+  if (error.code && FRIENDLY_ERRORS[error.code]) {
+    return new Error(FRIENDLY_ERRORS[error.code]);
+  }
+  const sanitized = sanitizeErrorMessage(error.message, error.status, 'Authentication failed. Please check your credentials and try again.');
+  return new Error(sanitized);
 }
 
 function client(): SupabaseClient {
   if (!supabase) {
-    throw new Error('Sign-in is unavailable: Supabase is not configured (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY).');
+    logErrorDetails('Supabase Client Missing', 'Supabase client is not initialized due to missing environment variables.');
+    throw new Error('Sign-in is temporarily unavailable. Please try again later or contact support.');
   }
   return supabase;
 }
