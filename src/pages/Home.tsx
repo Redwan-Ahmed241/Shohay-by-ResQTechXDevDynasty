@@ -21,6 +21,8 @@ import {
   Home as HomeIcon,
   HelpCircle,
   Hand,
+  Play,
+  Pause,
 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
@@ -46,6 +48,7 @@ export const Home: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { t } = useLanguage();
+  const [tickerPaused, setTickerPaused] = useState(false);
   const [trackingId, setTrackingId] = useState('');
   const [trackingResult, setTrackingResult] = useState<RequestTracking | null>(null);
   const [trackingError, setTrackingError] = useState('');
@@ -140,14 +143,13 @@ export const Home: React.FC = () => {
             <div className="location-row-inner">
               <div className="location-label">
                 <MapPin size={14} aria-hidden="true" />
-                <span>{locationDisplay}</span>
+                <span aria-live="polite" aria-atomic="true">{locationDisplay}</span>
               </div>
               <button
                 className="location-gps-btn"
                 onClick={shareGps}
                 disabled={gpsBusy}
                 type="button"
-                aria-label="Use GPS location"
               >
                 <Navigation size={13} aria-hidden="true" />
                 <span>{gpsBusy ? 'Locating…' : t('homeGps')}</span>
@@ -159,7 +161,7 @@ export const Home: React.FC = () => {
                   setSelectedUpazila(e.target.value);
                   setGpsStatus(null);
                 }}
-                aria-label="Select upazila"
+                aria-label={t('homeSelectUpazila')}
               >
                 <option value="">{t('homeSelectUpazila')}</option>
                 {BD_UPAZILAS.map((d) => (
@@ -175,7 +177,6 @@ export const Home: React.FC = () => {
                 className="location-skip"
                 onClick={() => setLocationDismissed(true)}
                 type="button"
-                aria-label="Skip location selection"
               >
                 {t('homeSkip')}
               </button>
@@ -254,8 +255,17 @@ export const Home: React.FC = () => {
            4. LIVE TICKER
            ═══════════════════════════════════════ */}
         <div className="live-ticker" role="region" aria-label="Live updates">
+          <button
+            type="button"
+            className="ticker-toggle-btn"
+            onClick={() => setTickerPaused((prev) => !prev)}
+            aria-label={t('homeTickerToggle')}
+            aria-pressed={tickerPaused}
+          >
+            {tickerPaused ? <Play size={14} /> : <Pause size={14} />}
+          </button>
           <div className="live-ticker-track">
-            <span className="live-ticker-text">
+            <span className={`live-ticker-text ${tickerPaused ? 'ticker-paused' : ''}`}>
               {t('homeLiveTicker')} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               {t('homeLiveTicker')}
             </span>
