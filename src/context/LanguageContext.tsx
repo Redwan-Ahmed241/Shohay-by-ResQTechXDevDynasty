@@ -488,8 +488,11 @@ const DICTIONARY: Record<string, Record<Language, string>> = {
   donateMobilePlaceholder: { en: 'Mobile number', bn: 'মোবাইল নম্বর' },
   donateContinueToPayment: { en: 'Continue to Payment', bn: 'পেমেন্টে এগিয়ে যান' },
   donateSuccessTitle: { en: 'Thank you for your support', bn: 'আপনার সহযোগিতার জন্য ধন্যবাদ' },
+  donateSuccessFallback: { en: 'Thank you for your generous contribution. Your support directly aids flood relief efforts.', bn: 'আপনার উদার অনুদানের জন্য ধন্যবাদ। আপনার সহায়তা সরাসরি বন্যা ত্রাণ কার্যক্রমে সাহায্য করবে।' },
   donateFailTitle: { en: 'Payment did not go through', bn: 'পেমেন্ট সম্পন্ন হয়নি' },
+  donateFailedFallback: { en: 'The transaction could not be completed. Please try again or choose another payment method.', bn: 'লেনদেনটি সম্পন্ন করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন বা অন্য পেমেন্ট পদ্ধতি বেছে নিন।' },
   donateCancelTitle: { en: 'Payment cancelled', bn: 'পেমেন্ট বাতিল করা হয়েছে' },
+  donatePendingFallback: { en: 'Your transaction is currently being processed. You will be notified once confirmed.', bn: 'আপনার লেনদেনটি বর্তমানে প্রক্রিয়াধীন রয়েছে। নিশ্চিত হলে আপনাকে জানানো হবে।' },
   donateTryAgain: { en: 'Try Again', bn: 'আবার চেষ্টা করুন' },
   // My Requests
   myReqTitle: { en: 'My Requests', bn: 'আমার অনুরোধসমূহ' },
