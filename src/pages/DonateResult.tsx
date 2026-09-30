@@ -26,17 +26,17 @@ export const DonateResult: React.FC<Props> = ({ outcome }) => {
     success: {
       icon: <CheckCircle2 size={40} color="#059669" />,
       title: t('donateSuccessTitle'),
-      fallback: 'Your donation was received.'
+      fallback: t('donateSuccessFallback')
     },
     fail: {
       icon: <XCircle size={40} color="#dc2626" />,
       title: t('donateFailTitle'),
-      fallback: 'SSLCommerz reported this payment as failed. No amount was charged.'
+      fallback: t('donateFailedFallback')
     },
     cancel: {
       icon: <Ban size={40} color="#d97706" />,
       title: t('donateCancelTitle'),
-      fallback: 'You cancelled the payment before it completed. No amount was charged.'
+      fallback: t('donateCancelFallback')
     }
   }[outcome];
 
