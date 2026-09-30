@@ -477,8 +477,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .live-ticker-track {
-    animation: none;
+  .live-ticker-track,
+  .live-ticker-text {
+    animation: none !important;
     transform: none;
   }
   .live-ticker {

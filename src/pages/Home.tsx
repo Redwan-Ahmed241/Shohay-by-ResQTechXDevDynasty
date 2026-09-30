@@ -47,8 +47,7 @@ const HELP_IMAGE_2 = '/photo-1649134799042-ccca78a3f9bf.jpg';
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { language, t } = useLanguage();
-  const currentLang = language;
+  const { t } = useLanguage();
   const [tickerPaused, setTickerPaused] = useState(false);
   const [trackingId, setTrackingId] = useState('');
   const [trackingResult, setTrackingResult] = useState<RequestTracking | null>(null);
@@ -260,7 +259,7 @@ export const Home: React.FC = () => {
             type="button"
             className="ticker-toggle-btn"
             onClick={() => setTickerPaused((prev) => !prev)}
-            aria-label={tickerPaused ? (currentLang === 'bn' ? 'টিকার চালু করুন' : 'Resume ticker') : (currentLang === 'bn' ? 'টিকার থামান' : 'Pause ticker')}
+            aria-label={t('homeTickerToggle')}
             aria-pressed={tickerPaused}
           >
             {tickerPaused ? <Play size={14} /> : <Pause size={14} />}

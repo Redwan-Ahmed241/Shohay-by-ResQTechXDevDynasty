@@ -60,6 +60,10 @@ const DICTIONARY: Record<string, Record<Language, string>> = {
     en: '🔴 LIVE — Sunamganj: Water level 3.2m above danger level · Brahmaputra rising at 5cm/hr · 14 upazilas on red alert · Evacuations ongoing in Bishwambarpur · BNCC deploying additional rescue boats',
     bn: '🔴 সরাসরি — সুনামগঞ্জ: পানি বিপদসীমার ৩.২ মিটার উপরে · ব্রহ্মপুত্রের পানি প্রতি ঘণ্টায় ৫ সেমি বৃদ্ধি পাচ্ছে · ১৪টি উপজেলায় লাল সতর্কতা · বিশ্বম্ভরপুরে স্থানান্তর কার্যক্রম চলমান · বিএনসিসি অতিরিক্ত উদ্ধারকারী নৌকা মোতায়েন করেছে'
   },
+  homeTickerToggle: {
+    en: 'Toggle emergency updates ticker',
+    bn: 'জরুরি আপডেট টিকার চালু বা বন্ধ করুন'
+  },
   homeHeroBadge: { en: 'Emergency Response · Bangladesh', bn: 'জরুরি সাড়াদান · বাংলাদেশ' },
   homeHeroTitle: { en: 'Standing With Bangladesh in Times of Crisis.', bn: 'সংকটময় মুহূর্তে বাংলাদেশের পাশে।' },
   homeHeroDesc: { en: 'Coordinating immediate rescue, shelter access, and transparent relief tracking for flood-affected communities across Bangladesh.', bn: 'বাংলাদেশ জুড়ে বন্যা কবলিত সম্প্রদায়ের জন্য তাৎক্ষণিক উদ্ধার, নিরাপদ আশ্রয় এবং স্বচ্ছ ত্রাণ পর্যবেক্ষণ সমন্বয় করা হচ্ছে।' },
@@ -492,6 +496,10 @@ const DICTIONARY: Record<string, Record<Language, string>> = {
   donateFailTitle: { en: 'Payment did not go through', bn: 'পেমেন্ট সম্পন্ন হয়নি' },
   donateFailedFallback: { en: 'The transaction could not be completed. Please try again or choose another payment method.', bn: 'লেনদেনটি সম্পন্ন করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন বা অন্য পেমেন্ট পদ্ধতি বেছে নিন।' },
   donateCancelTitle: { en: 'Payment cancelled', bn: 'পেমেন্ট বাতিল করা হয়েছে' },
+  donateCancelFallback: {
+    en: 'You cancelled the payment before it was completed. No amount was charged.',
+    bn: 'সম্পন্ন হওয়ার আগেই আপনি পেমেন্টটি বাতিল করেছেন। কোনো অর্থ কাটা হয়নি।'
+  },
   donatePendingFallback: { en: 'Your transaction is currently being processed. You will be notified once confirmed.', bn: 'আপনার লেনদেনটি বর্তমানে প্রক্রিয়াধীন রয়েছে। নিশ্চিত হলে আপনাকে জানানো হবে।' },
   donateTryAgain: { en: 'Try Again', bn: 'আবার চেষ্টা করুন' },
   // My Requests

@@ -36,7 +36,7 @@ export const DonateResult: React.FC<Props> = ({ outcome }) => {
     cancel: {
       icon: <Ban size={40} color="#d97706" />,
       title: t('donateCancelTitle'),
-      fallback: t('donatePendingFallback')
+      fallback: t('donateCancelFallback')
     }
   }[outcome];
 
