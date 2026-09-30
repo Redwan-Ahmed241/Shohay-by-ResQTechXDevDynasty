@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { CheckCircle, ArrowLeft } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { Checkbox } from '../components/ui/Checkbox';
+import { Select } from '../components/ui/Select';
 import { StepIndicator } from '../components/ui/StepIndicator';
 import { useAuth } from '../context/AuthContext';
 import { VolunteerSignupData } from '../services/authService';
 import { errorText } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import { BD_UPAZILAS } from '../data/upazilas';
 import './VolunteerRegister.css';
 
 export const VolunteerRegister: React.FC = () => {
@@ -364,12 +366,16 @@ export const VolunteerRegister: React.FC = () => {
                     <h2 className="step-card-title">{t('availabilityDistrictTitle')}</h2>
 
                     <div className="field-group-item">
-                      <label className="field-label-text">{t('primaryOperatingDistrict')}</label>
-                      <input
-                        type="text"
-                        className="form-input-field"
+                      <Select
+                        label={t('primaryOperatingDistrict')}
                         value={formData.district}
                         onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                        options={[
+                          { label: '-- Select Operating District --', value: '' },
+                          ...BD_UPAZILAS.map((d) => d.district)
+                            .sort((a, b) => a.localeCompare(b))
+                            .map((dist) => ({ label: dist, value: dist }))
+                        ]}
                         required
                       />
                     </div>

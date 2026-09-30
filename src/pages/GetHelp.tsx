@@ -22,12 +22,14 @@ import {
 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { Input } from '../components/ui/Input';
+import { Select } from '../components/ui/Select';
 import { Checkbox } from '../components/ui/Checkbox';
 import { StepIndicator } from '../components/ui/StepIndicator';
 import { requestService } from '../services/requestService';
 import { errorText } from '../services/api';
 import { AssistanceType, AssistanceRequestPayload } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { BD_UPAZILAS } from '../data/upazilas';
 import './GetHelp.css';
 
 export const GetHelp: React.FC = () => {
@@ -53,6 +55,21 @@ export const GetHelp: React.FC = () => {
     landmark: '',
     gpsCoords: ''
   });
+
+  // District & Upazila options extracted from BD_UPAZILAS dataset
+  const districtList = BD_UPAZILAS.map((d) => d.district).sort((a, b) => a.localeCompare(b));
+  const selectedDistrictData = BD_UPAZILAS.find((d) => d.district.toLowerCase() === location.district.toLowerCase());
+  const upazilaList = selectedDistrictData
+    ? selectedDistrictData.upazilas.slice().sort((a, b) => a.localeCompare(b))
+    : [];
+
+  const handleDistrictSelect = (districtName: string) => {
+    setLocation((prev) => ({
+      ...prev,
+      district: districtName,
+      upazila: '' // Reset upazila when district changes
+    }));
+  };
   const [contact, setContact] = useState({
     name: '',
     phone: '',
@@ -120,7 +137,8 @@ export const GetHelp: React.FC = () => {
   const findMissing = (): { step: number; message: string } | null => {
     if (selectedTypes.length === 0) return { step: 1, message: 'Choose at least one kind of help you need.' };
     if (householdSize < 1) return { step: 2, message: 'Household size must be at least 1.' };
-    if (!location.district.trim()) return { step: 3, message: 'Enter your district.' };
+    if (!location.district.trim()) return { step: 3, message: 'Please select your District from the given options.' };
+    if (!location.upazila.trim()) return { step: 3, message: 'Please select your Upazila from the given options.' };
     if (!location.address.trim() && !location.gpsCoords) return { step: 3, message: 'Enter your village / address or share your GPS location so rescuers can find you.' };
     if (!contact.phone.trim()) return { step: 4, message: 'Enter a mobile number so responders can call you back.' };
     if (!contact.isAnonymous && !contact.name.trim()) return { step: 4, message: 'Enter your name, or tick "Keep my request anonymous".' };
@@ -270,15 +288,27 @@ export const GetHelp: React.FC = () => {
                     <h3 className="step-heading">{t('yourLocation')}</h3>
 
                     <div className="grid-2 gap-4">
-                      <Input
-                        label={t('districtLabel')}
+                      <Select
+                        label={`${t('districtLabel')} *`}
                         value={location.district}
-                        onChange={(e) => setLocation({ ...location, district: e.target.value })}
+                        onChange={(e) => handleDistrictSelect(e.target.value)}
+                        options={[
+                          { label: '-- Select District --', value: '' },
+                          ...districtList.map((dist) => ({ label: dist, value: dist }))
+                        ]}
                       />
-                      <Input
-                        label={t('upazilaLabel')}
+                      <Select
+                        label={`${t('upazilaLabel')} *`}
                         value={location.upazila}
                         onChange={(e) => setLocation({ ...location, upazila: e.target.value })}
+                        disabled={!location.district}
+                        options={[
+                          {
+                            label: location.district ? '-- Select Upazila --' : '-- Select District First --',
+                            value: ''
+                          },
+                          ...upazilaList.map((upazila) => ({ label: upazila, value: upazila }))
+                        ]}
                       />
                     </div>
 
