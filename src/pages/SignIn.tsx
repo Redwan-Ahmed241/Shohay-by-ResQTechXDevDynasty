@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Phone, Mail, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { AuthMethod, SignUpMetadata } from '../services/authService';
 import { errorText } from '../services/api';
 import { UserRole } from '../types';
 import {
   validateWithSchema,
   emailSchema,
-  bdPhoneSchema,
   otpCodeSchema
 } from '../utils/validationSchemas';
 import './SignIn.css';
@@ -27,18 +25,12 @@ export const SignIn: React.FC = () => {
   const { user, isLoading: isRestoringSession, sendCode, verifyCode } = useAuth();
   const { t } = useLanguage();
 
-  const [selectedRole, setSelectedRole] = useState<Exclude<UserRole, 'admin'>>('volunteer');
-  const [authMethod, setAuthMethod] = useState<AuthMethod>('email');
   const [step, setStep] = useState<'identify' | 'verify'>('identify');
-  const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [resendIn, setResendIn] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const identifier = authMethod === 'email' ? email.trim() : mobileNumber.trim();
-  const roleLabel = selectedRole === 'volunteer' ? 'Volunteer' : 'Public';
 
   // Already signed in (restored session, or arrived here from the emailed sign-in link)
   useEffect(() => {
@@ -59,20 +51,14 @@ export const SignIn: React.FC = () => {
     setErrorMessage(null);
   };
 
-  const validateIdentifier = () => {
-    if (authMethod === 'email') {
-      return validateWithSchema(emailSchema, identifier);
-    }
-    return validateWithSchema(bdPhoneSchema, identifier);
-  };
+  const validateEmail = () => validateWithSchema(emailSchema, email.trim());
 
   const requestCode = async () => {
-    const val = validateIdentifier();
+    const val = validateEmail();
     if (!val.success) {
       throw new Error(val.error);
     }
-    const metadata: SignUpMetadata = { requested_role: selectedRole === 'volunteer' ? 'fieldworker' : 'public' };
-    await sendCode(authMethod, val.data, metadata);
+    await sendCode('email', val.data);
     setResendIn(RESEND_COOLDOWN_SECONDS);
   };
 
@@ -80,7 +66,7 @@ export const SignIn: React.FC = () => {
     e.preventDefault();
     setErrorMessage(null);
 
-    const val = validateIdentifier();
+    const val = validateEmail();
     if (!val.success) {
       setErrorMessage(val.error);
       return;
@@ -99,7 +85,7 @@ export const SignIn: React.FC = () => {
 
   const handleResend = async () => {
     setErrorMessage(null);
-    const val = validateIdentifier();
+    const val = validateEmail();
     if (!val.success) {
       setErrorMessage(val.error);
       return;
@@ -123,7 +109,7 @@ export const SignIn: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const signedIn = await verifyCode(authMethod, identifier, codeVal.data);
+      const signedIn = await verifyCode('email', email.trim(), codeVal.data);
       navigate(returnTo || dashboardPath(signedIn.role));
     } catch (err: any) {
       setErrorMessage(errorText(err, 'Failed to sign in. Please try again.'));
@@ -177,54 +163,12 @@ export const SignIn: React.FC = () => {
               <div className="signin-header-block">
                 <h1 className="signin-title">{t('signIn')}</h1>
                 <p className="signin-subtitle">
-                  Choose your role and we'll send a one-time sign-in code to your email or phone. No password needed.
+                  Enter your email address and we'll send a one-time sign-in code. No password needed.
                 </p>
-              </div>
-
-              {/* Role Selection Tabs: Public Access vs Field Worker */}
-              <div className="role-selector-tabs" role="tablist">
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={selectedRole === 'public'}
-                  className={`role-tab ${selectedRole === 'public' ? 'active' : ''}`}
-                  onClick={() => { setSelectedRole('public'); resetToIdentify(); }}
-                >
-                  {t('publicAccessTab')}
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={selectedRole === 'volunteer'}
-                  className={`role-tab ${selectedRole === 'volunteer' ? 'active' : ''}`}
-                  onClick={() => { setSelectedRole('volunteer'); resetToIdentify(); }}
-                >
-                  {t('fieldWorkerTab')}
-                </button>
               </div>
 
               {/* Main Auth Card Box */}
               <div className="auth-card-box">
-                {/* Auth Method Toggle */}
-                <div className="auth-method-toggle" role="tablist">
-                  <button
-                    type="button"
-                    className={`method-btn ${authMethod === 'email' ? 'active' : ''}`}
-                    onClick={() => { setAuthMethod('email'); resetToIdentify(); }}
-                  >
-                    <Mail size={14} />
-                    <span>Email Address</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`method-btn ${authMethod === 'mobile' ? 'active' : ''}`}
-                    onClick={() => { setAuthMethod('mobile'); resetToIdentify(); }}
-                  >
-                    <Phone size={14} />
-                    <span>Mobile Number</span>
-                  </button>
-                </div>
-
                 {errorMessage && (
                   <div role="alert" style={{ padding: '8px 12px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', color: '#991b1b', fontSize: '12px', marginBottom: '12px' }}>
                     {errorMessage}
@@ -233,40 +177,20 @@ export const SignIn: React.FC = () => {
 
                 {step === 'identify' ? (
                   <form onSubmit={handleSendCode} className="auth-form-stack">
-                    {authMethod === 'email' ? (
-                      <div className="field-group">
-                        <label className="field-label" htmlFor="email-input">EMAIL ADDRESS</label>
-                        <input
-                          id="email-input"
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="auth-text-input"
-                          placeholder={selectedRole === 'volunteer' ? 'volunteer@example.org' : 'citizen@example.com'}
-                          autoComplete="email"
-                          required
-                          autoFocus
-                        />
-                      </div>
-                    ) : (
-                      <div className="field-group">
-                        <label className="field-label" htmlFor="phone-input">MOBILE NUMBER</label>
-                        <div className="phone-prefix-group">
-                          <span className="phone-prefix">+880</span>
-                          <input
-                            id="phone-input"
-                            type="tel"
-                            value={mobileNumber}
-                            onChange={(e) => setMobileNumber(e.target.value)}
-                            className="phone-input"
-                            placeholder="01XXXXXXXXX"
-                            autoComplete="tel-national"
-                            required
-                            autoFocus
-                          />
-                        </div>
-                      </div>
-                    )}
+                    <div className="field-group">
+                      <label className="field-label" htmlFor="email-input">EMAIL ADDRESS</label>
+                      <input
+                        id="email-input"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="auth-text-input"
+                        placeholder="name@example.com"
+                        autoComplete="email"
+                        required
+                        autoFocus
+                      />
+                    </div>
 
                     <button type="submit" className="submit-btn-navy" disabled={isLoading}>
                       {isLoading ? (
@@ -282,9 +206,7 @@ export const SignIn: React.FC = () => {
                       )}
                     </button>
                     <p className="otp-disclaimer">
-                      {authMethod === 'email'
-                        ? "We'll email you a one-time code and a sign-in link."
-                        : "We'll text you a one-time code."}
+                      We'll email you a one-time code and a sign-in link.
                     </p>
                   </form>
                 ) : (
@@ -294,7 +216,7 @@ export const SignIn: React.FC = () => {
                         <label className="field-label" htmlFor="code-input">ENTER CODE</label>
                         <button type="button" className="change-auth-btn" onClick={resetToIdentify}>
                           <ArrowLeft size={12} />
-                          {authMethod === 'email' ? 'Change email' : 'Change number'}
+                          Change email
                         </button>
                       </div>
                       <input
@@ -312,8 +234,7 @@ export const SignIn: React.FC = () => {
                         autoFocus
                       />
                       <p className="otp-disclaimer" style={{ textAlign: 'left' }}>
-                        Sent to <strong>{authMethod === 'mobile' ? `+880 ${identifier.replace(/^0/, '')}` : identifier}</strong>.
-                        {authMethod === 'email' && ' You can also tap the sign-in link in the email.'}
+                        Sent to <strong>{email.trim()}</strong>. You can also tap the sign-in link in the email.
                       </p>
                     </div>
 
@@ -325,7 +246,7 @@ export const SignIn: React.FC = () => {
                         </>
                       ) : (
                         <>
-                          <span>Verify &amp; Sign In as {roleLabel}</span>
+                          <span>Verify &amp; Sign In</span>
                           <ArrowRight size={15} />
                         </>
                       )}

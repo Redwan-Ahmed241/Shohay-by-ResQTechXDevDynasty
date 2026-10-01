@@ -138,9 +138,11 @@
   max-width: 440px;
 }
 
+.signin-header-block,
 .auth-header-block {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
+
 
 .signin-title {
   font-family: var(--font-family);
