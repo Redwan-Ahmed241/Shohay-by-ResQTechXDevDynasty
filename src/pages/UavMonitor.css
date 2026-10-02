@@ -249,3 +249,107 @@
 .uav-video-stat.risk-medium, .uav-det-card.risk-medium { border-top-color: #ca8a04; border-left-color: #ca8a04; }
 .uav-video-stat.risk-low, .uav-det-card.risk-low { border-top-color: #16a34a; border-left-color: #16a34a; }
 .uav-det-card[class*="risk-"] { border-top-color: #e2e8f0; }
+
+/* ── Navy primary buttons ── */
+.btn-navy-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background-color: #0a2540;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: var(--font-family);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: background-color var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.btn-navy-primary:hover {
+  background-color: #0f3460;
+  color: #ffffff;
+}
+
+.btn-navy-primary:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.btn-navy-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── UAV Live Feed Empty State & File Selector Trigger ── */
+.uav-feed-empty-state {
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 36px 20px;
+  text-align: center;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+  box-sizing: border-box;
+}
+
+.uav-feed-empty-icon {
+  margin: 0 auto 10px;
+  display: block;
+  color: #64748b;
+}
+
+.uav-feed-empty-title {
+  margin: 0 0 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.4;
+}
+
+.uav-feed-empty-desc {
+  margin: 0;
+  max-width: 480px;
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.uav-choose-video-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  padding: 0.55rem 1.4rem;
+  background-color: #0a2540;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  text-decoration: none;
+  transition: background-color var(--transition-fast, 150ms ease), opacity var(--transition-fast, 150ms ease), box-shadow var(--transition-fast, 150ms ease);
+}
+
+.uav-choose-video-btn:hover {
+  background-color: #0f3460;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.uav-choose-video-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+

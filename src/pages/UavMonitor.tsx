@@ -322,16 +322,30 @@ export const UavMonitor: React.FC = () => {
             ) : demoVideoSrc ? (
               <video ref={feedVideoRef} key={demoVideoSrc} src={demoVideoSrc} controls autoPlay style={{ width: '100%', maxHeight: 420, borderRadius: 8, background: '#000', display: 'block' }} />
             ) : (
-              <div style={{ border: '2px dashed #cbd5e1', borderRadius: 8, padding: '32px 20px', textAlign: 'center', color: '#64748b' }}>
-                <Video size={28} style={{ margin: '0 auto 10px', display: 'block' }} />
-                <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+              <div className="uav-feed-empty-state">
+                <Video size={28} className="uav-feed-empty-icon" aria-hidden="true" />
+                <p className="uav-feed-empty-title">
                   {feedDrone ? `No usable video URL for ${feedDrone.name} yet.` : 'No drone selected — nothing streaming yet.'}
                 </p>
-                <p style={{ margin: '0 0 14px', fontSize: 12 }}>
+                <p className="uav-feed-empty-desc">
                   Play a recorded detection demo instead — showing risk level and person count from a past flight.
                 </p>
-                <button type="button" className="btn-navy-primary" onClick={() => demoFileRef.current?.click()}>{t('uavChooseRecordedVideo')}</button>
-                <input ref={demoFileRef} type="file" accept="video/*" onChange={handleDemoFile} style={{ display: 'none' }} />
+                <button
+                  type="button"
+                  id="uav-choose-video-btn"
+                  className="uav-choose-video-btn btn-navy-primary"
+                  onClick={() => demoFileRef.current?.click()}
+                >
+                  {t('uavChooseRecordedVideo')}
+                </button>
+                <input
+                  ref={demoFileRef}
+                  id="uav-recorded-video-input"
+                  type="file"
+                  accept="video/*"
+                  onChange={handleDemoFile}
+                  style={{ display: 'none' }}
+                />
               </div>
             )}
 

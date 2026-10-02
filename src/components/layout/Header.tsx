@@ -78,7 +78,7 @@ export const Header: React.FC = () => {
   return (
     <header className={`header${scrolled ? ' header-scrolled' : ''}`}>
       <div className="container header-container">
-        <Link to="/" className="header-brand" onClick={() => setMobileMenuOpen(false)}>
+        <Link to="/" className="header-brand nav-brand" onClick={() => setMobileMenuOpen(false)}>
           <div className="brand-icon" aria-hidden="true">
             <Radio size={20} />
           </div>
@@ -88,15 +88,15 @@ export const Header: React.FC = () => {
           </div>
         </Link>
 
-        <nav className={`header-nav${scrolled ? ' nav-centered' : ''}`}>
+        <nav className="header-nav nav-links nav-menu">
           {navigationItems.map((item) => (
-            <Link key={item.path} to={item.path} className={`nav-link ${isActive(item.path) ? 'active' : ''}`}>
+            <Link key={item.path} to={item.path} className={`nav-link nav-item ${isActive(item.path) ? 'active' : ''}`}>
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="header-actions">
+        <div className="header-actions nav-actions">
           <button className="utility-btn utility-lang hide-mobile" onClick={toggleLanguage} aria-label="Toggle language">
             <Globe size={14} />
             <span>{t('banglaBtn')}</span>
