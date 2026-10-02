@@ -33,7 +33,7 @@ export const Campaigns: React.FC = () => {
                 <div className="c-stat-lbl">{t('householdsReachedLabel')}</div>
               </div>
               <div className="c-stat-box box-purple">
-                <div className="c-stat-num">৳{summaryStats.totalRaisedBDT}</div>
+                <div className="c-stat-num">{summaryStats.totalRaisedBDT}</div>
                 <div className="c-stat-lbl">{t('totalRaisedBDTLabel')}</div>
               </div>
             </div>
